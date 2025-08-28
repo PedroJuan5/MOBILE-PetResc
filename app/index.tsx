@@ -3,28 +3,33 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
-const PRIMARY = "#2D68A6"; // azul do print
-const TEXT_MUTED = "#3A5C7A"; // tom mais frio para o subtítulo
+const { width, height } = Dimensions.get("window");
 
-const { width, height } = Dimensions.get("window"); // pega dimensões da tela
+// 🎨 Cores padrão
+const PRIMARY = "#2D68A6"; 
+const TEXT_MUTED = "#3A5C7A"; 
 
 export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
       <StatusBar style="dark" />
+      
       <View style={styles.container}>
-        {/* BLOCO CENTRAL (logo + textos centralizados) */}
+        {/* BLOCO CENTRAL */}
         <View style={styles.centerBlock}>
+          {/* Logo */}
           <Image
             source={require("../assets/LogoHome.png")}
             style={styles.logo}
             resizeMode="contain"
           />
 
+          {/* Textos */}
           <Text style={styles.subtitle}>Bem-vindo ao</Text>
+          <Text style={styles.title}>PetCo</Text>
         </View>
 
-        {/* BOTÃO FIXO NA PARTE INFERIOR */}
+        {/* BOTÃO */}
         <View style={styles.footer}>
           <Link href="/(tabs)/index" asChild>
             <Pressable style={styles.cta} android_ripple={{ foreground: true }}>
@@ -44,27 +49,33 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: width * 0.06, // padding proporcional
     justifyContent: "space-between",
   },
   centerBlock: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    transform: [{ translateY: -height * 0.1 }], // sobe 10% da altura da tela
+    transform: [{ translateY: -height * 0.05 }], // sobe 5% da tela
   },
   logo: {
-    width: width * 0.7, // 70% da largura da tela
-    height: width * 0.7, // mantém proporção quadrada
-    marginBottom: height * -0.1, // distancia logo e subtítulo proporcional
+    width: width * 1.9, // 55% da largura da tela
+    height: width * 1.0,
+    marginBottom: height * 0.02, // espaçamento proporcional
   },
   subtitle: {
-    fontSize: width * 0.05, // tamanho de fonte proporcional à tela
+    fontSize: width * 0.10, // responsivo
     color: TEXT_MUTED,
-    marginBottom: 3,
+    marginBottom: height * 0.002,
+  },
+  title: {
+    fontSize: width * 0.1, // responsivo
+    fontWeight: "800",
+    color: PRIMARY,
+    letterSpacing: 1,
   },
   footer: {
-    paddingBottom: 28,
+    paddingBottom: height * 0.035, // proporcional
     alignItems: "center",
   },
   cta: {
@@ -72,12 +83,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: PRIMARY,
-    paddingVertical: 14,
+    paddingVertical: height * 0.02,
     borderRadius: 14,
   },
   ctaText: {
     color: "#FFFFFF",
-    fontSize: 18,
+    fontSize: width * 0.05, // responsivo
     fontWeight: "600",
   },
 });
