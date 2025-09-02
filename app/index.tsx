@@ -5,33 +5,33 @@ import { StatusBar } from "expo-status-bar";
 
 const { width, height } = Dimensions.get("window");
 
-// 🎨 Cores padrão
-const PRIMARY = "#2D68A6"; 
-const TEXT_MUTED = "#3A5C7A"; 
+const PRIMARY = "#2D68A6";
+const TEXT_MUTED = "#3A5C7A";
+
+// Função util para limitar tamanhos
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max);
 
 export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
       <StatusBar style="dark" />
-      
       <View style={styles.container}>
         {/* BLOCO CENTRAL */}
         <View style={styles.centerBlock}>
-          {/* Logo */}
           <Image
             source={require("../assets/LogoHome.png")}
             style={styles.logo}
             resizeMode="contain"
           />
 
-          {/* Textos */}
           <Text style={styles.subtitle}>Bem-vindo ao</Text>
           <Text style={styles.title}>PetCo</Text>
         </View>
 
         {/* BOTÃO */}
         <View style={styles.footer}>
-          <Link href="/(tabs)/index" asChild>
+          <Link href="/(tabs)" asChild>
             <Pressable style={styles.cta} android_ripple={{ foreground: true }}>
               <Text style={styles.ctaText}>Comece já</Text>
             </Pressable>
@@ -49,46 +49,46 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingHorizontal: width * 0.06, // padding proporcional
+    paddingHorizontal: "6%",
     justifyContent: "space-between",
   },
   centerBlock: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    transform: [{ translateY: -height * 0.05 }], // sobe 5% da tela
   },
   logo: {
-    width: width * 1.9, // 55% da largura da tela
-    height: width * 1.0,
-    marginBottom: height * 0.02, // espaçamento proporcional
+    width: clamp(width * 1.8, 140, 300), // logo responsivo com limites
+    height: clamp(width * 0., 140, 260),
+    marginBottom: 12,
   },
   subtitle: {
-    fontSize: width * 0.10, // responsivo
+    fontSize: clamp(width * 0.04, 14, 18), // entre 14 e 18
     color: TEXT_MUTED,
-    marginBottom: height * 0.002,
+    marginTop: 4,
   },
   title: {
-    fontSize: width * 0.1, // responsivo
+    fontSize: clamp(width * 0.09, 28, 40), // entre 28 e 40
     fontWeight: "800",
     color: PRIMARY,
-    letterSpacing: 1,
+    marginTop: 2,
+    letterSpacing: 0.5,
   },
   footer: {
-    paddingBottom: height * 0.035, // proporcional
+    paddingBottom: "8%",
     alignItems: "center",
   },
   cta: {
-    width: "88%",
+    width: "90%",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: PRIMARY,
-    paddingVertical: height * 0.02,
+    paddingVertical: clamp(width * 0.035, 12, 18), // entre 12 e 18
     borderRadius: 14,
   },
   ctaText: {
     color: "#FFFFFF",
-    fontSize: width * 0.05, // responsivo
+    fontSize: clamp(width * 0.045, 16, 20), // entre 16 e 20
     fontWeight: "600",
   },
 });
