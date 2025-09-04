@@ -3,6 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
+
 const { width } = Dimensions.get("window");
 
 const PRIMARY = "#2D68A6";
@@ -30,14 +31,14 @@ export default function SignUpScreen() {
             </Pressable>
 
             {/* TÍTULO */}
-            <Text style={styles.title}>Vamos começar! 🚀</Text>
+            <Text style={styles.title}>Cadastra-se!</Text>
             <Text style={styles.subtitle}>
-              Crie sua conta para entrar no app e fazer parte dessa mudança.
+              Crie sua conta e ajude a tranformar vidas.
             </Text>
 
             {/* FORMULÁRIO */}
             <View style={styles.form}>
-              <Text style={styles.label}>Seu nome completo</Text>
+              <Text style={styles.label}>Nome completo</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Ex: Maria Silva"
@@ -64,7 +65,7 @@ export default function SignUpScreen() {
             {/* DIVISOR */}
             <View style={styles.dividerRow}>
               <View style={styles.divider} />
-              <Text style={styles.or}>ou continue com</Text>
+              <Text style={styles.or}>ou</Text>
               <View style={styles.divider} />
             </View>
 
@@ -107,6 +108,7 @@ export default function SignUpScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
+    
   );
 }
 
