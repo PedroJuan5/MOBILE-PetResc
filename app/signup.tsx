@@ -73,7 +73,7 @@ export default function SignUpScreen() {
             <View style={styles.socialRow}>
               <Pressable style={styles.socialButton}>
                 <Image
-                  source={require("../assets/google.png")}
+                source={require("../assets/google.png")}
                   style={styles.socialIcon}
                 />
               </Pressable>

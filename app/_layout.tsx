@@ -1,7 +1,7 @@
-// app/_layout.tsx
 import React from "react";
 import { Drawer } from "expo-router/drawer";
 import { Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet } from "react-native";
 
 export default function RootLayout() {
   return (
@@ -9,17 +9,15 @@ export default function RootLayout() {
       screenOptions={{
         headerShown: false,
         drawerStyle: { backgroundColor: "#F6FBFF", width: 260 },
-        drawerLabelStyle: { marginLeft: -10, fontSize: 15, fontWeight: "600" },
         drawerActiveTintColor: "#2D68A6",
         drawerInactiveTintColor: "#3A5C7A",
       }}
     >
-      {/* A rota '(tabs)' agora renderiza todo o seu Tab Navigator.
-        Isso é o que cria a conexão correta entre o menu lateral e as abas.
-      */}
+      {/* 1. Tela principal (grupo de abas) */}
       <Drawer.Screen
         name="(tabs)"
         options={{
+          href: null,
           drawerLabel: "Início",
           drawerIcon: ({ size, color }: { size: number; color: string }) => (
             <Ionicons name="home-outline" size={size} color={color} />
@@ -27,19 +25,41 @@ export default function RootLayout() {
         }}
       />
       
-      {/* Para outras telas que devem aparecer apenas no menu (sem abas),
-        elas devem ser colocadas na raiz da pasta 'app/' e referenciadas aqui.
-        Por exemplo, se você tem 'signup.tsx' na raiz, a rota seria 'signup'.w
-      */}
+      {/* 2. Tela de Cadastro com o estilo personalizado */}
       <Drawer.Screen
         name="signup"
         options={{
-          drawerLabel: "Cadastre-se",
-          drawerIcon: ({ size, color }: { size: number; color: string }) => (
+          drawerIcon: ({ focused, size, color }: { focused: boolean; size: number; color: string }) => (
             <Ionicons name="person-add-outline" size={size} color={color} />
           ),
+          drawerLabel: ({ focused, color }: { focused: boolean; color: string }) => (
+            <View style={styles.drawerLabelContainer}>
+              <Text style={[styles.drawerMainLabel, { color: focused ? '#2D68A6' : '#3A5C7A' }]}>
+                Cadastre-se
+              </Text>
+              <Text style={[styles.drawerSubLabel, { color: focused ? '#2D68A6' : '#3A5C7A' }]}>
+                Cadastre sua ONG
+              </Text>
+            </View>
+          ),
+          title: "Cadastro de Usuário/ONG",
         }}
       />
     </Drawer>
   );
 }
+
+const styles = StyleSheet.create({
+  drawerLabelContainer: {
+    marginLeft: -10,
+  },
+  drawerMainLabel: {
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  drawerSubLabel: {
+    fontSize: 12,
+    fontWeight: "400",
+    marginTop: 2,
+  },
+});
