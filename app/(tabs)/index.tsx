@@ -1,17 +1,8 @@
 // HomeScreen.tsx
 import React from "react";
-import {
-  SafeAreaView,
-  ScrollView,
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  StatusBar,
-} from "react-native";
+import {  SafeAreaView,ScrollView,View,Text,StyleSheet, Dimensions,TouchableOpacity,StatusBar,} from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
-
+import { useNavigation } from "expo-router";
 const { width, height } = Dimensions.get("window");
 
 // Funções de escala para responsividade
@@ -63,7 +54,9 @@ const featureData = [
 
 export default function HomeScreen() {
   const [adoptedCount] = React.useState(63); // exemplo de estado
+    const navigation = useNavigation();
 
+    
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
@@ -73,9 +66,11 @@ export default function HomeScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity accessibilityLabel="menu">
-            <Ionicons name="menu" size={moderateScale(26)} color={COLORS.primary} />
-          </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.push("menu")}>
+  <Ionicons name="menu" size={26} color={COLORS.primary} />
+</TouchableOpacity>
+
+
 
           <TouchableOpacity accessibilityLabel="perfil" style={styles.profileBtn}>
             <Ionicons
