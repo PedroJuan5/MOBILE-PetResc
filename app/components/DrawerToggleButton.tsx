@@ -1,19 +1,26 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "expo-router";
-import { TouchableOpacity, StyleSheet } from "react-native";
+import React from "react";
+import { TouchableOpacity, StyleProp, ViewStyle } from "react-native";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { useNavigation, DrawerActions } from "@react-navigation/native";
 
-export default function DrawerToggleButton() {
-  const navigation = useNavigation();
+interface Props {
+  style?: StyleProp<ViewStyle>;
+}
+
+export default function DrawerToggleButton({ style }: Props) {
+  const navigation = useNavigation<any>();
+
+  const handlePress = () => {
+    navigation.dispatch(DrawerActions.toggleDrawer());
+  };
 
   return (
-    <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
-      <Ionicons name="menu" size={26} color="#2D68A6" style={styles.icon} />
+    <TouchableOpacity
+      onPress={handlePress}
+      style={style}
+      accessibilityLabel="Abrir menu"
+    >
+      <FontAwesome5 name="bars" size={24} color="#2D68A6" />
     </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  icon: {
-    paddingHorizontal: 15,
-  },
-});
