@@ -17,7 +17,6 @@ export default function RootLayout() {
       <Drawer.Screen
         name="(tabs)"
         options={{
-          href: null,
           drawerLabel: "Início",
           drawerIcon: ({ size, color }: { size: number; color: string }) => (
             <Ionicons name="home-outline" size={size} color={color} />
