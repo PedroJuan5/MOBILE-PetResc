@@ -66,10 +66,7 @@ export default function HomeScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.push("menu")}>
-  <Ionicons name="menu" size={26} color={COLORS.primary} />
-</TouchableOpacity>
-
+        
 
 
           <TouchableOpacity accessibilityLabel="perfil" style={styles.profileBtn}>

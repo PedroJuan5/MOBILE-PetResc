@@ -1,22 +1,24 @@
-import React from "react";
+// app/_layout.tsx
 import { Drawer } from "expo-router/drawer";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text, StyleSheet } from "react-native";
+import DrawerToggleButton from '../components/DrawerToggleButton'; // IMPORTAÇÃO AQUI!
 
 export default function RootLayout() {
   return (
     <Drawer
       screenOptions={{
-        headerShown: false,
         drawerStyle: { backgroundColor: "#F6FBFF", width: 260 },
         drawerActiveTintColor: "#2D68A6",
         drawerInactiveTintColor: "#3A5C7A",
       }}
     >
-      {/* 1. Tela principal (grupo de abas) */}
       <Drawer.Screen
         name="(tabs)"
         options={{
+          headerShown: true,
+          title: "Início",
+          headerLeft: () => <DrawerToggleButton />, // USANDO O COMPONENTE AQUI!
           drawerLabel: "Início",
           drawerIcon: ({ size, color }: { size: number; color: string }) => (
             <Ionicons name="home-outline" size={size} color={color} />
@@ -24,10 +26,11 @@ export default function RootLayout() {
         }}
       />
       
-      {/* 2. Tela de Cadastro com o estilo personalizado */}
-      <Drawer.Screen
-        name="signup"
+      <Drawer.Screen 
+        name="signup" 
         options={{
+          headerShown: true,
+          headerLeft: () => <DrawerToggleButton />,
           drawerIcon: ({ focused, size, color }: { focused: boolean; size: number; color: string }) => (
             <Ionicons name="person-add-outline" size={size} color={color} />
           ),
@@ -44,6 +47,59 @@ export default function RootLayout() {
           title: "Cadastro de Usuário/ONG",
         }}
       />
+
+      <Drawer.Screen 
+        name="adotar" 
+        options={{
+          headerShown: true,
+          headerLeft: () => <DrawerToggleButton />,
+          drawerLabel: "Adotar",
+          title: "Adotar",
+          drawerIcon: ({ size, color }: { size: number; color: string }) => (
+            <Ionicons name="paw-outline" size={size} color={color} />
+          ),
+        }} 
+      />
+
+      <Drawer.Screen 
+        name="doar" 
+        options={{
+          headerShown: true,
+          headerLeft: () => <DrawerToggleButton />,
+          drawerLabel: "Doar",
+          title: "Doar",
+          drawerIcon: ({ size, color }: { size: number; color: string }) => (
+            <Ionicons name="gift-outline" size={size} color={color} />
+          ),
+        }} 
+      />
+
+      <Drawer.Screen 
+        name="voluntarios" 
+        options={{
+          headerShown: true,
+          headerLeft: () => <DrawerToggleButton />,
+          drawerLabel: "Voluntários",
+          title: "Voluntários",
+          drawerIcon: ({ size, color }: { size: number; color: string }) => (
+            <Ionicons name="people-outline" size={size} color={color} />
+          ),
+        }} 
+      />
+      
+      <Drawer.Screen 
+        name="registro-animal" 
+        options={{
+          headerShown: true,
+          headerLeft: () => <DrawerToggleButton />,
+          drawerLabel: "Registro de Animal",
+          title: "Registro de Animal",
+          drawerIcon: ({ size, color }: { size: number; color: string }) => (
+            <Ionicons name="add-circle-outline" size={size} color={color} />
+          ),
+        }} 
+      />
+
     </Drawer>
   );
 }
