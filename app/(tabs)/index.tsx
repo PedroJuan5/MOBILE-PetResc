@@ -10,7 +10,6 @@ import {
   StatusBar,
 } from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
-import DrawerToggleButton from "../components/DrawerToggleButton";
 
 // — Dimensões da tela e escalas de responsividade —
 const { width, height } = Dimensions.get("window");
@@ -18,33 +17,33 @@ const LARGURA_BASE = 375;
 const ALTURA_BASE = 812;
 
 const escalaHorizontal = (t: number) => (width / LARGURA_BASE) * t;
-const escalaVertical   = (t: number) => (height / ALTURA_BASE) * t;
-const escalaModerada   = (t: number, f = 0.5) =>
+const escalaVertical = (t: number) => (height / ALTURA_BASE) * t;
+const escalaModerada = (t: number, f = 0.5) =>
   t + (escalaHorizontal(t) - t) * f;
 
 // — Paleta de cores do app —
 const CORES = {
-  primaria:    "#2D68A6",
-  azulClaro:   "#E6F0FA",
-  fundoCard:   "#F6FBFF",
+  primaria: "#2D68A6",
+  azulClaro: "#E6F0FA",
+  fundoCard: "#F6FBFF",
   textoNeutro: "#3A5C7A",
-  bordaClaro:  "#D6EAF7",
-  pataClaro:   "#BFE1F7",
-  pataMaisClaro:"#CFE8FB",
+  bordaClaro: "#D6EAF7",
+  pataClaro: "#BFE1F7",
+  pataMaisClaro: "#CFE8FB",
 };
 
 // — Dados para os cards de funcionalidades e estatísticas —
 const funcionalidades = [
   {
-    icone:      "hand-holding-heart",
-    titulo:     "Faça sua doação",
+    icone: "hand-holding-heart",
+    titulo: "Faça sua doação",
     descricao:
       "Contribua com suprimentos ou recursos e ajude a transformar a vida de animais resgatados.",
     textoBotao: "Saiba mais",
   },
   {
-    icone:      "paw",
-    titulo:     "Adoções",
+    icone: "paw",
+    titulo: "Adoções",
     descricao:
       "Veja perfis de animais prontos para adoção e agende uma visita.",
     textoBotao: "Ver animais",
@@ -54,17 +53,17 @@ const funcionalidades = [
 const estatisticas = [
   { numero: 63, rotulo: "Animais adotados" },
   { numero: 12, rotulo: "ONGs parceiras" },
-  { numero: 8,  rotulo: "Campanhas realizadas" },
+  { numero: 8, rotulo: "Campanhas realizadas" },
 ];
 
 // — Componente principal da Home —
-export default function Home({ navigation }: any) {
+export default function Home() { // Remova a propriedade de navegação aqui
   return (
     <SafeAreaView style={styles.areaSegura}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-      {/* Cabeçalho: botão de menu + perfil */}
-      <View style={styles.cabecalho}>
+      {/* ✅ REMOVA O CABEÇALHO DAQUI! Ele agora está no _layout.tsx. */}
+      {/* <View style={styles.cabecalho}>
         <DrawerToggleButton style={styles.botaoMenu} />
         <TouchableOpacity
           style={styles.botaoPerfil}
@@ -77,7 +76,7 @@ export default function Home({ navigation }: any) {
             color={CORES.primaria}
           />
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       <ScrollView
         contentContainerStyle={styles.container}
@@ -103,7 +102,7 @@ export default function Home({ navigation }: any) {
           </View>
         </View>
 
-        {/* Seção: Nossa missão */}
+        {/* Seção: nossa missão */}
         <View style={styles.secao}>
           <Text style={styles.tituloSecao}>Nossa missão</Text>
           <View style={styles.caixaMissao}>

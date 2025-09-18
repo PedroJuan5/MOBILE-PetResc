@@ -1,7 +1,8 @@
+// app/components/DrawerToggleButton.tsx
 import React from "react";
 import { TouchableOpacity, StyleProp, ViewStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "expo-router";
+import { useRouter } from "expo-router";
 import { DrawerActions } from "@react-navigation/native";
 
 interface Props {
@@ -9,10 +10,10 @@ interface Props {
 }
 
 export default function DrawerToggleButton({ style }: Props) {
-  const navigation = useNavigation();
+  const router = useRouter();
 
   const handlePress = () => {
-    navigation.dispatch(DrawerActions.toggleDrawer());
+    router.dispatch(DrawerActions.toggleDrawer());
   };
 
   return (
