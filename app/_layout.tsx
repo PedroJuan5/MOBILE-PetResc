@@ -1,13 +1,13 @@
+import 'react-native-gesture-handler';
+
 import React from "react";
 import { Drawer } from "expo-router/drawer";
 import { Ionicons } from "@expo/vector-icons";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
-import DrawerToggleButton from "./components/DrawerToggleButton";
+
+// 1. Importe o novo componente que criamos
+import CustomHeaderRight from "./components/elementosDireita";
 
 export default function RootLayout() {
-  const router = useRouter();
-
   return (
     <Drawer
       screenOptions={{
@@ -15,6 +15,7 @@ export default function RootLayout() {
         drawerActiveTintColor: "#2D68A6",
         drawerInactiveTintColor: "#3A5C7A",
         headerShown: true,
+        headerTitleAlign: "center", // Adicionei isso para manter o título centralizado
       }}
     >
       <Drawer.Screen
@@ -24,28 +25,10 @@ export default function RootLayout() {
           drawerIcon: ({ size, color }) => (
             <Ionicons name="home-outline" size={size} color={color} />
           ),
-          headerLeft: () => <DrawerToggleButton />,
-          headerRight: () => (
-            <View style={styles.container}>
-              <TouchableOpacity
-                onPress={() => router.push("profile")}
-                style={styles.button}
-              >
-                <Ionicons
-                  name="person-circle-outline"
-                  size={28}
-                  color="#2D68A6"
-                />
-              </TouchableOpacity>
-              
-              <TouchableOpacity
-                onPress={() => router.push("signup")}
-                style={styles.button}
-              >
-                <Ionicons name="add-circle-outline" size={28} color="#2D68A6" />
-              </TouchableOpacity>
-            </View>
-          ),
+         
+          headerLeft: () => null,
+         
+          headerRight: () => <CustomHeaderRight />,
         }}
       />
       <Drawer.Screen
@@ -62,12 +45,4 @@ export default function RootLayout() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    marginRight: 15,
-  },
-  button: {
-    marginLeft: 15,
-  },
-});
+// O StyleSheet pode ser removido deste arquivo se não for mais usado aqui

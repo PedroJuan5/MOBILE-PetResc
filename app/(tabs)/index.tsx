@@ -202,6 +202,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: escalaModerada(18),
     paddingBottom: escalaVertical(40),
+     paddingTop: escalaVertical(40),
   },
   cabecalho: {
     marginTop: escalaVertical(3),
