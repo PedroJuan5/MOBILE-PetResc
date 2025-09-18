@@ -1,17 +1,8 @@
 import React from "react";
-import {
-  SafeAreaView,
-  ScrollView,
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  StatusBar,
-} from "react-native";
+import {SafeAreaView,ScrollView,View,Text, StyleSheet,Dimensions,TouchableOpacity,StatusBar,} from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 
-// — Dimensões da tela e escalas de responsividade —
+//dimensoes da tela e escalas de responsividade
 const { width, height } = Dimensions.get("window");
 const LARGURA_BASE = 375;
 const ALTURA_BASE = 812;
@@ -21,7 +12,7 @@ const escalaVertical = (t: number) => (height / ALTURA_BASE) * t;
 const escalaModerada = (t: number, f = 0.5) =>
   t + (escalaHorizontal(t) - t) * f;
 
-// — Paleta de cores do app —
+//paleta de cores da home
 const CORES = {
   primaria: "#2D68A6",
   azulClaro: "#E6F0FA",
@@ -32,7 +23,7 @@ const CORES = {
   pataMaisClaro: "#CFE8FB",
 };
 
-// — Dados para os cards de funcionalidades e estatísticas —
+//dados para os cards de funcionalidades e estatísticas
 const funcionalidades = [
   {
     icone: "hand-holding-heart",
@@ -56,33 +47,16 @@ const estatisticas = [
   { numero: 8, rotulo: "Campanhas realizadas" },
 ];
 
-// — Componente principal da Home —
-export default function Home() { // Remova a propriedade de navegação aqui
+//componente principal da Home 
+export default function Home() {
   return (
     <SafeAreaView style={styles.areaSegura}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-
-      {/* ✅ REMOVA O CABEÇALHO DAQUI! Ele agora está no _layout.tsx. */}
-      {/* <View style={styles.cabecalho}>
-        <DrawerToggleButton style={styles.botaoMenu} />
-        <TouchableOpacity
-          style={styles.botaoPerfil}
-          accessibilityLabel="Abrir perfil"
-          onPress={() => navigation.navigate("profile")}
-        >
-          <Ionicons
-            name="person-circle-outline"
-            size={escalaModerada(30)}
-            color={CORES.primaria}
-          />
-        </TouchableOpacity>
-      </View> */}
-
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        {/* Título principal e decoração */}
+        /* titulo principal e decoracao */
         <View style={styles.boxTitulo}>
           <Text style={styles.tituloPrincipal}>
             Conheça seu novo{"\n"}melhor amigo!
@@ -102,7 +76,7 @@ export default function Home() { // Remova a propriedade de navegação aqui
           </View>
         </View>
 
-        {/* Seção: nossa missão */}
+        /*secao:nossa missao*/
         <View style={styles.secao}>
           <Text style={styles.tituloSecao}>Nossa missão</Text>
           <View style={styles.caixaMissao}>
@@ -115,7 +89,7 @@ export default function Home() { // Remova a propriedade de navegação aqui
           </View>
         </View>
 
-        {/* Seção: Funcionalidades em destaque */}
+        /*seçao:funcionalidades em destaque*/
         <View style={styles.secao}>
           <Text style={styles.tituloSecao}>Funcionalidades em destaque</Text>
           <ScrollView
@@ -137,7 +111,7 @@ export default function Home() { // Remova a propriedade de navegação aqui
           </ScrollView>
         </View>
 
-        {/* Seção: Estatísticas */}
+        /* seçao:estatísticas */
         <View style={styles.secao}>
           <Text style={styles.tituloSecao}>Nossos marcos</Text>
           <ScrollView
@@ -160,7 +134,7 @@ export default function Home() { // Remova a propriedade de navegação aqui
   );
 }
 
-// — Componentes de cartão reutilizáveis —
+// componentes de cartão reutilizáveis 
 interface CartaoFuncProps {
   icone: string;
   titulo: string;

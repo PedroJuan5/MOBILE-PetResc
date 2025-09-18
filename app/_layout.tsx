@@ -37,6 +37,7 @@ export default function RootLayout() {
                   color="#2D68A6"
                 />
               </TouchableOpacity>
+              
               <TouchableOpacity
                 onPress={() => router.push("signup")}
                 style={styles.button}
