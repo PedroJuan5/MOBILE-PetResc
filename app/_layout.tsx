@@ -1,7 +1,7 @@
 import React from "react";
 import { Drawer } from "expo-router/drawer";
 import { Ionicons } from "@expo/vector-icons";
-import { View, Text, StyleSheet } from "react-native";
+import DrawerToggleButton from './components/DrawerToggleButton';
 
 export default function RootLayout() {
   return (
@@ -10,7 +10,7 @@ export default function RootLayout() {
         drawerStyle: { backgroundColor: "#F6FBFF", width: 260 },
         drawerActiveTintColor: "#2D68A6",
         drawerInactiveTintColor: "#3A5C7A",
-        headerShown: true,    
+        headerShown: true,
       }}
     >
       <Drawer.Screen
@@ -20,6 +20,7 @@ export default function RootLayout() {
           drawerIcon: ({ size, color }) => (
             <Ionicons name="home-outline" size={size} color={color} />
           ),
+          headerLeft: () => <DrawerToggleButton />,
         }}
       />
 
@@ -33,14 +34,6 @@ export default function RootLayout() {
           ),
         }}
       />
-
-      {/* adotar, doar, voluntarios, registro-animal */}
     </Drawer>
   );
 }
-
-const styles = StyleSheet.create({
-  drawerLabelContainer: { marginLeft: -10 },
-  drawerMainLabel:  { fontSize: 15, fontWeight: "600" },
-  drawerSubLabel:   { fontSize: 12, fontWeight: "400", marginTop: 2 },
-});

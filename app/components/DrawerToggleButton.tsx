@@ -1,14 +1,15 @@
 import React from "react";
 import { TouchableOpacity, StyleProp, ViewStyle } from "react-native";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { useNavigation, DrawerActions } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "expo-router";
+import { DrawerActions } from "@react-navigation/native";
 
 interface Props {
   style?: StyleProp<ViewStyle>;
 }
 
 export default function DrawerToggleButton({ style }: Props) {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation();
 
   const handlePress = () => {
     navigation.dispatch(DrawerActions.toggleDrawer());
@@ -20,7 +21,7 @@ export default function DrawerToggleButton({ style }: Props) {
       style={style}
       accessibilityLabel="Abrir menu"
     >
-      <FontAwesome5 name="bars" size={24} color="#2D68A6" />
+      <Ionicons name="menu" size={26} color="#2D68A6" />
     </TouchableOpacity>
   );
 }
