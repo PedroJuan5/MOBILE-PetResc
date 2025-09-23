@@ -23,7 +23,7 @@ const CORES = {
   pataMaisClaro: "#CFE8FB",
 };
 
-//dados para os cards de funcionalidades e estatísticas
+//dados para os cards de funcionalidades e estatisticas
 const funcionalidades = [
   {
     icone: "hand-holding-heart",
@@ -56,7 +56,7 @@ export default function Home() {
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        /* titulo principal e decoracao */
+        //titulo principal e decoracao 
         <View style={styles.boxTitulo}>
           <Text style={styles.tituloPrincipal}>
             Conheça seu novo{"\n"}melhor amigo!
@@ -76,7 +76,7 @@ export default function Home() {
           </View>
         </View>
 
-        /*secao:nossa missao*/
+        //secao:nossa missao
         <View style={styles.secao}>
           <Text style={styles.tituloSecao}>Nossa missão</Text>
           <View style={styles.caixaMissao}>
@@ -89,7 +89,7 @@ export default function Home() {
           </View>
         </View>
 
-        /*seçao:funcionalidades em destaque*/
+        /seçao:funcionalidades em destaque
         <View style={styles.secao}>
           <Text style={styles.tituloSecao}>Funcionalidades em destaque</Text>
           <ScrollView
@@ -111,7 +111,7 @@ export default function Home() {
           </ScrollView>
         </View>
 
-        /* seçao:estatísticas */
+        //seçao:estatisticas
         <View style={styles.secao}>
           <Text style={styles.tituloSecao}>Nossos marcos</Text>
           <ScrollView
@@ -193,7 +193,7 @@ function CartaoEstatistica({ numero, rotulo, ultimo }: CartaoEstProps) {
   );
 }
 
-// — Estilos da tela —
+//styles da tela
 const styles = StyleSheet.create({
   areaSegura: {
     flex: 1,

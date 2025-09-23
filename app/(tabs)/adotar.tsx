@@ -1,4 +1,3 @@
-// App.js
 import React from "react";
 import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,7 +14,7 @@ const pets = [
 export default function App() {
   return (
     <View style={styles.container}>
-      {/* Header */}
+      //Header
       <View style={styles.header}>
         <Ionicons name="menu" size={28} color="#1f5fa3" />
         <Ionicons name="notifications-outline" size={28} color="#1f5fa3" />
@@ -27,7 +26,7 @@ export default function App() {
         <Ionicons name="options-outline" size={22} color="#1f5fa3" />
       </View>
 
-      {/* Lista de pets */}
+   //Lista de pets
       <FlatList
         data={pets}
         keyExtractor={(item) => item.id}
