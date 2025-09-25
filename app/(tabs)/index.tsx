@@ -89,7 +89,7 @@ export default function Home() {
           </View>
         </View>
 
-        /seçao:funcionalidades em destaque
+        //seçao:funcionalidades em destaque
         <View style={styles.secao}>
           <Text style={styles.tituloSecao}>Funcionalidades em destaque</Text>
           <ScrollView

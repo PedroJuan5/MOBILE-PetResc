@@ -11,7 +11,7 @@ export default function CustomHeaderRight() {
     <View style={styles.container}>
     
       <TouchableOpacity
-        onPress={() => router.push("/(tabs)/profile")} 
+        onPress={() => router.push("/perfil")} 
         style={styles.button}
       >
         <Ionicons name="person-circle-outline" size={30} color="#2D68A6" />

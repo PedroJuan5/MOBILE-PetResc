@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 export default function Profile() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Página de Perfil</Text>
+      <Text style={styles.text}>Página de Configurações</Text>
     </View>
   );
 }
