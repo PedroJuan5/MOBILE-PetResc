@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from 'react-native';
 import { Stack } from 'expo-router/stack';
 
-// seus componentes de cabeçalho
+//componentes de cabeçalho
 import CustomHeaderLeft from "./components/elementosEsquerda";
 import CustomHeaderRight from "./components/elementosDireita";
 
