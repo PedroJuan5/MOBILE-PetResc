@@ -2,12 +2,14 @@ import { AntDesign } from "@expo/vector-icons"; // ícones do expo/vector-icons
 import React from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
+
+
 export default function CadastroScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
       <TouchableOpacity style={styles.backButton}>
-        <AntDesign className="arrowleft" size={24} color="#fff" />
+        <AntDesign name="arrow-left" size={24} color="#ffffffff" />
       </TouchableOpacity>
       <Text style={styles.title}>Cadastre-se</Text>
       <Text style={styles.subtitle}>Crie sua conta e ajude a transformar vidas.</Text>
@@ -48,8 +50,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
    backgroundColor: '#1c5b8f',
-    paddingTop: 20,
+    paddingTop:15,
+    
   },
+
   backButton: {
     marginLeft: 20,
     marginBottom: 10,
@@ -60,14 +64,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 5,
     backgroundColor: '#1c5b8f',
-    padding: 10,
+    padding: 5,
     borderRadius: 8,
     textAlign: 'center',
   },
   subtitle: {
     color: '#e5e5e5',
     fontSize: 14,
-    marginBottom: 30,
+    marginBottom: 50,
     backgroundColor: '#1c5b8f',
     padding: 10,
     borderRadius: 8,
@@ -76,11 +80,13 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: '#e8edf1ff',
     borderRadius: 8,
-    padding: 12,
-    marginBottom: 15,
+    padding: 15,
+    marginBottom: 35,
     fontSize: 16,
     marginHorizontal: 20,
-    color: "#fff"
+    color: "#000000ff",
+    
+    
   },
   dividerContainer: {
     flexDirection: 'row',
@@ -91,8 +97,9 @@ const styles = StyleSheet.create({
   },
   line: {
     flex: 1,
-    height: 1,
-   backgroundColor: '#1c5b8f'
+    height: 2,
+   backgroundColor: '#b3bac0ff',
+   marginBottom: 10,
   },
   orText: {
     marginHorizontal: 10,
@@ -103,14 +110,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 15,
-    marginBottom: 30,
-    backgroundColor: "#ffffffff"
+    backgroundColor: "#1c5b8f",
+    
   },
   socialButton: {
     backgroundColor: '#ffffffff',
     borderRadius: 25,
-    padding: 12,
-    elevation: 3,
+    padding: 15,
+    
     marginHorizontal: 5,
   },
   bottomCard: {
@@ -119,14 +126,16 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 25,
     padding: 20,
     justifyContent: 'flex-start',
-    marginTop: 120,
+    marginTop: 20,
+    height: '40%',
   },
   nextButton: {
     backgroundColor: '#1c5b8f',
     padding: 15,
     borderRadius: 12,
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 25,
+    
   },
   nextButtonText: {
     color: '#fff',
@@ -137,7 +146,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
     color: '#666',
-    marginBottom: 10,
+    marginBottom: 30,
   },
   loginLink: {
     color: '#1c5b8f',
