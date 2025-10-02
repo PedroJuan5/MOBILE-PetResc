@@ -1,44 +1,53 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useRouter, useSegments } from 'expo-router';
-import { Href } from 'expo-router/build/link/href';
+import { Href } from 'expo-router';
 
-const AuthContext = createContext(null);
+// Define o "formato" dos nossos dados para o TypeScript
+interface Session { id: string; }
+interface AuthContextData {
+  session: Session | null;
+  signIn: () => void;
+  signOut: () => void;
+  isLoading: boolean;
+}
+
+const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export function useAuth() {
   return useContext(AuthContext);
 }
 
-export function AuthProvider({ children }) {
-  const [session, setSession] = useState(null);
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const segments = useSegments();
 
   useEffect(() => {
-    // Aqui você verificaria o AsyncStorage por um token salvo
-    // Por enquanto, vamos começar como deslogado
+    // Aqui é onde, no futuro, você verificaria se o usuário já tem um login salvo no celular
     setIsLoading(false);
   }, []);
 
   useEffect(() => {
     if (isLoading) return;
-
-    // MUDANÇA 1: Adicionamos uma verificação para garantir que 'segments' não está vazio
     const inAppGroup = segments.length > 0 && segments[0] === '(app)';
 
     if (session && !inAppGroup) {
-      // MUDANÇA 2: Passamos a rota como um objeto para segurança de tipo
-      router.replace('/(app)/(tabs)/' as Href);
+      // Se o usuário está LOGADO e NÃO está na área privada, nós o levamos para a home.
+      router.replace('/home' as Href); 
     } else if (!session && inAppGroup) {
-      // MUDANÇA 3: Passamos a rota como um objeto para segurança de tipo
-      router.replace('/login' as Href);
+      // Se o usuário NÃO está logado e TENTA acessar a área privada, nós o levamos para a tela de entrada.
+      router.replace('/' as Href); 
     }
   }, [session, segments, isLoading]);
 
+  // Função para simular o login
   const signIn = () => {
     setSession({ id: '123' });
+    router.replace('/home' as Href);
   };
 
+  // Função para fazer o logout
   const signOut = () => {
     setSession(null);
   };
