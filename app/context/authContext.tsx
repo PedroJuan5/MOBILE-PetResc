@@ -1,42 +1,48 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useRouter, useSegments } from 'expo-router';
-import { Href } from 'expo-router/build/link/href';
+import { Href } from 'expo-router';
 
-const AuthContext = createContext(null);
+// Tipos
+interface Session { id: string; }
+interface AuthContextData {
+  session: Session | null;
+  signIn: () => void;
+  signOut: () => void;
+  isLoading: boolean;
+}
+
+const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export function useAuth() {
   return useContext(AuthContext);
 }
 
-export function AuthProvider({ children }) {
-  const [session, setSession] = useState(null);
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const segments = useSegments();
 
   useEffect(() => {
-    // Aqui você verificaria o AsyncStorage por um token salvo
-    // Por enquanto, vamos começar como deslogado
     setIsLoading(false);
   }, []);
 
   useEffect(() => {
     if (isLoading) return;
 
-    // MUDANÇA 1: Adicionamos uma verificação para garantir que 'segments' não está vazio
+    // Esta é a linha em questão, escrita da forma mais segura e explícita possível.
     const inAppGroup = segments.length > 0 && segments[0] === '(app)';
 
     if (session && !inAppGroup) {
-      // MUDANÇA 2: Passamos a rota como um objeto para segurança de tipo
-      router.replace('/(app)/(tabs)/' as Href);
+      router.replace('/home' as Href); 
     } else if (!session && inAppGroup) {
-      // MUDANÇA 3: Passamos a rota como um objeto para segurança de tipo
-      router.replace('/login' as Href);
+      router.replace('/' as Href); 
     }
   }, [session, segments, isLoading]);
 
   const signIn = () => {
     setSession({ id: '123' });
+    router.replace('/home' as Href);
   };
 
   const signOut = () => {
