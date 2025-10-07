@@ -1,9 +1,14 @@
-
 import React from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export const DenuncieModal = ({ visible, onClose }) => {
+// Define os "tipos" das propriedades que o modal vai receber
+interface DenuncieModalProps {
+  visible: boolean;
+  onClose: () => void; // onClose é uma função
+}
+
+export const DenuncieModal = ({ visible, onClose }: DenuncieModalProps) => {
   return (
     <Modal
       animationType="fade"
@@ -16,7 +21,7 @@ export const DenuncieModal = ({ visible, onClose }) => {
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <Ionicons name="close-circle" size={30} color="#ccc" />
           </TouchableOpacity>
-
+          
           <Text style={styles.modalTitle}>Denuncie!</Text>
           <Text style={styles.modalSubtitle}>Sua atitude é a voz de quem não pode falar.</Text>
 
@@ -45,14 +50,68 @@ export const DenuncieModal = ({ visible, onClose }) => {
 };
 
 const styles = StyleSheet.create({
-  centeredView: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' },
-  modalView: { width: '85%', backgroundColor: 'white', borderRadius: 20, padding: 35, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 },
-  closeButton: { position: 'absolute', top: 10, right: 10 },
-  modalTitle: { fontSize: 24, fontWeight: 'bold', color: '#2D68A6', marginBottom: 10 },
-  modalSubtitle: { fontSize: 14, color: '#3A5C7A', textAlign: 'center', marginBottom: 30 },
-  infoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 15, width: '100%' },
-  infoText: { marginLeft: 10, fontSize: 16, color: '#3A5C7A', flex: 1 },
-  boldText: { fontWeight: 'bold' },
-  orText: { fontSize: 14, color: '#3A5C7A', marginVertical: 10 },
-  finalText: { fontSize: 16, color: '#3A5C7A', textAlign: 'center', marginTop: 10 },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    width: '85%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#2D68A6',
+    marginBottom: 10,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: '#3A5C7A',
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+    width: '100%',
+  },
+  infoText: {
+    marginLeft: 10,
+    fontSize: 16,
+    color: '#3A5C7A',
+    flex: 1,
+  },
+  boldText: {
+    fontWeight: 'bold',
+  },
+  orText: {
+    fontSize: 14,
+    color: '#3A5C7A',
+    marginVertical: 10,
+  },
+  finalText: {
+    fontSize: 16,
+    color: '#3A5C7A',
+    textAlign: 'center',
+    marginTop: 10,
+  },
 });

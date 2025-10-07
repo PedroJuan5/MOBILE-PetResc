@@ -1,333 +1,160 @@
-import React from "react";
-import {SafeAreaView,ScrollView,View,Text, StyleSheet,Dimensions,TouchableOpacity,StatusBar,} from "react-native";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+// Arquivo: app/(auth)/index.tsx
+import React, { useState, useLayoutEffect } from 'react';
+import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { useNavigation, useRouter } from 'expo-router';
+import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { DenuncieModal } from '../../components/denuncieModal';
 
-//dimensoes da tela e escalas de responsividade
-const { width, height } = Dimensions.get("window");
-const LARGURA_BASE = 375;
-const ALTURA_BASE = 812;
+// --- Componentes Reutilizáveis para esta tela ---
 
-const escalaHorizontal = (t: number) => (width / LARGURA_BASE) * t;
-const escalaVertical = (t: number) => (height / ALTURA_BASE) * t;
-const escalaModerada = (t: number, f = 0.5) =>
-  t + (escalaHorizontal(t) - t) * f;
+const FeatureCard = ({ icon, title, description }: { icon: string, title: string, description: string }) => (
+  <View style={styles.featureCard}>
+    <View style={styles.featureIconContainer}>
+      <FontAwesome5 name={icon} size={24} color="#2D68A6" />
+    </View>
+    <Text style={styles.featureTitle}>{title}</Text>
+    <Text style={styles.featureDescription}>{description}</Text>
+    <TouchableOpacity>
+      <Text style={styles.featureLink}>Saiba mais</Text>
+    </TouchableOpacity>
+  </View>
+);
 
-//paleta de cores da home
-const CORES = {
-  primaria: "#2D68A6",
-  azulClaro: "#E6F0FA",
-  fundoCard: "#F6FBFF",
-  textoNeutro: "#3A5C7A",
-  bordaClaro: "#D6EAF7",
-  pataClaro: "#BFE1F7",
-  pataMaisClaro: "#CFE8FB",
-};
+const StatCard = ({ value, label }: { value: string, label: string }) => (
+  <View style={styles.statCard}>
+    <Text style={styles.statValue}>{value}</Text>
+    <Text style={styles.statLabel}>{label}</Text>
+  </View>
+);
 
-//dados para os cards de funcionalidades e estatisticas
-const funcionalidades = [
-  {
-    icone: "hand-holding-heart",
-    titulo: "Faça sua doação",
-    descricao:
-      "Contribua com suprimentos ou recursos e ajude a transformar a vida de animais resgatados.",
-    textoBotao: "Saiba mais",
-  },
-  {
-    icone: "paw",
-    titulo: "Adoções",
-    descricao:
-      "Veja perfis de animais prontos para adoção e agende uma visita.",
-    textoBotao: "Ver animais",
-  },
-];
 
-const estatisticas = [
-  { numero: 63, rotulo: "Animais adotados" },
-  { numero: 12, rotulo: "ONGs parceiras" },
-  { numero: 8, rotulo: "Campanhas realizadas" },
-];
+// --- Componente Principal da Tela de Entrada Pública ---
+export default function PublicIndex() {
+  const [isModalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation();
+  const router = useRouter();
 
-//componente principal da Home 
-export default function Home() {
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: true,
+      headerTransparent: true,
+      headerTitle: '',
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => setModalVisible(true)} style={{ marginLeft: 20 }}>
+          <Ionicons name="alert-circle-outline" size={28} color="#2D68A6" />
+        </TouchableOpacity>
+      ),
+      headerRight: () => (
+        <TouchableOpacity onPress={() => router.push('/signup')} style={{ marginRight: 20 }}>
+          <Ionicons name="person-add-outline" size={28} color="#2D68A6" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
   return (
-    <SafeAreaView style={styles.areaSegura}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      <ScrollView
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}
-      >
-        {/*titulo principal e decoracao */}
-        <View style={styles.boxTitulo}>
-          <Text style={styles.tituloPrincipal}>
-            Conheça seu novo{"\n"}melhor amigo!
-          </Text>
-          <View style={styles.decoracaoPatas}>
-            <FontAwesome5
-              name="paw"
-              size={escalaModerada(18)}
-              color={CORES.pataClaro}
-            />
-            <FontAwesome5
-              name="paw"
-              size={escalaModerada(12)}
-              color={CORES.pataMaisClaro}
-              style={{ marginLeft: escalaModerada(8), opacity: 0.6 }}
-            />
+    <SafeAreaView style={styles.safeArea}>
+      <DenuncieModal visible={isModalVisible} onClose={() => setModalVisible(false)} />
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.container}>
+          
+          <View style={styles.headerTitle}>
+            <Text style={styles.title}>Conheça seu novo melhor amigo!</Text>
+            <View style={styles.paws}><FontAwesome5 name="paw" size={18} color="#BFE1F7" /></View>
           </View>
-        </View>
 
-        {/*secao:nossa missao*/}
-        <View style={styles.secao}>
-          <Text style={styles.tituloSecao}>Nossa missão</Text>
-          <View style={styles.caixaMissao}>
-            <Text style={styles.textoMissao}>
-              Nosso objetivo é otimizar a gestão das organizações, dar mais
-              visibilidade aos animais em situação de vulnerabilidade e
-              incentivar a participação social, ajudando a reduzir o abandono
-              e promovendo a adoção responsável.
-            </Text>
+          <Text style={styles.sectionTitle}>Nossa missão</Text>
+          <View style={styles.missionBox}>
+              <Text style={styles.missionText}>
+                Nosso objetivo é otimizar a gestão das organizações, dar mais visibilidade aos animais em situação de vulnerabilidade e incentivar a participação social, ajudando a reduzir o abandono e promovendo a adoção responsável.
+              </Text>
           </View>
-        </View>
 
-        {/*seçao:funcionalidades em destaque*/}
-        <View style={styles.secao}>
-          <Text style={styles.tituloSecao}>Funcionalidades em destaque</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.listaFuncionalidades}
-          >
-            {funcionalidades.map((item, idx) => (
-              <CartaoFuncionalidade
-                key={idx}
-                icone={item.icone}
-                titulo={item.titulo}
-                descricao={item.descricao}
-                textoBotao={item.textoBotao}
-                ultimo={idx === funcionalidades.length - 1}
-                onPress={() => console.log("Navegar para", item.titulo)}
-              />
-            ))}
+          <Text style={styles.sectionTitle}>Funcionalidades em destaque</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingVertical: 30 }}>
+            <FeatureCard icon="bone" title="Faça sua doação" description="Contribua com suprimentos ou recursos e ajude a transformar a vida de animais resgatados." />
+            <FeatureCard icon="hand-holding-heart" title="Seja voluntário" description="Doe seu tempo e talento para cuidar dos animais, ajudar em eventos e muito mais." />
+            <FeatureCard icon="paw" title="Adote um amigo" description="Encontre seu companheiro ideal e dê a ele um lar amoroso e seguro para sempre." />
           </ScrollView>
-        </View>
 
-  
-        <View style={styles.secao}>
-          <Text style={styles.tituloSecao}>Nossos marcos</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.listaEstatisticas}
-          >
-            {estatisticas.map((item, idx) => (
-              <CartaoEstatistica
-                key={idx}
-                numero={item.numero}
-                rotulo={item.rotulo}
-                ultimo={idx === estatisticas.length - 1}
-              />
-            ))}
+          <Text style={styles.sectionTitle}>Nossos marcos</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <StatCard value="63" label="Animais adotados" />
+            <StatCard value="12" label="ONGs parceiras" />
+            <StatCard value="25" label="Campanhas" />
           </ScrollView>
+
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-// componentes de cartão reutilizáveis 
-interface CartaoFuncProps {
-  icone: string;
-  titulo: string;
-  descricao: string;
-  textoBotao: string;
-  ultimo: boolean;
-  onPress: () => void;
-}
-function CartaoFuncionalidade({
-  icone,
-  titulo,
-  descricao,
-  textoBotao,
-  ultimo,
-  onPress,
-}: CartaoFuncProps) {
-  return (
-    <View
-      style={[
-        styles.cardFuncionalidade,
-        { marginRight: ultimo ? 0 : escalaModerada(12) },
-      ]}
-    >
-      <View style={styles.iconeCard}>
-        <FontAwesome5
-          name={icone}
-          size={escalaModerada(18)}
-          color={CORES.primaria}
-        />
-      </View>
-      <Text style={styles.tituloCard}>{titulo}</Text>
-      <Text style={styles.descricaoCard}>{descricao}</Text>
-      <TouchableOpacity style={styles.botaoLink} onPress={onPress}>
-        <Text style={styles.textoLink}>{textoBotao}</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
-
-interface CartaoEstProps {
-  numero: number;
-  rotulo: string;
-  ultimo: boolean;
-}
-function CartaoEstatistica({ numero, rotulo, ultimo }: CartaoEstProps) {
-  return (
-    <View
-      style={[
-        styles.cardEstatistica,
-        { marginRight: ultimo ? 0 : escalaModerada(10) },
-      ]}
-    >
-      <Text style={styles.numeroEstatistica}>{numero}</Text>
-      <Text style={styles.rotuloEstatistica}>{rotulo}</Text>
-    </View>
-  );
-}
-
-//styles da tela
+// --- ESTILOS ATUALIZADOS ---
 const styles = StyleSheet.create({
-  areaSegura: {
-    flex: 1,
-    backgroundColor: "#fff",
+  safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
+  container: { paddingHorizontal: 20 },
+  headerTitle: { paddingTop: 80, marginBottom: 30, position: 'relative' },
+  title: { fontSize: 36, fontWeight: 'bold', color: '#2D68A6', width: '80%' },
+  paws: { position: 'absolute', right: 10, top: 80 },
+  sectionTitle: { fontSize: 20, fontWeight: '600', color: '#3A5C7A', marginBottom: 5 },
+  missionBox: { backgroundColor: '#E6F0FA', padding: 25, borderRadius: 20, marginBottom: 30 },
+  missionText: { fontSize: 16, color: '#3A5C7A', lineHeight: 24, textAlign: 'center' },
+  
+  // Estilos atualizados para os cards de funcionalidade
+  featureCard: {
+    width: 200,
+    marginTop: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#BFE1F7',
+    borderStyle: 'dashed', // Borda pontilhada
+    padding: 20,
+    paddingTop: 40, // Mais espaço no topo para o ícone
+    marginRight: 20,
+    alignItems: 'center',
   },
-  container: {
-    paddingHorizontal: escalaModerada(18),
-    paddingBottom: escalaVertical(40),
-     paddingTop: escalaVertical(40),
+  featureIconContainer: {
+    position: 'absolute', // Posição absoluta para "flutuar"
+    top: -30, // Puxa o ícone para cima, para fora do card
+    backgroundColor: 'white', // Fundo branco para cobrir a linha pontilhada
+    borderRadius: 30,
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // Adiciona a mesma borda pontilhada ao redor do ícone
+    borderWidth: 2,
+    borderColor: '#BFE1F7',
+    borderStyle: 'dashed',
   },
-  cabecalho: {
-    marginTop: escalaVertical(3),
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: escalaModerada(18),
+  featureTitle: { fontSize: 18, fontWeight: 'bold', color: '#2D68A6', marginBottom: 10 },
+  featureDescription: { fontSize: 14, color: '#3A5C7A', textAlign: 'center', lineHeight: 20, marginBottom: 15 },
+  featureLink: { fontSize: 14, color: '#A0A0A0', fontWeight: '500' },
+
+  // Estilos atualizados para os cards de marcos
+  statCard: {
+    backgroundColor: '#E6F0FA',
+    borderRadius: 20,
+    paddingVertical: 20,
+    alignItems: 'center',
+    width: 150, // Um pouco mais largo
+    height: 150, // Altura fixa para ficarem iguais
+    marginRight: 15,
+    marginBottom: 30,
+    justifyContent: 'center', // Centraliza o conteúdo
   },
-  botaoMenu: {
-    padding: escalaModerada(6),
+  statValue: {
+    fontSize: 64, // Número bem maior
+    fontWeight: '300', // Fonte mais fina e moderna
+    color: '#2D68A6',
   },
-  botaoPerfil: {
-    padding: escalaModerada(6),
-  },
-  boxTitulo: {
-    marginTop: escalaVertical(14),
-    marginBottom: escalaVertical(8),
-    position: "relative",
-  },
-  tituloPrincipal: {
-    fontSize: escalaModerada(26),
-    fontWeight: "700",
-    color: CORES.primaria,
-    lineHeight: escalaModerada(36),
-  },
-  decoracaoPatas: {
-    position: "absolute",
-    right: 0,
-    top: 0,
-    flexDirection: "row",
-  },
-  secao: {
-    marginTop: escalaVertical(18),
-  },
-  tituloSecao: {
-    fontSize: escalaModerada(14),
-    fontWeight: "600",
-    color: CORES.textoNeutro,
-    marginBottom: escalaVertical(8),
-  },
-  caixaMissao: {
-    backgroundColor: CORES.azulClaro,
-    borderRadius: escalaModerada(12),
-    padding: escalaModerada(14),
-    borderWidth: 1,
-    borderColor: CORES.bordaClaro,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  textoMissao: {
-    fontSize: escalaModerada(13),
-    lineHeight: escalaModerada(18),
-    color: CORES.textoNeutro,
-  },
-  listaFuncionalidades: {
-    paddingVertical: escalaVertical(6),
-    paddingLeft: escalaModerada(10),
-  },
-  cardFuncionalidade: {
-    width: Math.min(width * 0.8, escalaModerada(300)),
-    backgroundColor: CORES.fundoCard,
-    borderRadius: escalaModerada(12),
-    padding: escalaModerada(14),
-    borderWidth: 1,
-    borderColor: CORES.bordaClaro,
-  },
-  iconeCard: {
-    width: escalaModerada(36),
-    height: escalaModerada(36),
-    borderRadius: escalaModerada(10),
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: escalaVertical(8),
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 1,
-  },
-  tituloCard: {
-    fontSize: escalaModerada(16),
-    fontWeight: "700",
-    color: CORES.primaria,
-    marginBottom: escalaVertical(6),
-  },
-  descricaoCard: {
-    fontSize: escalaModerada(12),
-    color: CORES.textoNeutro,
-    marginBottom: escalaVertical(10),
-  },
-  botaoLink: {
-    alignSelf: "flex-start",
-    paddingVertical: escalaModerada(6),
-  },
-  textoLink: {
-    fontSize: escalaModerada(13),
-    color: CORES.primaria,
-    fontWeight: "600",
-  },
-  listaEstatisticas: {
-    paddingLeft: escalaModerada(10),
-    paddingVertical: escalaVertical(6),
-  },
-  cardEstatistica: {
-    width: Math.min(width * 0.4, escalaModerada(140)),
-    backgroundColor: CORES.azulClaro,
-    paddingVertical: escalaVertical(18),
-    borderRadius: escalaModerada(12),
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: CORES.bordaClaro,
-  },
-  numeroEstatistica: {
-    fontSize: escalaModerada(34),
-    fontWeight: "700",
-    color: CORES.primaria,
-  },
-  rotuloEstatistica: {
-    fontSize: escalaModerada(12),
-    color: CORES.textoNeutro,
-    marginTop: escalaVertical(6),
+  statLabel: {
+    fontSize: 16, // Rótulo um pouco maior
+    color: '#3A5C7A',
+    marginTop: 5,
+    textAlign: 'center',
   },
 });
