@@ -1,12 +1,11 @@
 // Arquivo: app/(auth)/index.tsx
-import React, { useState, useLayoutEffect } from 'react';
-import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRouter } from 'expo-router';
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import React, { useLayoutEffect, useState } from 'react';
+import { Modal, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { DenuncieModal } from '../components/denuncieModal';
 
 // --- Componentes Reutilizáveis para esta tela ---
-
 const FeatureCard = ({ icon, title, description }: { icon: string, title: string, description: string }) => (
   <View style={styles.featureCard}>
     <View style={styles.featureIconContainer}>
@@ -27,10 +26,10 @@ const StatCard = ({ value, label }: { value: string, label: string }) => (
   </View>
 );
 
-
 // --- Componente Principal da Tela de Entrada Pública ---
 export default function PublicIndex() {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [signupModalVisible, setSignupModalVisible] = useState(false);
   const navigation = useNavigation();
   const router = useRouter();
 
@@ -45,7 +44,7 @@ export default function PublicIndex() {
         </TouchableOpacity>
       ),
       headerRight: () => (
-        <TouchableOpacity onPress={() => router.push('/signup')} style={{ marginRight: 20 }}>
+        <TouchableOpacity onPress={() => setSignupModalVisible(true)} style={{ marginRight: 20 }}>
           <Ionicons name="person-add-outline" size={28} color="#2D68A6" />
         </TouchableOpacity>
       ),
@@ -56,9 +55,50 @@ export default function PublicIndex() {
     <SafeAreaView style={styles.safeArea}>
       <DenuncieModal visible={isModalVisible} onClose={() => setModalVisible(false)} />
 
+      {/* Modal de escolha de cadastro */}
+      <Modal
+        visible={signupModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSignupModalVisible(false)}
+      >
+        <TouchableOpacity style={styles.overlay} activeOpacity={1} onPressOut={() => setSignupModalVisible(false)}>
+          <View style={styles.popup}>
+            <Text style={styles.popupTitle}>Cadastrar-se como:</Text>
+
+            <TouchableOpacity
+              style={styles.option}
+              onPress={() => {
+                setSignupModalVisible(false);
+                router.push('/signup'); // rota de cadastro de usuário
+              }}
+            >
+              <Ionicons name="person-outline" size={20} color="#2D68A6" />
+              <Text style={styles.optionText}>Usuário</Text>
+            </TouchableOpacity>
+
+            <View style={styles.dividerLine} />
+
+            <TouchableOpacity
+              style={styles.option}
+              onPress={() => {
+                setSignupModalVisible(false);
+                (router as any).push('/signup-ong'); // rota de cadastro de ONG (crie essa rota se necessário)
+              }}
+            >
+              <Ionicons name="paw-outline" size={20} color="#2D68A6" />
+              <Text style={styles.optionText}>ONG</Text>
+            </TouchableOpacity>
+              <View style={styles.dividerLine2} />
+            <TouchableOpacity style={{ marginTop: 12 }} onPress={() => setSignupModalVisible(false)}>
+              <Text style={{ color: '#1c5b8f' }}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
-          
           <View style={styles.headerTitle}>
             <Text style={styles.title}>Conheça seu novo melhor amigo!</Text>
             <View style={styles.paws}><FontAwesome5 name="paw" size={18} color="#BFE1F7" /></View>
@@ -157,4 +197,51 @@ const styles = StyleSheet.create({
     marginTop: 5,
     textAlign: 'center',
   },
+  // estilos do popup/modal de cadastro
+  overlay: { 
+    flex: 1, 
+    justifyContent: 'center',
+     alignItems: 'center', 
+     backgroundColor: 'rgba(0,0,0,0.3)' },
+
+  popup: {
+     backgroundColor: '#fff', 
+     borderRadius: 12, 
+     padding: 20, 
+     width: 300, 
+     alignItems: 'center' 
+    },
+  popupTitle: { 
+    fontSize: 18, 
+    fontWeight: '700', 
+    color: '#2D68A6',
+     marginBottom: 12
+     },
+   option: {
+     flexDirection: 'row', 
+     alignItems: 'center',
+     padding: 10,
+     width: '100%',
+     borderRadius: 8,
+     marginBottom: 8
+    },
+  optionText: { 
+    marginLeft: 8, 
+    fontSize: 16,
+    color: '#2D68A6', 
+    fontWeight: '600'
+   },
+  dividerLine: { 
+    height: 1,
+     backgroundColor: '#E6F0FA',
+     width: '80%',
+      marginVertical: 8
+     },
+   dividerLine2: {
+     height: 2, 
+     backgroundColor: '#eaf0f7ff',
+      width: '100%', 
+      marginVertical: 8 
+    },
+   
 });

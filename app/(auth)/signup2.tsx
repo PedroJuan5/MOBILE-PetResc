@@ -31,7 +31,7 @@ export default function CadastroScreen() {
           <Text style={styles.nextButtonText}>Finalizar cadastro</Text>
         </TouchableOpacity>
         <Text style={styles.loginText}>
-          Já tem conta? <Text style={styles.loginLink}>Loginm</Text>
+          Já tem conta? <Text style={styles.loginLink}>Login</Text>
         </Text>
         <View style={styles.indicatorContainer}>
           <View style={[styles.indicator, { backgroundColor: '#2563eb' }]} />
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     height: '40%',
   },
   nextButton: {
-    backgroundColor: '#1c5b8f',
+    backgroundColor: '#94B9D8',
     padding: 15,
     borderRadius: 12,
     alignItems: 'center',
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     
   },
   nextButtonText: {
-    color: '#fff',
+    color: '#1c5b8f',
     fontSize: 18,
     fontWeight: 'bold',
   },

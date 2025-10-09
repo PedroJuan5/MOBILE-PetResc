@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     height: '40%',
   },
   nextButton: {
-    backgroundColor: '#1c5b8f',
+    backgroundColor: '#94B9D8',
     padding: 15,
     borderRadius: 12,
     alignItems: 'center',
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
 
   },
   nextButtonText: {
-    color: '#fff',
+    color: '#1c5b8f',
     fontSize: 18,
     fontWeight: 'bold',
   },
