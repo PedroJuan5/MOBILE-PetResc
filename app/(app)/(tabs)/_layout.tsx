@@ -2,19 +2,20 @@ import React from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function TabsLayout() {
+export default function TabLayout() {
   return (
     <Tabs
+      initialRouteName="home"
       screenOptions={{
-        headerShown: false,
+        headerShown: false, // O cabeçalho é controlado pelo layout pai
         headerTitleAlign: "center",
         tabBarActiveTintColor: "#2D68A6",
         tabBarInactiveTintColor: "#3A5C7A",
       }}
-      initialRouteName="index"
     >
+      
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
           title: "Início",
           tabBarIcon: ({ color, size }) => (
@@ -22,19 +23,11 @@ export default function TabsLayout() {
           ),
         }}
       />
-        <Tabs.Screen
-        name="home" // A rota que ele deve encontrar
-        options={{
-          title: 'Início',
-          headerShown: false,
-          tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={28} color={color} />,
-        }}
-      />
       <Tabs.Screen
         name="adotar"
         options={{
           title: "Adoção",
-          headerShown: true, //mostra o cabeçalho nesta tela
+          headerShown: true, //mostra o cabeçalho específico desta tela
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="paw-outline" size={size} color={color} />
           ),
@@ -67,7 +60,16 @@ export default function TabsLayout() {
           ),
         }}
       />
-    
+   
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Configurações",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings-outline" size={size} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

@@ -1,4 +1,4 @@
-import { AntDesign } from "@expo/vector-icons"; // ícones do expo/vector-icons
+import { AntDesign } from "@expo/vector-icons"; 
 import { useRouter } from 'expo-router';
 import React from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";

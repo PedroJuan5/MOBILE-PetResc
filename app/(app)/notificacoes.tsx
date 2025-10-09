@@ -1,54 +1,73 @@
-import React, { useState } from 'react';
-import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { FontAwesome5, Ionicons } from '@expo/vector-icons';
+import React, { useState } from "react";import {SafeAreaView,View,Text,StyleSheet,TouchableOpacity,ScrollView,} from "react-native";
+import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 
-//exemplos de notificações
+/*
+  Exemplo de notificações.
+  UNREAD = não lidas, READ = lidas.
+  Em produção, esses arrays virão da API.
+*/
 const UNREAD = [
-  { id: '1', icon: 'alert-circle', text: 'Termos de uso e privacidade' },
-  { id: '2', icon: 'gift', text: 'Nova campanha de doação iniciada!' },
+  { id: "1", icon: "alert-circle", text: "Termos de uso e privacidade" },
+  { id: "2", icon: "gift", text: "Nova campanha de doação iniciada!" },
 ];
 const READ = [
-  { id: '3', icon: 'paw', text: 'Bem-vindo ao PetCo!' },
-  { id: '4', icon: 'checkmark-circle', text: 'Seu cadastro foi concluído.' },
+  { id: "3", icon: "paw", text: "Bem-vindo ao PetCo!" },
+  { id: "4", icon: "checkmark-circle", text: "Seu cadastro foi concluído." },
 ];
 
-const NotificationItem = ({ item }) => (
-  <TouchableOpacity style={styles.row}>
-    <Ionicons name={item.icon} size={24} color="#3A5C7A" />
+/*
+  componente simples que renderiza uma linha de notificação
+  TouchableOpacity para permitir futuras ações ao tocar
+*/
+const ItemNotificacao = ({ item }: { item: { id: string; icon: string; text: string } }) => (
+  <TouchableOpacity style={styles.row} accessibilityRole="button">
+    <Ionicons name={item.icon as any} size={24} color="#3A5C7A" />
     <Text style={styles.rowText}>{item.text}</Text>
     <Ionicons name="chevron-forward" size={20} color="#B0C4DE" />
   </TouchableOpacity>
 );
 
-export default function NotificationsScreen() {
-  const [tab, setTab] = useState('UNREAD');
-  const list = tab === 'READ' ? READ : UNREAD;
+export default function Notificacoes() {
+  // controle da aba ativa: 'UNREAD' ou 'READ'
+  const [aba, setAba] = useState<"UNREAD" | "READ">("UNREAD");
+
+  // seleciona a lista correta com base na aba ativa
+  const lista = aba === "READ" ? READ : UNREAD;
 
   return (
-    <SafeAreaView style={styles.saferea}>
+    <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
+        {/* Abas (Lidos / Não lidos) */}
         <View style={styles.tabsContainer}>
           <TouchableOpacity
-            style={[styles.tab, tab === 'READ' && styles.activeTab]}
-            onPress={() => setTab('READ')}>
-            <Text style={[styles.tabText, tab === 'READ' && styles.activeTabText]}>LIDOS</Text>
+            style={[styles.tab, aba === "READ" && styles.activeTab]}
+            onPress={() => setAba("READ")}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: aba === "READ" }}
+          >
+            <Text style={[styles.tabText, aba === "READ" && styles.activeTabText]}>LIDOS</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.tab, tab === 'UNREAD' && styles.activeTab]}
-            onPress={() => setTab('UNREAD')}>
-            <Text style={[styles.tabText, tab === 'UNREAD' && styles.activeTabText]}>NÃO LIDOS</Text>
+            style={[styles.tab, aba === "UNREAD" && styles.activeTab]}
+            onPress={() => setAba("UNREAD")}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: aba === "UNREAD" }}
+          >
+            <Text style={[styles.tabText, aba === "UNREAD" && styles.activeTabText]}>NÃO LIDOS</Text>
           </TouchableOpacity>
         </View>
 
+        {/* Lista de notificações */}
         <ScrollView>
-          {list.map(item => (
-            <NotificationItem key={item.id} item={item} />
+          {lista.map((item) => (
+            <ItemNotificacao key={item.id} item={item} />
           ))}
         </ScrollView>
       </View>
 
-      <View style={styles.pawsContainer}>
+      {/* Patinhas decorativas no canto inferior direito */}
+      <View style={styles.pawsContainer} pointerEvents="none">
         <FontAwesome5 name="paw" size={20} color="#D6EAF7" style={styles.paw1} />
         <FontAwesome5 name="paw" size={16} color="#E6F0FA" style={styles.paw2} />
         <FontAwesome5 name="paw" size={18} color="#D6EAF7" style={styles.paw3} />
@@ -57,20 +76,21 @@ export default function NotificationsScreen() {
   );
 }
 
+/* Estilos */
 const styles = StyleSheet.create({
-  saferea: {
+  safeArea: {
     flex: 1,
-    backgroundColor: '#F6FBFF',
+    backgroundColor: "#F6FBFF",
   },
   container: {
     flex: 1,
     paddingHorizontal: 20,
   },
 
-  //abas
+  // Abas
   tabsContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#E6F0FA',
+    flexDirection: "row",
+    backgroundColor: "#E6F0FA",
     borderRadius: 20,
     marginVertical: 20,
     padding: 4,
@@ -79,68 +99,71 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
     borderRadius: 18,
-    alignItems: 'center',
+    alignItems: "center",
   },
   activeTab: {
-    backgroundColor: '#2D68A6',
+    backgroundColor: "#2D68A6",
   },
   tabText: {
-    color: '#3A5C7A',
-    fontWeight: 'bold',
+    color: "#3A5C7A",
+    fontWeight: "700",
   },
   activeTabText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
 
-  //lista
+  // Itens da lista
   row: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E6F0FA',
+    borderBottomColor: "#E6F0FA",
   },
   rowText: {
     flex: 1,
     marginLeft: 15,
     fontSize: 16,
-    color: '#3A5C7A',
+    color: "#3A5C7A",
   },
-  //patinhas decorativas
+
+  // Patinhas decorativas
   pawsContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 20,
     right: 20,
     width: 100,
     height: 100,
   },
   paw1: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 10,
     right: 40,
-    transform: [{ rotate: '20deg' }],
+    transform: [{ rotate: "20deg" }],
   },
   paw2: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 50,
     right: 60,
-    transform: [{ rotate: '-10deg' }],
+    transform: [{ rotate: "-10deg" }],
   },
   paw3: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 80,
     right: 20,
-    transform: [{ rotate: '30deg' }],
+    transform: [{ rotate: "30deg" }],
   },
+
+  // Estilos extras (mantidos para possíveis textos/títulos)
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "700",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#666',
+    fontWeight: "600",
+    color: "#666",
     marginBottom: 20,
   },
   link: {
@@ -148,7 +171,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   linkText: {
-    color: '#2D68A6',
+    color: "#2D68A6",
     fontSize: 16,
   },
 });
