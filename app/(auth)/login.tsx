@@ -26,8 +26,12 @@ export default function CadastroScreen() {
       </TouchableOpacity>
       <Text style={styles.title}>Bem-Vindo de volta</Text>
       <Text style={styles.subtitle}>Faça o login para continuar</Text>
+       <TextInput style={styles.input} placeholder="Nome de usuário" />
       <TextInput style={styles.input} placeholder="Email" />
-      <TextInput style={styles.input} placeholder="Senha" />
+      <TextInput style={styles.input} placeholder="Senha" secureTextEntry />
+      <TouchableOpacity onPress={() => (router as any).push('/forgot-password')} style={{ alignSelf: 'flex-end', marginRight: 20, marginTop: 6 }}>
+        <Text style={styles.forgotPasswordText}>Esqueceu a senha?</Text>
+      </TouchableOpacity>
       {/* Removi o campo "Nome completo" pois não é comum em telas de login */}
       
       <View style={styles.dividerContainer}>
@@ -85,19 +89,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   input: {
-    backgroundColor: '#f0f4f7', // Cor de fundo mais suave para contraste
+    backgroundColor: '#1c5b8f', // Cor de fundo mais suave para contraste
     borderRadius: 8,
     padding: 15,
     marginBottom: 20,
     fontSize: 16,
     marginHorizontal: 20,
     color: "#333", // Cor do texto digitado
+    gap: 130,
   },
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 20,
     marginHorizontal: 20,
+    
   },
   line: {
     flex: 1,
@@ -106,8 +112,9 @@ const styles = StyleSheet.create({
   },
   orText: {
     marginHorizontal: 10,
-    color: '#aaa',
+    color: '#1c5b8f',
     fontSize: 14,
+    fontWeight: '500',
   },
   socialContainer: {
     flexDirection: 'row',
@@ -129,26 +136,18 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 25,
     padding: 20,
     justifyContent: 'flex-start',
-    marginTop: 'auto', // Empurra o card para a parte de baixo
-    paddingTop: 30,
-    shadowColor: "#000", // Sombra para dar destaque
-    shadowOffset: {
-      width: 0,
-      height: -2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    marginTop: 20,
+   
   },
   nextButton: {
-    backgroundColor: '#2D68A6',
+    backgroundColor: '#94B9D8',
     padding: 15,
     borderRadius: 12,
     alignItems: 'center',
     marginBottom: 25,
   },
   nextButtonText: {
-    color: '#FFFFFF',
+    color: '#1c5b8f',
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -160,5 +159,11 @@ const styles = StyleSheet.create({
   loginLink: {
     color: '#1c5b8f',
     fontWeight: 'bold',
+  }
+  ,
+  forgotPasswordText: {
+    color: '#1c5b8f',
+    fontSize: 14,
+    fontWeight: '600',
   }
 });
