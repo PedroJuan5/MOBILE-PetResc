@@ -16,10 +16,11 @@ export default function CadastroScreen() {
       return;
     }
 
+  
     router.push({
-      pathname: '/signup2',
-      params: { name, cpf, email } 
-    });
+  pathname: './signup2', // Caminho relativo (note o "./")
+  params: { name, cpf, email } 
+});
   };
 
   return (
