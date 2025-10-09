@@ -5,20 +5,19 @@ import { Ionicons } from "@expo/vector-icons";
 export default function TabLayout() {
   return (
     <Tabs
-      // 1. A rota inicial agora é 'home'
-      initialRouteName="home" 
+      initialRouteName="home"
       screenOptions={{
-        headerShown: false, // Esconde o cabeçalho por padrão em todas as abas
+        headerShown: false, // O cabeçalho é controlado pelo layout pai
         headerTitleAlign: "center",
         tabBarActiveTintColor: "#2D68A6",
         tabBarInactiveTintColor: "#3A5C7A",
       }}
     >
-      {/* 2. Removemos a tela 'index' duplicada e mantemos apenas a 'home' */}
+      
       <Tabs.Screen
-        name="home" 
+        name="home"
         options={{
-          title: 'Início',
+          title: "Início",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
           ),
@@ -28,7 +27,7 @@ export default function TabLayout() {
         name="adotar"
         options={{
           title: "Adoção",
-          headerShown: true, // Mostra o cabeçalho APENAS nesta tela
+          headerShown: true, //mostra o cabeçalho específico desta tela
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="paw-outline" size={size} color={color} />
           ),
@@ -58,6 +57,16 @@ export default function TabLayout() {
           title: "Registro",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="add-circle-outline" size={size} color={color} />
+          ),
+        }}
+      />
+   
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Configurações",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings-outline" size={size} color={color} />
           ),
         }}
       />

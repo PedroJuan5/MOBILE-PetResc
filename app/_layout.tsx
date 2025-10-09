@@ -1,4 +1,3 @@
-// Arquivo: app/_layout.tsx (O Novo Centro de Controle)
 import React, { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { AuthProvider, useAuth } from '../context/AuthContext';
@@ -15,10 +14,10 @@ function RootLayoutNav() {
     const inAppGroup = segments[0] === '(app)';
 
     if (session && !inAppGroup) {
-      // Se logado e não está na área privada, redireciona para a home privada
+      //se logado e não está na área privada, redireciona para a home privada
       router.replace('/(app)/(tabs)/home');
     } else if (!session && inAppGroup) {
-      // Se deslogado e tentando acessar a área privada, redireciona para a home pública
+      // se deslogado e tentando acessar a área privada, redireciona para a home pública
       router.replace('/');
     }
   }, [session, isLoading]);

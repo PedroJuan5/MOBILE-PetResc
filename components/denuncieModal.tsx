@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 // Define os "tipos" das propriedades que o modal vai receber
 interface DenuncieModalProps {
   visible: boolean;
-  onClose: () => void; // onClose é uma função
+  onClose: () => void; //onClose e uma função
 }
 
 export const DenuncieModal = ({ visible, onClose }: DenuncieModalProps) => {

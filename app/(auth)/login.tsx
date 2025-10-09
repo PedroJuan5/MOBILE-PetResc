@@ -1,164 +1,246 @@
+import React, { useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
-import { useRouter } from 'expo-router';
-import React from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useRouter } from "expo-router";
+import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert,} from "react-native";
+import { useAuth } from "../../context/AuthContext";
 
-// 1. Importe o nosso hook 'useAuth'
-import { useAuth } from "../../context/AuthContext"; // Verifique se o caminho ../../ está correto
 
-export default function CadastroScreen() {
+export default function TelaLogin() {
   const router = useRouter();
-  
-  // 2. Pegue a função 'signIn' do nosso contexto
-  const { signIn } = useAuth();
+  const { signIn } = useAuth(); //função do AuthContext que realiza o login
 
-  const handleLogin = () => {
-    // No futuro, você pode adicionar a lógica de validação aqui
-    console.log("Botão de login pressionado, chamando o signIn...");
-    signIn(); // Chama a função que troca o usuário para o estado "logado"
+  //estados do formulário com nomes claros
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [carregando, setCarregando] = useState(false);
+
+  //função acionada ao tocar em "Entrar"
+  const entrar = async () => {
+    if (!email.trim() || !senha) {
+      Alert.alert("Atenção", "Por favor, preencha email e senha");
+      return;
+    }
+
+    if (typeof signIn !== "function") {
+      Alert.alert("Erro", "Serviço de autenticação indisponível");
+      return;
+    }
+
+    setCarregando(true);
+    try {
+      //tentamos enviar credenciais num objeto (forma mais comum)
+      await (signIn as any)({ email, password: senha });
+      return;
+    } catch (err) {
+      //se falhar, tentamos chamar sem argumentos — alguns contextos leem campos internos
+      try {
+        await (signIn as any)();
+        return;
+      } catch (err2) {
+        console.warn("signIn falhou:", err2);
+        Alert.alert("Erro", "Não foi possível entrar. Tente novamente mais tarde.");
+      }
+    } finally {
+      setCarregando(false);
+    }
   };
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <AntDesign name="arrow-left" size={24} color="#1c5b8f" />
+    <SafeAreaView style={styles.container}>
+      {/*botao de voltar */}
+      <TouchableOpacity
+        style={styles.botaoVoltar}
+        onPress={() => router.back()}
+        accessibilityLabel="Voltar"
+      >
+        {/*AntDesign usa "arrowleft"; fazemos cast para evitar erro de tipagem temporário */}
+        <AntDesign name={"arrowleft" as any} size={24} color="#1c5b8f" />
       </TouchableOpacity>
-      <Text style={styles.title}>Bem-Vindo de volta</Text>
-      <Text style={styles.subtitle}>Faça o login para continuar</Text>
-      <TextInput style={styles.input} placeholder="Email" />
-      <TextInput style={styles.input} placeholder="Senha" />
-      {/* Removi o campo "Nome completo" pois não é comum em telas de login */}
+
+      <View style={styles.conteudo}>
+        <Text style={styles.titulo}>Bem-vindo de volta</Text>
+        <Text style={styles.subtitulo}>Entre com seu email e senha</Text>
+
+        {/*campo de email */}
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#cac9c9ff"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
+          editable={!carregando}
+        />
+
+        {/*campo de senha */}
+        <TextInput
+          style={styles.input}
+          placeholder="Senha"
+          placeholderTextColor="#cac9c9ff"
+          secureTextEntry
+          value={senha}
+          onChangeText={setSenha}
+          editable={!carregando}
+        />
+
+        {/*divisor com "Ou" */}
+        <View style={styles.divisor}>
+          <View style={styles.linha} />
+          <Text style={styles.ou}>Ou</Text>
+          <View style={styles.linha} />
+        </View>
       
-      <View style={styles.dividerContainer}>
-        <View style={styles.line} />
-        <Text style={styles.orText}>Ou</Text>
-        <View style={styles.line} />
+        <View style={styles.sociais}>
+          <TouchableOpacity
+            style={styles.botaoSocial}
+            accessibilityLabel="Entrar com Google"
+            onPress={() => Alert.alert("Google", "Login social não implementado")}
+            disabled={carregando}
+          >
+            <Text>Google</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.botaoSocial}
+            accessibilityLabel="Entrar com Apple"
+            onPress={() => Alert.alert("Apple", "Login social não implementado")}
+            disabled={carregando}
+          >
+            <Text>Apple</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <View style={styles.socialContainer}>
-        <TouchableOpacity style={styles.socialButton}>
-          <Text>G</Text>
+      {/* Rodape com ação principal e link para cadastro */}
+      <View style={styles.rodape}>
+        <TouchableOpacity
+          style={[styles.botaoEntrar, carregando && { opacity: 0.6 }]}
+          onPress={entrar}
+          accessibilityLabel="Entrar"
+          disabled={carregando}
+        >
+          <Text style={styles.textoBotao}>{carregando ? "Entrando..." : "Entrar"}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
-          <Text></Text>
-        </TouchableOpacity>
-      </View>
-      
-      <View style={styles.bottomCard}>
-        {/* 3. Chame a função 'handleLogin' no 'onPress' do botão de Login */}
-        <TouchableOpacity style={styles.nextButton} onPress={handleLogin}>
-          <Text style={styles.nextButtonText}>Login</Text>
-        </TouchableOpacity>
-        <Text style={styles.loginText}>
-          Não tem conta? <Text style={styles.loginLink} onPress={() => router.push('/signup')}>Cadastre-se</Text>
+
+        <Text style={styles.textoCadastro}>
+          Sem conta?{" "}
+          <Text style={styles.linkCadastro} onPress={() => router.push("/signup")}>
+            Criar conta
+          </Text>
         </Text>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
-// Seus estilos continuam aqui...
+/* 
+- signIn: a assinatura varia; verifique o AuthContext e remova os casts quando souber a forma correta.
+- tratamento de erros: aqui usamos Alert e console.warn em produção prefira mensagens na UI.
+- a flag carregando evita múltiplos envios e desabilita inputs temporariamente.
+*/
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffffff',
+    backgroundColor: "#ffffff",
+  },
+  botaoVoltar: {
+    marginLeft: 20,
+    marginTop: 20,
+    alignSelf: "flex-start",
+  },
+
+  conteudo: {
+    flex: 1,
+    paddingHorizontal: 20,
     paddingTop: 15,
   },
-  // ... (resto dos seus estilos)
-  backButton: {
-    marginLeft: 20,
-    marginBottom: 10,
-    alignSelf: 'flex-start',
-  },
-  title: {
-    color: '#1c5b8f',
+  titulo: {
+    color: "#1c5b8f",
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "700",
     marginBottom: 5,
-    textAlign: 'center',
+    textAlign: "center",
   },
-  subtitle: {
-    color: '#1c5b8f',
+  subtitulo: {
+    color: "#1c5b8f",
     fontSize: 14,
-    marginBottom: 50,
-    textAlign: 'center',
+    marginBottom: 40,
+    textAlign: "center",
   },
+
   input: {
-    backgroundColor: '#f0f4f7', // Cor de fundo mais suave para contraste
+    backgroundColor: "#1c5b8f",
     borderRadius: 8,
     padding: 15,
     marginBottom: 20,
     fontSize: 16,
-    marginHorizontal: 20,
-    color: "#333", // Cor do texto digitado
+    color: "#fff",
   },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+
+  divisor: {
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 20,
-    marginHorizontal: 20,
   },
-  line: {
+  linha: {
     flex: 1,
     height: 1,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: "#e0e0e0",
   },
-  orText: {
+  ou: {
     marginHorizontal: 10,
-    color: '#aaa',
+    color: "#aaa",
     fontSize: 14,
   },
-  socialContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+
+  sociais: {
+    flexDirection: "row",
+    justifyContent: "center",
     gap: 20,
+    marginBottom: 20,
   },
-  socialButton: {
+  botaoSocial: {
     borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 25,
-    width: 50,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderColor: "#e0e0e0",
+    borderRadius: 30,
+    width: 100,
+    height: 48,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  bottomCard: {
-    backgroundColor: '#ffffffff',
+
+  rodape: {
+    backgroundColor: "#ffffff",
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
-    padding: 20,
-    justifyContent: 'flex-start',
-    marginTop: 'auto', // Empurra o card para a parte de baixo
-    paddingTop: 30,
-    shadowColor: "#000", // Sombra para dar destaque
-    shadowOffset: {
-      width: 0,
-      height: -2,
-    },
+    padding: 30,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
-    shadowRadius: 3.84,
+    shadowRadius: 4,
     elevation: 5,
   },
-  nextButton: {
-    backgroundColor: '#2D68A6',
+  botaoEntrar: {
+    backgroundColor: "#94B9D8",
     padding: 15,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 25,
   },
-  nextButtonText: {
-    color: '#FFFFFF',
+  textoBotao: {
+    color: "#1c5b8f",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "700",
   },
-  loginText: {
-    textAlign: 'center',
+  textoCadastro: {
+    textAlign: "center",
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
-  loginLink: {
-    color: '#1c5b8f',
-    fontWeight: 'bold',
-  }
+  linkCadastro: {
+    color: "#1c5b8f",
+    fontWeight: "700",
+  },
 });

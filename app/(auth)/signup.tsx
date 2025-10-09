@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { AntDesign } from "@expo/vector-icons";
+=======
+import { AntDesign } from "@expo/vector-icons"; 
+>>>>>>> aa63a7e04d9912af7023acc7bd0cbf00f9710557
 import { useRouter } from 'expo-router';
 import React, { useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
