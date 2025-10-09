@@ -3,7 +3,7 @@ import React, { useState, useLayoutEffect } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation, useRouter } from 'expo-router';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
-import { DenuncieModal } from '../../components/denuncieModal';
+import { DenuncieModal } from '../components/denuncieModal';
 
 // --- Componentes Reutilizáveis para esta tela ---
 
