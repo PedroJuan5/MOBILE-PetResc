@@ -26,7 +26,7 @@ const StatCard = ({ value, label }: { value: string, label: string }) => (
   </View>
 );
 
-// --- Componente Principal da Tela de Entrada Pública ---
+//componente principal da tela de entrada publica
 export default function PublicIndex() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [signupModalVisible, setSignupModalVisible] = useState(false);
@@ -131,7 +131,6 @@ export default function PublicIndex() {
   );
 }
 
-// --- ESTILOS ATUALIZADOS ---
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
   container: { paddingHorizontal: 20 },
@@ -142,7 +141,7 @@ const styles = StyleSheet.create({
   missionBox: { backgroundColor: '#E6F0FA', padding: 25, borderRadius: 20, marginBottom: 30 },
   missionText: { fontSize: 16, color: '#3A5C7A', lineHeight: 24, textAlign: 'center' },
   
-  // Estilos atualizados para os cards de funcionalidade
+  //estilos para os cards de funcionalidade
   featureCard: {
     width: 200,
     marginTop: 20,
@@ -150,22 +149,21 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 2,
     borderColor: '#BFE1F7',
-    borderStyle: 'dashed', // Borda pontilhada
+    borderStyle: 'dashed', //borda pontilhada
     padding: 20,
-    paddingTop: 40, // Mais espaço no topo para o ícone
+    paddingTop: 40, 
     marginRight: 20,
     alignItems: 'center',
   },
   featureIconContainer: {
-    position: 'absolute', // Posição absoluta para "flutuar"
-    top: -30, // Puxa o ícone para cima, para fora do card
-    backgroundColor: 'white', // Fundo branco para cobrir a linha pontilhada
+    position: 'absolute',//posiçao absoluta para "flutuar"
+    top: -30, //puxa o ícone para cima, para fora do card
+    backgroundColor: 'white', 
     borderRadius: 30,
     width: 60,
     height: 60,
     justifyContent: 'center',
     alignItems: 'center',
-    // Adiciona a mesma borda pontilhada ao redor do ícone
     borderWidth: 2,
     borderColor: '#BFE1F7',
     borderStyle: 'dashed',
@@ -174,25 +172,25 @@ const styles = StyleSheet.create({
   featureDescription: { fontSize: 14, color: '#3A5C7A', textAlign: 'center', lineHeight: 20, marginBottom: 15 },
   featureLink: { fontSize: 14, color: '#A0A0A0', fontWeight: '500' },
 
-  // Estilos atualizados para os cards de marcos
+  //estilos para os cards de marcos
   statCard: {
     backgroundColor: '#E6F0FA',
     borderRadius: 20,
     paddingVertical: 20,
     alignItems: 'center',
-    width: 150, // Um pouco mais largo
-    height: 150, // Altura fixa para ficarem iguais
+    width: 150, 
+    height: 150, 
     marginRight: 15,
     marginBottom: 30,
-    justifyContent: 'center', // Centraliza o conteúdo
+    justifyContent: 'center', 
   },
   statValue: {
-    fontSize: 64, // Número bem maior
-    fontWeight: '300', // Fonte mais fina e moderna
+    fontSize: 64, 
+    fontWeight: '300',
     color: '#2D68A6',
   },
   statLabel: {
-    fontSize: 16, // Rótulo um pouco maior
+    fontSize: 16, 
     color: '#3A5C7A',
     marginTop: 5,
     textAlign: 'center',

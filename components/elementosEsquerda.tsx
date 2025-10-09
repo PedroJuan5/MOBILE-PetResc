@@ -1,18 +1,14 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 
-export default function CustomHeaderLeft() {
-  const router = useRouter();
-
+//ocomponente agora recebe uma propriedade 'onDenunciePress'
+export default function CustomHeaderLeft({ onDenunciePress }: { onDenunciePress: () => void }) {
   return (
     <View style={styles.container}>
-      {/* Botão de Notificações*/}
-      <TouchableOpacity
-        onPress={() => router.push('/notificacoes')}
-        style={styles.button}>
-        <Ionicons name="notifications-outline" size={25} color="#2D68A6" />
+      {/* Botão de Denúncia */}
+   ''   <TouchableOpacity onPress={onDenunciePress} style={styles.button}>
+        <Ionicons name="alert-circle-outline" size={28} color="#2D68A6" />
       </TouchableOpacity>
     </View>
   );
