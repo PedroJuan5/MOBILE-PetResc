@@ -2,33 +2,39 @@ import React from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function TabLayout() {
+export default function TabsLayout() {
   return (
     <Tabs
-      // 1. A rota inicial agora é 'home'
-      initialRouteName="home" 
       screenOptions={{
-        headerShown: false, // Esconde o cabeçalho por padrão em todas as abas
+        headerShown: false,
         headerTitleAlign: "center",
         tabBarActiveTintColor: "#2D68A6",
         tabBarInactiveTintColor: "#3A5C7A",
       }}
+      initialRouteName="index"
     >
-      {/* 2. Removemos a tela 'index' duplicada e mantemos apenas a 'home' */}
       <Tabs.Screen
-        name="home" 
+        name="index"
         options={{
-          title: 'Início',
+          title: "Início",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
           ),
+        }}
+      />
+        <Tabs.Screen
+        name="home" // A rota que ele deve encontrar
+        options={{
+          title: 'Início',
+          headerShown: false,
+          tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={28} color={color} />,
         }}
       />
       <Tabs.Screen
         name="adotar"
         options={{
           title: "Adoção",
-          headerShown: true, // Mostra o cabeçalho APENAS nesta tela
+          headerShown: true, //mostra o cabeçalho nesta tela
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="paw-outline" size={size} color={color} />
           ),
@@ -61,6 +67,7 @@ export default function TabLayout() {
           ),
         }}
       />
+    
     </Tabs>
   );
 }
