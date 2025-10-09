@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 
-// exemplos de notificações
+//exemplos de notificações
 const UNREAD = [
   { id: '1', icon: 'alert-circle', text: 'Termos de uso e privacidade' },
   { id: '2', icon: 'gift', text: 'Nova campanha de doação iniciada!' },
