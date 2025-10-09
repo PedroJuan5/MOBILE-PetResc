@@ -1,23 +1,61 @@
 import { AntDesign } from "@expo/vector-icons"; // ícones do expo/vector-icons
 import { useRouter } from 'expo-router';
-import React from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert ,StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import React, { useState } from "react";
+
 
 
 
 export default function CadastroScreen() {
   const router = useRouter();
+
+  const [name, setName] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [email, setEmail] = useState('');
+
+  const handleNext = () => {
+    if (!name || !email) {
+      Alert.alert("Erro", "Nome e Email são obrigatórios.");
+      return;
+    }
+
+
+     router.push({
+      pathname: '/signup2',
+      params: { name, cpf, email } 
+    });
+  };
+
+
   return (
     <View style={styles.container}>
       {/* Header */}
-      <TouchableOpacity style={styles.backButton} onPress={() => router.push('/home')}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.push('./home')}>
         <AntDesign name="arrow-left" size={24} color="#1c5b8f" />
       </TouchableOpacity>
       <Text style={styles.title}>Cadastre-se</Text>
       <Text style={styles.subtitle}>Crie sua conta e ajude a transformar vidas.</Text>
-      <TextInput style={styles.input} placeholder="Nome completo" />
-      <TextInput style={styles.input} placeholder="CPF" />
-      <TextInput style={styles.input} placeholder="Email" />
+      <TextInput
+        style={styles.input}
+        placeholder="Nome completo"
+        value={name}
+        onChangeText={setName} 
+      />
+       <TextInput
+        style={styles.input}
+        placeholder="CPF"
+        value={cpf} 
+        onChangeText={setCpf} 
+        keyboardType="numeric"
+      />
+       <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email} 
+        onChangeText={setEmail} 
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
       <View style={styles.dividerContainer}>
         <View style={styles.line} />
         <Text style={styles.orText}>Ou</Text>
@@ -32,12 +70,13 @@ export default function CadastroScreen() {
         </TouchableOpacity>
       </View>
       <View style={styles.bottomCard}>
-        <TouchableOpacity style={styles.nextButton} onPress={() => router.push('/signup2')}>
+             <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
           <Text style={styles.nextButtonText}>Próximo</Text>
         </TouchableOpacity>
+        
         <Text style={styles.loginText}>
           Já tem conta?{' '}
-          <Text style={styles.loginLink} onPress={() => router.push('/login')}>Login</Text>
+          <Text style={styles.loginLink} onPress={() => router.push('./login')}>Login</Text>
         </Text>
         <View style={styles.indicatorContainer}>
           <View style={[styles.indicator, { backgroundColor: '#2563eb' }]} />
