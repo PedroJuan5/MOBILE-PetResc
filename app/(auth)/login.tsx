@@ -17,6 +17,7 @@ export default function CadastroScreen() {
       <TextInput style={styles.input} placeholder="Nome completo" />
       <TextInput style={styles.input} placeholder="Email" />
       <TextInput style={styles.input} placeholder="Senha" />
+
       <View style={styles.dividerContainer}>
         <View style={styles.line} />
         <Text style={styles.orText}>Ou</Text>
@@ -94,6 +95,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     backgroundColor: '#ffffffff',
     color: '#1c5b8f',
+
   },
   line: {
     flex: 1,
@@ -105,6 +107,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     color: '#1c5b8f',
     fontSize: 14,
+    fontWeight: '500',
   },
   socialContainer: {
     flexDirection: 'row',
