@@ -27,7 +27,7 @@ export default function CadastroScreen() {
         
       </View>
       <View style={styles.bottomCard}>
-        <TouchableOpacity style={styles.nextButton} onPress={() => router.push('/login')}>
+        <TouchableOpacity style={styles.nextButton} onPress={() => router.push('./login')}>
           <Text style={styles.nextButtonText}>Finalizar cadastro</Text>
         </TouchableOpacity>
         <Text style={styles.loginText}>
