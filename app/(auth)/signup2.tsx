@@ -10,34 +10,28 @@ export default function CadastroScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <TouchableOpacity style={styles.backButton} onPress={() => router.push('/home')}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.push('/signup')}>
         <AntDesign name="arrow-left" size={24} color="#1c5b8f" />
       </TouchableOpacity>
       <Text style={styles.title}>Cadastre-se</Text>
       <Text style={styles.subtitle}>Crie sua conta e ajude a transformar vidas.</Text>
-      <TextInput style={styles.input} placeholder="Nome completo" />
-      <TextInput style={styles.input} placeholder="CPF" />
-      <TextInput style={styles.input} placeholder="Email" />
+      <TextInput style={styles.input} placeholder="Telefone" />
+      <TextInput style={styles.input} placeholder="Senha" />
+      <TextInput style={styles.input} placeholder="Confirmar Senha" />
       <View style={styles.dividerContainer}>
         <View style={styles.line} />
-        <Text style={styles.orText}>Ou</Text>
+        <Text style={styles.orText}>ou</Text>
         <View style={styles.line} />
       </View>
       <View style={styles.socialContainer}>
-        <TouchableOpacity style={styles.socialButton}>
-          <Text>G</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
-          <Text></Text>
-        </TouchableOpacity>
+        
       </View>
       <View style={styles.bottomCard}>
-        <TouchableOpacity style={styles.nextButton} onPress={() => router.push('/signup2')}>
-          <Text style={styles.nextButtonText}>Próximo</Text>
+        <TouchableOpacity style={styles.nextButton} onPress={() => router.push('/login')}>
+          <Text style={styles.nextButtonText}>Finalizar cadastro</Text>
         </TouchableOpacity>
         <Text style={styles.loginText}>
-          Já tem conta?{' '}
-          <Text style={styles.loginLink} onPress={() => router.push('/login')}>Login</Text>
+          Já tem conta? <Text style={styles.loginLink}>Login</Text>
         </Text>
         <View style={styles.indicatorContainer}>
           <View style={[styles.indicator, { backgroundColor: '#2563eb' }]} />
@@ -50,18 +44,18 @@ export default function CadastroScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+   container: {
     flex: 1,
-    backgroundColor: '#ffffffff',
-    paddingTop: 15,
+   backgroundColor: '#ffffffff',
+    paddingTop:15,
     color: '#1c5b8f',
-
+    
   },
 
   backButton: {
     marginLeft: 20,
     marginBottom: 10,
-
+    
   },
   title: {
     color: '#1c5b8f',
@@ -90,8 +84,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginHorizontal: 20,
     color: "#cac9c9ff",
-
-
+    
+    
   },
   dividerContainer: {
     flexDirection: 'row',
@@ -104,8 +98,8 @@ const styles = StyleSheet.create({
   line: {
     flex: 1,
     height: 2,
-    backgroundColor: '#b3bac0ff',
-    marginBottom: 10,
+   backgroundColor: '#b3bac0ff',
+   marginBottom: 10,
   },
   orText: {
     marginHorizontal: 10,
@@ -117,14 +111,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 15,
     backgroundColor: "#ffffffff",
-
+    
   },
   socialButton: {
     backgroundColor: '#94B9D8',
     borderRadius: 25,
     padding: 15,
     color: '#1c5b8f',
-
+    
     marginHorizontal: 5,
   },
   bottomCard: {
@@ -142,7 +136,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     marginBottom: 25,
-
+    
   },
   nextButtonText: {
     color: '#fff',
@@ -173,3 +167,4 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
   },
 });
+
