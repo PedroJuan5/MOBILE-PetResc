@@ -3,10 +3,13 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, ImageSourcePropType } 
 
 interface Pet {
   id: string;
-  name: string;
-  breed: string;
-  gender: string;
-  image: ImageSourcePropType;
+  nome: string;
+  raca: string;
+  genero: string;
+  imagem: ImageSourcePropType;
+  especie: string;
+  idade: string;
+  tamanho: string;
 }
 
 interface PetCardProps {
@@ -15,9 +18,9 @@ interface PetCardProps {
 
 export const PetCard = ({ pet }: PetCardProps) => (
   <TouchableOpacity style={styles.card}>
-    <Image source={pet.image} style={styles.image} />
-    <Text style={styles.name}>{pet.name}</Text>
-    <Text style={styles.info}>{`${pet.breed} ${pet.gender}`}</Text>
+    <Image source={pet.imagem} style={styles.imagem} />
+    <Text style={styles.name}>{pet.nome}</Text>
+    <Text style={styles.info}>{`${pet.raca} ${pet.genero}`}</Text>
   </TouchableOpacity>
 );
 
@@ -30,9 +33,10 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     alignItems: 'flex-start',
   },
-  image: {
+  imagem: {
     width: '100%',
     height: 120,
+    resizeMode: 'cover',
   },
   name: {
     fontSize: 16,
