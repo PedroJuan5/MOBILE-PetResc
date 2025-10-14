@@ -1,27 +1,30 @@
-import React from "react";
-import { Stack } from 'expo-router/stack';
+import React, { useEffect } from 'react';
+import { Stack, useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
+// ... seus outros imports de componentes de header
 
 export default function AppLayout() {
-  const { session } = useAuth();
-  if (!session) return null;
+  const { session, isLoading } = useAuth();
+  const router = useRouter();
 
+  useEffect(() => {
+    // Se a sessão não está carregando e não há sessão (usuário deslogado)...
+    if (!isLoading && !session) {
+      // ...expulsa o usuário para a tela de entrada.
+      router.replace('/');
+    }
+  }, [session, isLoading]);
+
+  // Enquanto carrega a sessão ou se não há sessão, não mostra nada.
+  if (isLoading || !session) {
+    return null;
+  }
+
+  // Se passou pelas verificações, mostra a área privada.
   return (
-    <Stack
-      screenOptions={{
-        headerTitleAlign: "center",
-        headerStyle: { backgroundColor: "#F6FBFF" },
-        headerTintColor: "#2D68A6",
-      }}>
-      <Stack.Screen
-        name="(tabs)"
-        options={{
-
-          headerShown: false, 
-        }}
-      />
-      <Stack.Screen name="perfil" options={{ title: "Meu Perfil", presentation: 'modal' }} />
-      <Stack.Screen name="notificacoes" options={{ title: "Notificação" }} />
+    <Stack>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      {/* ... suas outras telas privadas */}
     </Stack>
   );
 }

@@ -1,32 +1,27 @@
-// Arquivo: app/(auth)/index.tsx
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRouter } from 'expo-router';
 import React, { useLayoutEffect, useState } from 'react';
 import { Modal, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { DenuncieModal } from '../components/denuncieModal';
 
+// --- Tipos para os componentes (Boa Prática) ---
+interface FeatureCardProps { icon: string; title: string; description: string; }
+interface StatCardProps { value: string; label: string; }
+
 // --- Componentes Reutilizáveis para esta tela ---
-const FeatureCard = ({ icon, title, description }: { icon: string, title: string, description: string }) => (
+const FeatureCard = ({ icon, title, description }: FeatureCardProps) => (
   <View style={styles.featureCard}>
-    <View style={styles.featureIconContainer}>
-      <FontAwesome5 name={icon} size={24} color="#2D68A6" />
-    </View>
-    <Text style={styles.featureTitle}>{title}</Text>
-    <Text style={styles.featureDescription}>{description}</Text>
-    <TouchableOpacity>
-      <Text style={styles.featureLink}>Saiba mais</Text>
-    </TouchableOpacity>
+    {/* ...código do seu FeatureCard... */}
   </View>
 );
 
-const StatCard = ({ value, label }: { value: string, label: string }) => (
+const StatCard = ({ value, label }: StatCardProps) => (
   <View style={styles.statCard}>
-    <Text style={styles.statValue}>{value}</Text>
-    <Text style={styles.statLabel}>{label}</Text>
+    {/* ...código do seu StatCard... */}
   </View>
 );
 
-//componente principal da tela de entrada publica
+// Componente principal da tela de entrada publica
 export default function PublicIndex() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [signupModalVisible, setSignupModalVisible] = useState(false);
@@ -83,13 +78,15 @@ export default function PublicIndex() {
               style={styles.option}
               onPress={() => {
                 setSignupModalVisible(false);
-                (router as any).push('/signup-ong'); // rota de cadastro de ONG (crie essa rota se necessário)
+                // 2. AVISO: Garanta que o arquivo 'signup-ong.tsx' existe!
+                (router as any).push('/signup-ong'); 
               }}
             >
               <Ionicons name="paw-outline" size={20} color="#2D68A6" />
               <Text style={styles.optionText}>ONG</Text>
             </TouchableOpacity>
-              <View style={styles.dividerLine2} />
+
+            <View style={styles.dividerLine2} />
             <TouchableOpacity style={{ marginTop: 12 }} onPress={() => setSignupModalVisible(false)}>
               <Text style={{ color: '#1c5b8f' }}>Cancelar</Text>
             </TouchableOpacity>
@@ -97,34 +94,10 @@ export default function PublicIndex() {
         </TouchableOpacity>
       </Modal>
 
+      {/* O resto do seu código da tela continua aqui... */}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
-          <View style={styles.headerTitle}>
-            <Text style={styles.title}>Conheça seu novo melhor amigo!</Text>
-            <View style={styles.paws}><FontAwesome5 name="paw" size={18} color="#BFE1F7" /></View>
-          </View>
-
-          <Text style={styles.sectionTitle}>Nossa missão</Text>
-          <View style={styles.missionBox}>
-              <Text style={styles.missionText}>
-                Nosso objetivo é otimizar a gestão das organizações, dar mais visibilidade aos animais em situação de vulnerabilidade e incentivar a participação social, ajudando a reduzir o abandono e promovendo a adoção responsável.
-              </Text>
-          </View>
-
-          <Text style={styles.sectionTitle}>Funcionalidades em destaque</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingVertical: 30 }}>
-            <FeatureCard icon="bone" title="Faça sua doação" description="Contribua com suprimentos ou recursos e ajude a transformar a vida de animais resgatados." />
-            <FeatureCard icon="hand-holding-heart" title="Seja voluntário" description="Doe seu tempo e talento para cuidar dos animais, ajudar em eventos e muito mais." />
-            <FeatureCard icon="paw" title="Adote um amigo" description="Encontre seu companheiro ideal e dê a ele um lar amoroso e seguro para sempre." />
-          </ScrollView>
-
-          <Text style={styles.sectionTitle}>Nossos marcos</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <StatCard value="63" label="Animais adotados" />
-            <StatCard value="12" label="ONGs parceiras" />
-            <StatCard value="25" label="Campanhas" />
-          </ScrollView>
-
+            {/* ... */}
         </View>
       </ScrollView>
     </SafeAreaView>
