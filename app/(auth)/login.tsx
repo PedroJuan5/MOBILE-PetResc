@@ -117,7 +117,6 @@ export default function TelaLogin() {
         <TouchableOpacity
           style={[styles.botaoEntrar, carregando && { opacity: 0.6 }]}
           onPress={entrar}
-          accessibilityLabel="Entrar"
           disabled={carregando}
         >
           <Text style={styles.textoBotao}>{carregando ? "Entrando..." : "Entrar"}</Text>
@@ -125,7 +124,7 @@ export default function TelaLogin() {
 
         <Text style={styles.textoCadastro}>
           Sem conta?{" "}
-          <Text style={styles.linkCadastro} onPress={() => router.push("/signup")}>
+          <Text style={styles.linkCadastro} onPress={() => router.push('/signup')}>
             Criar conta
           </Text>
         </Text>
@@ -134,11 +133,6 @@ export default function TelaLogin() {
   );
 }
 
-/* 
-- signIn: a assinatura varia; verifique o AuthContext e remova os casts quando souber a forma correta.
-- tratamento de erros: aqui usamos Alert e console.warn em produção prefira mensagens na UI.
-- a flag carregando evita múltiplos envios e desabilita inputs temporariamente.
-*/
 
 const styles = StyleSheet.create({
   container: {
