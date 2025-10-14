@@ -1,5 +1,4 @@
 import { AntDesign } from "@expo/vector-icons";
-
 import { useRouter } from 'expo-router';
 import React, { useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
@@ -19,7 +18,7 @@ export default function CadastroScreen() {
 
   
     router.push({
-  pathname: './signup2', // Caminho relativo (note o "./")
+  pathname: './signup2', 
   params: { name, cpf, email } 
 });
   };
