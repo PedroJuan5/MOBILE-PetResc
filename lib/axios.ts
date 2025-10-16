@@ -1,8 +1,9 @@
-import axios from "axios"
+import axios, { AxiosError } from "axios"; 
 
 const api = axios.create({
-    baseURL: '',
-    headers: {
-        "Content-Type": "application/json"
-    }
-})
+  baseURL: "http://10.92.199.36:3000",
+  headers: { "Content-Type": "application/json" },
+});
+
+export default api;
+export { AxiosError };

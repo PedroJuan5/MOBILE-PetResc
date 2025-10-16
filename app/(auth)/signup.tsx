@@ -15,12 +15,8 @@ export default function CadastroScreen() {
       Alert.alert("Erro", "Nome e Email são obrigatórios.");
       return;
     }
+     router.push({ pathname: '/(auth)/signup2', params: { name, cpf, email } });
 
-  
-    router.push({
-  pathname: './signup2', 
-  params: { name, cpf, email } 
-});
   };
 
   return (

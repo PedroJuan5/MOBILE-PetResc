@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
-// Tipos
+
 interface Session { id: string; }
 interface AuthContextData {
   session: Session | null;
@@ -20,7 +20,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // No futuro, aqui você verificaria um token salvo no celular
     setIsLoading(false);
   }, []);
 

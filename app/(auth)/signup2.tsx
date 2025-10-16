@@ -2,8 +2,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import React, { useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from "react-native";
-
-const API_URL = 'http://192.168.56.1:3000'; 
+import api, { AxiosError } from '@/lib/axios';
 
 export default function CadastroScreen2() { 
   const router = useRouter();
@@ -15,7 +14,7 @@ export default function CadastroScreen2() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleFinalizeCadastro = async () => {
+ const handleFinalizeCadastro = async () => {
     if (password !== confirmPassword) {
       Alert.alert("Erro", "As senhas não coincidem.");
       return;
@@ -24,41 +23,52 @@ export default function CadastroScreen2() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: name,
-          email: email,
-          cpf: cpf, 
-          password: password,
-          role: 'PUBLICO', 
-        }),
-      });
+      const userData = {
+        name: name,
+        email: email,
+        cpf: cpf,
+        telefone: telefone,
+        password: password,
+        role: 'PUBLICO',
+      };
 
-      const responseData = await response.json();
+      await api.post('/auth/register', userData);
+      
+      console.log(" CADASTRO REALIZADO COM SUCESSO NO BACKEND!");
+      console.log("Tentando exibir o alerta e navegar...");
 
-      if (response.ok) { 
-        Alert.alert(
-          "Cadastro Realizado!",
-          "Sua conta foi criada com sucesso. Agora você pode fazer o login.",
-          [{ text: "OK", onPress: () => router.push('/login') }] 
-        );
-      } else {
-        Alert.alert("Erro no Cadastro", responseData.error || "Ocorreu um problema ao criar sua conta.");
-      }
+      Alert.alert(
+        "Cadastro Realizado!",
+        "Sua conta foi criada com sucesso. Agora você pode fazer o login.",
+        [{ 
+            text: "OK", 
+            onPress: () => {
+                console.log("Botão OK do alerta foi pressionado. Navegando para /login");
+                router.push('/login');
+            }
+        }] 
+      );
+
     } catch (error) {
-      console.error("Falha na requisição:", error);
-      Alert.alert("Erro de Conexão", "Não foi possível se comunicar com o servidor.");
+      let errorMessage = "Não foi possível realizar o cadastro. Verifique os dados e tente novamente.";
+
+      if (error instanceof AxiosError) {
+        console.error("Erro detalhado do Axios:", JSON.stringify(error.response?.data, null, 2));
+        errorMessage = error.response?.data?.message || error.response?.data?.error || errorMessage;
+      } else {
+        console.error("Erro inesperado:", error);
+      }
+                         
+      Alert.alert("Erro no Cadastro", errorMessage);
+
     } finally {
       setIsLoading(false);
     }
-  };
-
-  return (
+};
+return (
     <View style={styles.container}>
       {/* Header */}
-      <TouchableOpacity style={styles.backButton} onPress={() => router.push('/signup')}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.push('/login')}>
         <AntDesign name="arrow-left" size={24} color="#1c5b8f" />
       </TouchableOpacity>
       <Text style={styles.title}>Cadastre-se</Text>
@@ -67,6 +77,7 @@ export default function CadastroScreen2() {
       <TextInput 
         style={styles.input} 
         placeholder="Telefone"
+        placeholderTextColor="#cac9c9ff"
         value={telefone}
         onChangeText={setTelefone}
         keyboardType="phone-pad"
@@ -74,6 +85,7 @@ export default function CadastroScreen2() {
       <TextInput 
         style={styles.input} 
         placeholder="Senha"
+        placeholderTextColor="#cac9c9ff"
         value={password}
         onChangeText={setPassword}
         secureTextEntry 
@@ -81,13 +93,18 @@ export default function CadastroScreen2() {
       <TextInput 
         style={styles.input} 
         placeholder="Confirmar Senha"
+        placeholderTextColor="#cac9c9ff"
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         secureTextEntry
       />
       
       <View style={styles.bottomCard}>
-        <TouchableOpacity style={styles.nextButton} onPress={handleFinalizeCadastro} disabled={isLoading}>
+        <TouchableOpacity 
+          style={styles.nextButton} 
+          onPress={handleFinalizeCadastro} 
+          disabled={isLoading}
+        >
           {isLoading ? (
             <ActivityIndicator color="#1c5b8f" />
           ) : (
@@ -100,9 +117,10 @@ export default function CadastroScreen2() {
       </View>
     </View>
   );
+
 }
 
-// ... Cole seus estilos aqui ...
+ 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -140,7 +158,7 @@ const styles = StyleSheet.create({
         marginBottom: 35,
         fontSize: 16,
         marginHorizontal: 20,
-        color: "#cac9c9ff",
+        color: "#ffffff",
     },
     bottomCard: {
         backgroundColor: '#ffffffff',
@@ -148,7 +166,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 25,
         padding: 20,
         justifyContent: 'flex-start',
-        marginTop: 'auto', // Empurra para o final
+        marginTop: 'auto', 
     },
     nextButton: {
         backgroundColor: '#94B9D8',
@@ -171,4 +189,5 @@ const styles = StyleSheet.create({
         color: '#1c5b8f',
         fontWeight: 'bold',
     },
-});
+
+  });
