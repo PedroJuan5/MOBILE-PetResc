@@ -29,12 +29,12 @@ interface Filtros {
 
 /* Dados de exemplo (substitua pela API kaique quando der ) */
 const PETS_COMPLETOS: Pet[] = [
-  { id: "1", nome: "Branquinho", raca: "SRD", genero: "Macho", especie: "Gato", idade: "Adulto", tamanho: "Pequeno", imagem: require("../../../assets/branquinho.png") },
-  { id: "2", nome: "Frajola",   raca: "SRD", genero: "Fêmea", especie: "Gato", idade: "Filhote", tamanho: "Pequeno", imagem: require("../../../assets/frajola.png") },
-  { id: "3", nome: "Zeus",      raca: "Pitbull", genero: "Macho", especie: "Cachorro", idade: "Adulto", tamanho: "Grande", imagem: require("../../../assets/zeus.png") },
-  { id: "4", nome: "Paçoca",    raca: "SRD", genero: "Macho", especie: "Cachorro", idade: "Idoso", tamanho: "Medio", imagem: require("../../../assets/paçoca.png") },
-  { id: "5", nome: "Neguinho",  raca: "SRD", genero: "Macho", especie: "Cachorro", idade: "Filhote", tamanho: "Pequeno", imagem: require("../../../assets/neguinho.png") },
-  { id: "6", nome: "Caramelo",  raca: "SRD", genero: "Macho", especie: "Cachorro", idade: "Adulto", tamanho: "Medio", imagem: require("../../../assets/caramelo.png") },
+  { id: "1", nome: "Branquinho", raca: "SRD", genero: "Macho", especie: "Gato", idade: "Adulto", tamanho: "Pequeno", imagem: require("../../../assets/images/pets/branquinho.png") },
+  { id: "2", nome: "Frajola",   raca: "SRD", genero: "Fêmea", especie: "Gato", idade: "Filhote", tamanho: "Pequeno", imagem: require("../../../assets/images/pets/frajola.png") },
+  { id: "3", nome: "Zeus",      raca: "Pitbull", genero: "Macho", especie: "Cachorro", idade: "Adulto", tamanho: "Grande", imagem: require("../../../assets/images/pets/zeus.png") },
+  { id: "4", nome: "Paçoca",    raca: "SRD", genero: "Macho", especie: "Cachorro", idade: "Idoso", tamanho: "Medio", imagem: require("../../../assets/images/pets/paçoca.png") },
+  { id: "5", nome: "Neguinho",  raca: "SRD", genero: "Macho", especie: "Cachorro", idade: "Filhote", tamanho: "Pequeno", imagem: require("../../../assets/images/pets/neguinho.png") },
+  { id: "6", nome: "Caramelo",  raca: "SRD", genero: "Macho", especie: "Cachorro", idade: "Adulto", tamanho: "Medio", imagem: require("../../../assets/images/pets/caramelo.png") },
 ];
 
 export default function TelaAdotar() {

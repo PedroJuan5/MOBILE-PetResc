@@ -30,7 +30,7 @@ const ANIMAIS: Animal[] = [
   {
     id: "1",
     nome: "Amendoim",
-    imagem: require("../../../assets/caramelo.png"),
+    imagem: require("../../../assets/images/pets/caramelo.png"),
     raca: "Sem raça definida (SRD)",
     sexo: "F",
     larTemporario: true,
@@ -39,7 +39,7 @@ const ANIMAIS: Animal[] = [
   {
     id: "2",
     nome: "Bigodes",
-    imagem: require("../../../assets/gatoHome.png"),
+    imagem: require("../../../assets/images/ui/gatoHome.png"),
     raca: "Siamês",
     sexo: "M",
     larTemporario: false,
@@ -51,14 +51,14 @@ const ONGS: Ong[] = [
   {
     id: "1",
     nome: "Abrigo do Bairro",
-    imagem: require("../../../assets/jimjim.png"),
+    imagem: require("../../../assets/images/pets/jimjim.png"),
     endereco:
       "Rua do Saber, 223 - Vila Santo Antônio, Cotia - SP, 06706-281",
   },
   {
     id: "2",
     nome: "Resgate Feliz",
-    imagem: require("../../../assets/mel.png"),
+    imagem: require("../../../assets/images/pets/mel.png"),
     endereco:
       "Avenida da Inovação, 1420 - Vila Santa Antônia, Cotia - SP, 06708-282",
   },
@@ -116,7 +116,7 @@ export default function HomeScreen() {
           </View>
 
           <Text style={styles.subTitulo}>Meus animais</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ScrollView horizontal showsVerticalScrollIndicator={false}>
             {ANIMAIS.map((a) => (
               <CartaoAnimal key={a.id} animal={a} />
             ))}
@@ -133,8 +133,9 @@ export default function HomeScreen() {
                 <Text style={styles.textoBotaoDoar}>Doe agora</Text>
               </TouchableOpacity>
             </View>
+            {/* ✅ CORREÇÃO APLICADA AQUI */}
             <Image
-              source={require("../../../assets/gatoHome.png")}
+              source={require("../../../assets/images/ui/gatoHome.png")}
               style={styles.imagemContribuicao}
             />
           </View>
