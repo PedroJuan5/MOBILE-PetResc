@@ -1,15 +1,17 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ImageSourcePropType } from 'react-native';
+import { Link } from 'expo-router'; // 1. Importamos o componente Link para navegação
 
+// O "contrato" do Pet, garantindo que ele tenha todas as propriedades necessárias
 interface Pet {
   id: string;
-  nome: string;
-  raca: string;
-  genero: string;
-  imagem: ImageSourcePropType;
-  especie: string;
-  idade: string;
-  tamanho: string;
+  name: string;
+  breed: string;
+  gender: string;
+  image: ImageSourcePropType;
+  species: string;
+  age: string;
+  size: string;
 }
 
 interface PetCardProps {
@@ -17,11 +19,16 @@ interface PetCardProps {
 }
 
 export const PetCard = ({ pet }: PetCardProps) => (
-  <TouchableOpacity style={styles.card}>
-    <Image source={pet.imagem} style={styles.imagem} />
-    <Text style={styles.name}>{pet.nome}</Text>
-    <Text style={styles.info}>{`${pet.raca} ${pet.genero}`}</Text>
-  </TouchableOpacity>
+  // 2. Envolvemos o card com o componente Link
+  //    'href' define para onde navegar, usando o ID do pet
+  //    'asChild' faz com que o Link passe suas propriedades de clique para o TouchableOpacity
+  <Link href={`/pets/${pet.id}`} asChild>
+    <TouchableOpacity style={styles.card}>
+      <Image source={pet.image} style={styles.image} />
+      <Text style={styles.name}>{pet.name}</Text>
+      <Text style={styles.info}>{`${pet.breed} ${pet.gender}`}</Text>
+    </TouchableOpacity>
+  </Link>
 );
 
 const styles = StyleSheet.create({
@@ -32,8 +39,17 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     overflow: 'hidden',
     alignItems: 'flex-start',
+    // Adicionando uma pequena sombra para destaque
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
-  imagem: {
+  image: {
     width: '100%',
     height: 120,
     resizeMode: 'cover',
