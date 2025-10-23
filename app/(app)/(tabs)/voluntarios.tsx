@@ -1,8 +1,18 @@
 import React from 'react';
-import {View,Text,ScrollView,Image,StyleSheet,TouchableOpacity,SafeAreaView,} from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
 import { useRouter } from 'expo-router';
-
-import { FontAwesome, Feather } from '@expo/vector-icons';
+// Importa o Swiper
+import Swiper from 'react-native-swiper';
+// Adiciona FontAwesome5 para os novos ícones
+import { FontAwesome, Feather, FontAwesome5 } from '@expo/vector-icons';
 
 export default function VoluntariosScreen() {
   const router = useRouter();
@@ -13,6 +23,31 @@ export default function VoluntariosScreen() {
     // Exemplo: router.push('/(tabs)/formulario-interesse');
     console.log('Navegar para o formulário de interesse');
   };
+
+  // Dados para os slides do carrossel
+  const formularioSlides = [
+    {
+      key: 'interesse',
+      title: 'Formulário de interesse',
+      description:
+        'Faça o formulário de inscrição que disponibilizamos aqui que a ONG entrará em contato com você em até 48h.',
+      iconName: 'clipboard-list', // Ícone do FontAwesome5
+    },
+    {
+      key: 'avaliacao',
+      title: 'Avaliação de formulário',
+      description:
+        'A ONG irá fazer a análise do cadastro e perfil do voluntário. Preenchendo os requisitos, você recebe a aprovação por telefone/email.',
+      iconName: 'chart-line', // Ícone do FontAwesome5
+    },
+    {
+      key: 'aprovado',
+      title: 'Formulário aprovado',
+      description:
+        'Caso seja aprovado espere o contato e a aprovação. Com tudo certo, você busca o pet no dia combinado com a ONG.',
+      iconName: 'user-check', // Ícone do FontAwesome5
+    },
+  ];
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -46,7 +81,7 @@ export default function VoluntariosScreen() {
 
         {/* --- Imagem Principal --- */}
         <Image
-          source={require('../../../assets/images/ui/gatoVoluntario.png')} 
+          source={require('../../../assets/images/ui/gatoVoluntario.png')}
           style={styles.mainImage}
         />
 
@@ -57,18 +92,33 @@ export default function VoluntariosScreen() {
           sentem gratificadas por fazer a diferença.
         </Text>
 
-        {/* --- Botão Formulário --- */}
-        <TouchableOpacity style={styles.formButton} onPress={handleFormPress}>
-          <FontAwesome name="pencil-square-o" size={40} color="#005A9C" />
-          <View style={styles.formButtonTextContainer}>
-            <Text style={styles.formButtonTitle}>Formulário de interesse</Text>
-            <Text style={styles.formButtonDescription}>
-              Faça o formulário de inscrição que disponibilizamos aqui que a ONG entrará em contato
-              com você em até 48h.
-            </Text>
-          </View>
-          <Feather name="chevron-right" size={24} color="#005A9C" />
-        </TouchableOpacity>
+        {/* --- Seção Formulário (Carrossel) --- */}
+        <View style={styles.swiperContainer}>
+          <Swiper
+            style={styles.swiper}
+            showsButtons={true} // Mostra as setas < e >
+            showsPagination={false} // Esconde os pontinhos de paginação
+            loop={false} // Não deixa o carrossel em loop
+            buttonWrapperStyle={styles.swiperButtonWrapper}
+            nextButton={<Feather name="chevron-right" size={30} color="#005A9C" />}
+            prevButton={<Feather name="chevron-left" size={30} color="#005A9C" />}
+          >
+            {formularioSlides.map((slide) => (
+              <TouchableOpacity
+                key={slide.key}
+                style={styles.slide}
+                onPress={handleFormPress}
+                activeOpacity={0.8}
+              >
+                <View style={styles.slideIconContainer}>
+                  <FontAwesome5 name={slide.iconName} size={50} color="#FFFFFF" />
+                </View>
+                <Text style={styles.slideTitle}>{slide.title}</Text>
+                <Text style={styles.slideDescription}>{slide.description}</Text>
+              </TouchableOpacity>
+            ))}
+          </Swiper>
+        </View>
 
         {/* --- Perguntas Frequentes --- */}
         <Text style={styles.faqHeader}>Perguntas frequentes:</Text>
@@ -131,7 +181,7 @@ const styles = StyleSheet.create({
   },
   pawIcon1: {
     right: 10,
-    top: 30,
+    top: 10,
     transform: [{ rotate: '15deg' }],
   },
   pawIcon2: {
@@ -162,34 +212,67 @@ const styles = StyleSheet.create({
   },
   mainImage: {
     width: '100%',
-    height: 200,
+    height: 300,
     resizeMode: 'cover',
     borderRadius: 10,
     marginBottom: 20,
   },
-  formButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F0F8FF', // Azul bem claro
-    padding: 20,
-    borderRadius: 10,
+
+  // --- Estilos do Carrossel (Swiper) ---
+  swiperContainer: {
+    height: 320, // Altura fixa para o carrossel
     marginTop: 10,
     marginBottom: 30,
   },
-  formButtonTextContainer: {
-    flex: 1,
-    marginLeft: 15,
+  swiper: {
+    // O Swiper em si
   },
-  formButtonTitle: {
+  swiperButtonWrapper: {
+    paddingHorizontal: 0, // Remover padding padrão
+    width: '100%',
+    position: 'absolute',
+    top: 0,
+    height: '100%',
+    justifyContent: 'space-between', // Coloca as setas nas extremidades
+    alignItems: 'center', // Centraliza verticalmente
+    flexDirection: 'row',
+  },
+  slide: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    backgroundColor: '#F0F8FF', 
+    borderRadius: 10,
+    paddingTop: 30, 
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+
+    marginHorizontal: 40,
+  },
+  slideIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#005A9C', // Círculo azul escuro
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  slideTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#005A9C',
+    textAlign: 'center',
+    marginBottom: 10,
   },
-  formButtonDescription: {
+  slideDescription: {
     fontSize: 14,
     color: '#333',
-    marginTop: 5,
+    textAlign: 'center',
+    lineHeight: 20,
   },
+
+  // --- Estilos do FAQ (os seus, mantidos) ---
   faqHeader: {
     fontSize: 20,
     fontWeight: 'bold',
