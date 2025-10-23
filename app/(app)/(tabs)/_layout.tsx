@@ -1,14 +1,14 @@
 // Arquivo: app/(app)/(tabs)/_layout.tsx
-import React from 'react';
-import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Tabs } from 'expo-router';
+import React from 'react';
 
 export default function TabLayout() {
   return (
     <Tabs
       initialRouteName="home"
       screenOptions={{
-        headerShown: true, 
+        headerShown: false,
         headerTitleAlign: "center",
         tabBarActiveTintColor: "#2D68A6",
         tabBarInactiveTintColor: "#3A5C7A",
@@ -22,8 +22,7 @@ export default function TabLayout() {
         name="home"
         options={{
           title: 'Início',
-          // Escondemos o cabeçalho APENAS na home, já que ela tem um cabeçalho diferente.
-          headerShown: false, 
+          // A home possui um cabeçalho custom dentro do próprio componente.
           tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
         }}
       />

@@ -1,8 +1,10 @@
+import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ConfigScreen() {
+  const router = useRouter();
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -15,19 +17,19 @@ export default function ConfigScreen() {
         {/* Conta */}
         <Text style={styles.sectionTitle}>Conta</Text>
 
-        <TouchableOpacity style={styles.item}>
+        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/configperfil')}>
           <Ionicons name="person-outline" size={22} color="#2D68A6" />
           <Text style={styles.itemText}>Conta</Text>
           <Feather name="chevron-right" size={20} color="#2D68A6" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item}>
+  <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/endereco')}>
           <Ionicons name="home-outline" size={22} color="#2D68A6" />
           <Text style={styles.itemText}>Endereço</Text>
           <Feather name="chevron-right" size={20} color="#2D68A6" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item}>
+        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/notificacoes')}>
           <Ionicons name="notifications-outline" size={22} color="#2D68A6" />
           <Text style={styles.itemText}>Notificação</Text>
           <Feather name="chevron-right" size={20} color="#2D68A6" />

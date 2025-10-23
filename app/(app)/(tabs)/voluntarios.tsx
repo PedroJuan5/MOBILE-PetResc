@@ -1,18 +1,16 @@
+import { useRouter } from 'expo-router';
 import React from 'react';
 import {
-  View,
-  Text,
-  ScrollView,
   Image,
-  StyleSheet,
-  TouchableOpacity,
   SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-// Importa o Swiper
-import Swiper from 'react-native-swiper';
 // Adiciona FontAwesome5 para os novos ícones
-import { FontAwesome, Feather, FontAwesome5 } from '@expo/vector-icons';
+import { Feather, FontAwesome5 } from '@expo/vector-icons';
 
 export default function VoluntariosScreen() {
   const router = useRouter();
@@ -94,14 +92,11 @@ export default function VoluntariosScreen() {
 
         {/* --- Seção Formulário (Carrossel) --- */}
         <View style={styles.swiperContainer}>
-          <Swiper
-            style={styles.swiper}
-            showsButtons={true} // Mostra as setas < e >
-            showsPagination={false} // Esconde os pontinhos de paginação
-            loop={false} // Não deixa o carrossel em loop
-            buttonWrapperStyle={styles.swiperButtonWrapper}
-            nextButton={<Feather name="chevron-right" size={30} color="#005A9C" />}
-            prevButton={<Feather name="chevron-left" size={30} color="#005A9C" />}
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.swiperContent}
           >
             {formularioSlides.map((slide) => (
               <TouchableOpacity
@@ -117,7 +112,7 @@ export default function VoluntariosScreen() {
                 <Text style={styles.slideDescription}>{slide.description}</Text>
               </TouchableOpacity>
             ))}
-          </Swiper>
+          </ScrollView>
         </View>
 
         {/* --- Perguntas Frequentes --- */}
@@ -224,6 +219,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 30,
   },
+  swiperContent: {
+    // Ensure slides align horizontally and take full width for paging
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
   swiper: {
     // O Swiper em si
   },
@@ -247,7 +247,9 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     paddingHorizontal: 20,
 
-    marginHorizontal: 40,
+    // Make slide width roughly equal to screen minus padding
+    width: 300,
+    marginHorizontal: 10,
   },
   slideIconContainer: {
     width: 100,
