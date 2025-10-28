@@ -1,8 +1,8 @@
-import React from 'react';
-import {View,Text,ScrollView,Image,StyleSheet,TouchableOpacity,SafeAreaView,} from 'react-native';
+import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React from 'react';
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
 import Swiper from 'react-native-swiper';
-import { FontAwesome, Feather, FontAwesome5 } from '@expo/vector-icons';
 
 export default function VoluntariosScreen() {
   const router = useRouter();
@@ -215,6 +215,11 @@ const styles = StyleSheet.create({
     height: 320, 
     marginTop: 10,
     marginBottom: 30,
+  },
+  swiperContent: {
+    // Ensure slides align horizontally and take full width for paging
+    alignItems: 'center',
+    paddingHorizontal: 20,
   },
   swiper: {
   },
