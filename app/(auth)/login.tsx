@@ -7,14 +7,12 @@ import { useAuth } from "../../context/AuthContext";
 
 export default function TelaLogin() {
   const router = useRouter();
-  const { signIn } = useAuth(); //função do AuthContext que realiza o login
+  const { signIn } = useAuth(); 
 
-  //estados do formulário com nomes claros
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [carregando, setCarregando] = useState(false);
 
-  //função acionada ao tocar em "Entrar"
   const entrar = async () => {
     if (!email.trim() || !senha) {
       Alert.alert("Atenção", "Por favor, preencha email e senha");
@@ -27,24 +25,22 @@ export default function TelaLogin() {
     }
 
     setCarregando(true);
+
     try {
-      //tentamos enviar credenciais num objeto (forma mais comum)
-      await (signIn as any)({ email, password: senha });
-      return;
-    } catch (err) {
-      //se falhar, tentamos chamar sem argumentos — alguns contextos leem campos internos
-      try {
-        await (signIn as any)();
-        return;
-      } catch (err2) {
-        console.warn("signIn falhou:", err2);
-        Alert.alert("Erro", "Não foi possível entrar. Tente novamente mais tarde.");
-      }
+      await signIn({ email: email, password: senha });
+
+
+      router.push('/(tabs)/home' as any);
+      
+
+    } catch (err: any) {
+     console.warn("signIn falhou:", err.message);
+     Alert.alert("Erro no Login", err.message);
+
     } finally {
       setCarregando(false);
     }
   };
-
   return (
     <SafeAreaView style={styles.container}>
       {/*botao de voltar */}

@@ -6,16 +6,16 @@ import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "reac
 export default function CadastroScreen() {
   const router = useRouter();
 
-  const [name, setName] = useState('');
+  const [nome, setName] = useState('');
   const [cpf, setCpf] = useState('');
   const [email, setEmail] = useState('');
 
   const handleNext = () => {
-    if (!name || !email) {
+    if (!nome || !email) {
       Alert.alert("Erro", "Nome e Email são obrigatórios.");
       return;
     }
-     router.push({ pathname: '/(auth)/signup2', params: { name, cpf, email } });
+     router.push({ pathname: '/(auth)/signup2', params: { nome, cpf, email } });
 
   };
 
@@ -32,7 +32,7 @@ export default function CadastroScreen() {
       <TextInput
         style={styles.input}
         placeholder="Nome completo"
-        value={name}
+        value={nome}
         onChangeText={setName} 
       />
       <TextInput
@@ -60,7 +60,7 @@ export default function CadastroScreen() {
       <View style={styles.socialContainer}>
         <TouchableOpacity style={styles.socialButton}>
           <Text>G</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>a
         <TouchableOpacity style={styles.socialButton}>
           <Text></Text>
         </TouchableOpacity>
@@ -70,8 +70,7 @@ export default function CadastroScreen() {
           <Text style={styles.nextButtonText}>Próximo</Text>
         </TouchableOpacity>
         <Text style={styles.loginText}>
-          Já tem conta?{' '}
-          <Text style={styles.loginLink} onPress={() => router.push('./login')}>Login</Text>
+         <Text style={styles.loginLink} onPress={() => router.push('/login')}>Login</Text>
         </Text>
         <View style={styles.indicatorContainer}>
           <View style={[styles.indicator, { backgroundColor: '#2563eb' }]} />

@@ -7,7 +7,7 @@ import api, { AxiosError } from '@/lib/axios';
 export default function CadastroScreen2() { 
   const router = useRouter();
   
-  const { name, cpf, email } = useLocalSearchParams();
+  const { nome, cpf, email } = useLocalSearchParams();
 
   const [telefone, setTelefone] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +24,7 @@ export default function CadastroScreen2() {
 
     try {
       const userData = {
-        name: name,
+        nome: nome,
         email: email,
         cpf: cpf,
         telefone: telefone,

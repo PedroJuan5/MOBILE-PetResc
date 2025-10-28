@@ -1,60 +1,44 @@
-// Arquivo: app/(app)/(tabs)/_layout.tsx
-import React from 'react';
-import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+// app/_layout.tsx (O Layout Raiz - O GUARDA DA PORTA)
 
-export default function TabLayout() {
+import React, { useEffect } from 'react';
+import { SplashScreen, Slot, useRouter, useSegments } from 'expo-router';
+import { AuthProvider, useAuth } from '@/context/AuthContext'; 
+
+SplashScreen.preventAutoHideAsync();
+
+function RootLayoutNav() {
+  const { user, isLoading } = useAuth(); 
+  const segments = useSegments(); 
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading) {
+      const inAuthGroup = segments[0] === '(auth)';
+
+      if (user && inAuthGroup) {
+        SplashScreen.hideAsync(); 
+        router.replace('/home'); 
+      } else if (!user && !inAuthGroup) {
+        SplashScreen.hideAsync();
+        router.replace('/login'); 
+      } else {
+        
+         SplashScreen.hideAsync();
+      }
+    }
+  }, [user, isLoading, segments]);
+
+  if (isLoading) {
+    return null; 
+  }
+
+  return <Slot />; 
+}
+
+export default function RootLayout() {
   return (
-    <Tabs
-      initialRouteName="home"
-      screenOptions={{
-        headerShown: true, 
-        headerTitleAlign: "center",
-        tabBarActiveTintColor: "#2D68A6",
-        tabBarInactiveTintColor: "#3A5C7A",
-        headerStyle: {
-          backgroundColor: '#2D68A6',
-        },
-        headerTintColor: '#fff',
-      }}
-    >
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: 'Início',
-          // Escondemos o cabeçalho APENAS na home, já que ela tem um cabeçalho diferente.
-          headerShown: false, 
-          tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="adotar"
-        options={{
-          title: 'Adoção',
-          tabBarIcon: ({ color, size }) => <Ionicons name="paw-outline" size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="doar"
-        options={{
-          title: "Doar",
-          tabBarIcon: ({ color, size }) => <Ionicons name="gift-outline" size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="voluntarios"
-        options={{
-          title: "Voluntários",
-          tabBarIcon: ({ color, size }) => <Ionicons name="heart-outline" size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="registro-animal"
-        options={{
-          title: "Registro", // Este título será substituído pelo do próprio arquivo
-          tabBarIcon: ({ color, size }) => <Ionicons name="add-circle-outline" size={size} color={color} />,
-        }}
-      />
-    </Tabs>
+    <AuthProvider>
+      <RootLayoutNav />
+    </AuthProvider>
   );
 }
