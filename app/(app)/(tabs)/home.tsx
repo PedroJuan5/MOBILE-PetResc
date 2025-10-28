@@ -1,6 +1,22 @@
-import React from "react";
-import {SafeAreaView,ScrollView,View,Text,StyleSheet,Image,TouchableOpacity,ImageSourcePropType,} from "react-native";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+// 1. Importar o useState
+import React, { useState } from "react";
+import {
+  Image,
+  ImageSourcePropType,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+// --- 2. IMPORTAR OS NOVOS COMPONENTES ---
+import CustomHeaderLeft from '../../../components/elementosEsquerda';
+import CustomHeaderRight from '../../../components/elementosDireita';
+import { DenuncieModal } from '../../../components/denuncieModal';
+// --- FIM DAS NOVAS IMPORTAÇÕES ---
 
 //tipos para TypeScript
 interface Animal {
@@ -104,16 +120,29 @@ const CartaoOng = ({ ong }: CartaoOngProps) => (
 
 // Tela principal
 export default function HomeScreen() {
+  // --- 3. ADICIONAR LÓGICA DO MODAL ---
+  const [modalVisible, setModalVisible] = useState(false);
+  const handleDenunciePress = () => setModalVisible(true);
+  // --- FIM DA LÓGICA DO MODAL ---
+
   return (
     <SafeAreaView style={styles.safeArea}>
+      
+      {/* --- 4. SEU NOVO HEADER CUSTOMIZADO --- */}
+      <View style={styles.headerContainer}>
+        <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
+        {/* Mantive o mesmo texto do seu título antigo */}
+        <Text style={styles.headerTitle}>Conheça seu novo melhor amigo!</Text>
+        <CustomHeaderRight />
+      </View>
+
+      {/* --- 5. SEU MODAL (renderizado mas invisível) --- */}
+      <DenuncieModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
-          <View style={styles.cabecalho}>
-            <Text style={styles.titulo}>Conheça seu novo melhor amigo!</Text>
-            <View style={styles.pata}>
-              <FontAwesome5 name="paw" size={18} color="#BFE1F7" />
-            </View>
-          </View>
+          
+          {/* --- O CABEÇALHO ANTIGO FOI REMOVIDO DAQUI --- */}
 
           <Text style={styles.subTitulo}>Meus animais</Text>
           <ScrollView horizontal showsVerticalScrollIndicator={false}>
@@ -133,7 +162,6 @@ export default function HomeScreen() {
                 <Text style={styles.textoBotaoDoar}>Doe agora</Text>
               </TouchableOpacity>
             </View>
-            {/* ✅ CORREÇÃO APLICADA AQUI */}
             <Image
               source={require("../../../assets/images/ui/gatoHome.png")}
               style={styles.imagemContribuicao}
@@ -153,16 +181,36 @@ export default function HomeScreen() {
 //Estilos
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#FFFFFF" },
-  container: { padding: 20 },
-
-  cabecalho: { marginBottom: 20, position: "relative" },
-  titulo: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: "#2D68A6",
-    width: "70%",
+  
+  // --- 6. NOVOS ESTILOS DO HEADER ---
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 0, // Seus componentes já têm padding
+    paddingVertical: 10,
+    backgroundColor: '#FFFFFF',
+    // Adicionamos a sombra que você tinha na imagem de design
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEE', 
   },
-  pata: { position: "absolute", right: 0, top: 0 },
+  headerTitle: {
+    fontSize: 22, // Usei um tamanho padrão que fica bom entre os ícones
+    fontWeight: '700', // Mantém o peso original
+    color: '#2D68A6', // Mantém a cor original
+    textAlign: 'center',
+    flex: 1, // Permite que ele se centralize corretamente
+  },
+  // --- FIM DOS NOVOS ESTILOS ---
+
+  // Ajustei o padding do container para não colar no header
+  container: { padding: 20, paddingTop: 10 }, 
+
+  // --- 7. ESTILOS ANTIGOS REMOVIDOS ---
+  // cabecalho: { marginBottom: 20, position: "relative" },
+  // titulo: { ... },
+  // pata: { ... },
+  // --- FIM DOS ESTILOS REMOVIDOS ---
 
   subTitulo: {
     fontSize: 18,

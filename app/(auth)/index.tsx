@@ -1,7 +1,7 @@
 // Arquivo: app/(auth)/index.tsx
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRouter } from 'expo-router';
-import React, { useLayoutEffect, useState, useEffect } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Modal, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 // Importe os componentes e o contexto de autenticação

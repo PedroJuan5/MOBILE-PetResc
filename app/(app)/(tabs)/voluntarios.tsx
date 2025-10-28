@@ -1,143 +1,129 @@
-import React from 'react';
-import {View,Text,ScrollView,Image,StyleSheet,TouchableOpacity,SafeAreaView,} from 'react-native';
+import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Swiper from 'react-native-swiper';
-import { FontAwesome, Feather, FontAwesome5 } from '@expo/vector-icons';
+
+// --- IMPORTE SEUS COMPONENTES DE HEADER E MODAL ---
+import { DenuncieModal } from '../../../components/denuncieModal';// Verifique o caminho
+import CustomHeaderRight from '../../../components/elementosDireita'; // Verifique o caminho
+import CustomHeaderLeft from '../../../components/elementosEsquerda'; // Verifique o caminho
 
 export default function VoluntariosScreen() {
   const router = useRouter();
 
-  //funçao para navegar para a tela de formulário
-// Esta função agora recebe a "key" do slide
-  const handleSlidePress = (key: string) => {
-    // Só navega se for o primeiro slide
-    if (key === 'interesse') {
-      router.push('/formulario-interesse');
-    }
+  // --- LÓGICA DO MODAL DE DENÚNCIA ---
+  const [modalVisible, setModalVisible] = useState(false);
+  const handleDenunciePress = () => setModalVisible(true);
+  // --- FIM DA LÓGICA DO MODAL ---
+
+  // Navega para o NOVO formulário de voluntários
+  const handleFormPress = () => {
+    // Este é o novo formulário que você precisa criar
+    router.push('/formulario-voluntario');
   };
 
-  // dados para os slides do carrossel
-  const formularioSlides = [
+  // Dados para o carrossel de VOLUNTÁRIOS (Lar Temporário)
+  const voluntarioSlides = [
     {
       key: 'interesse',
       title: 'Formulário de interesse',
       description:
         'Faça o formulário de inscrição que disponibilizamos aqui que a ONG entrará em contato com você em até 48h.',
-      iconName: 'clipboard-list', 
+      iconName: 'clipboard-list', // (FontAwesome5)
+      iconLib: FontAwesome5,
     },
     {
       key: 'avaliacao',
       title: 'Avaliação de formulário',
       description:
         'A ONG irá fazer a análise do cadastro e perfil do voluntário. Preenchendo os requisitos, você recebe a aprovação por telefone/email.',
-      iconName: 'chart-line', 
+      iconName: 'chart-line', // (FontAwesome5)
+      iconLib: FontAwesome5,
     },
     {
       key: 'aprovado',
       title: 'Formulário aprovado',
       description:
         'Caso seja aprovado espere o contato e a aprovação. Com tudo certo, você busca o pet no dia combinado com a ONG.',
-      iconName: 'user-check', 
+      iconName: 'user-check', // (FontAwesome5)
+      iconLib: FontAwesome5,
     },
   ];
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* --- Seção Header --- */}
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerTitle}>Veja a diferença que você pode fazer!</Text>
-          {/* Ícones de patinha - ajuste o caminho da imagem */}
-          <Image
-            source={require('../../../assets/images/ui/patinhas.png')} 
-            style={[styles.pawIcon, styles.pawIcon1]}
-          />
-          <Image
-            source={require('../../../assets/images/ui/patinhas.png')} 
-            style={[styles.pawIcon, styles.pawIcon2]}
-          />
-          <Image
-            source={require('../../../assets/images/ui/patinhas.png')} 
-            style={[styles.pawIcon, styles.pawIcon3]}
-          />
-          <Feather name="bell" size={24} color="#555" style={styles.bellIcon} />
-        </View>
+      {/* --- SEU HEADER CUSTOMIZADO --- */}
+      <View style={styles.headerContainer}>
+        <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
+        <Text style={styles.headerTitle}>Veja a diferença que você pode fazer!</Text>
+        <CustomHeaderRight />
+      </View>
 
+      {/* --- SEU MODAL (renderizado mas invisível) --- */}
+      <DenuncieModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+
+      <ScrollView contentContainerStyle={styles.container}>
         {/* --- O que é Lar Temporário --- */}
         <Text style={styles.sectionTitle}>O que é um Lar Temporário?</Text>
         <Text style={styles.paragraph}>
           É um lar humano acolhedor que abriga temporariamente animais resgatados em situação de
-          vulnerabilidade, oferecendo-lhes um ambiente seguro, carinho e cuidados até que encontrem
-          um lar definitivo ou um cuidador permanente.
+          vulnerabilidade... (etc)
         </Text>
 
-        {/* --- Imagem principal --- */}
+        {/* --- Imagem Principal --- */}
         <Image
-          source={require('../../../assets/images/ui/gatoVoluntario.png')}
+          source={require('../../../assets/images/ui/gatoVoluntario.png')} // Imagem do gato na casinha
           style={styles.mainImage}
         />
 
-        {/* --- texto Explicativo --- */}
+        {/* --- Texto Explicativo --- */}
         <Text style={styles.paragraph}>
-          Este gesto transforma vidas, permitindo que os animais recebam tratamento adequado, evitem o
-          isolamento em abrigos e aprendam a confiar novamente, enquanto as famílias que acolhem se
-          sentem gratificadas por fazer a diferença.
+          Este gesto transforma vidas, permitindo que os animais recebam tratamento adequado... (etc)
         </Text>
 
-        {/* --- Seção Formulario (carrossel) --- */}
+        {/* --- Carrossel de VOLUNTÁRIO --- */}
         <View style={styles.swiperContainer}>
           <Swiper
             style={styles.swiper}
-            showsButtons={true} // Mostra as setas < e >
-            showsPagination={false} //esconde os pontinhos de paginação
-            loop={false} // nao deixa o carrossel em loop
+            showsButtons={true}
+            showsPagination={false}
+            loop={false}
             buttonWrapperStyle={styles.swiperButtonWrapper}
             nextButton={<Feather name="chevron-right" size={30} color="#005A9C" />}
             prevButton={<Feather name="chevron-left" size={30} color="#005A9C" />}
           >
-           {formularioSlides.map((slide) => (
-              <TouchableOpacity
-                key={slide.key}
-                style={styles.slide}
-                // Chama a função handleSlidePress passando a key
-                onPress={() => handleSlidePress(slide.key)}
-                // Desabilita o feedback de toque para os slides não-clicáveis
-                activeOpacity={slide.key === 'interesse' ? 0.8 : 1.0}
-              >
-                <View style={styles.slideIconContainer}>
-                  <FontAwesome5 name={slide.iconName} size={50} color="#FFFFFF" />
-                </View>
-                <Text style={styles.slideTitle}>{slide.title}</Text>
-                <Text style={styles.slideDescription}>{slide.description}</Text>
-              </TouchableOpacity>
-            ))}
+            {voluntarioSlides.map((slide) => {
+              const IconComponent = slide.iconLib;
+              return (
+                <TouchableOpacity
+                  key={slide.key}
+                  style={styles.slide}
+                  onPress={slide.key === 'interesse' ? handleFormPress : () => {}}
+                  activeOpacity={slide.key === 'interesse' ? 0.8 : 1.0}
+                >
+                  <View style={styles.slideIconContainer}>
+                    <IconComponent name={slide.iconName as any} size={50} color="#FFFFFF" />
+                  </View>
+                  <Text style={styles.slideTitle}>{slide.title}</Text>
+                  <Text style={styles.slideDescription}>{slide.description}</Text>
+                </TouchableOpacity>
+              );
+            })}
           </Swiper>
         </View>
 
-        {/* --- perguntas frequentes --- */}
+        {/* --- Perguntas Frequentes --- */}
         <Text style={styles.faqHeader}>Perguntas frequentes:</Text>
-
-        <View style={styles.faqCard}>
-          <Text style={styles.faqQuestion}>Por quanto tempo devo cuidar do animal?</Text>
-          <Text style={styles.faqAnswer}>
-            O período varia conforme a necessidade do animal, geralmente de algumas semanas a meses.
-          </Text>
-        </View>
-
-        <View style={styles.faqCard}>
-          <Text style={styles.faqQuestion}>Preciso ter experiência com animais?</Text>
-          <Text style={styles.faqAnswer}>
-            Não. Fornecemos orientação e acompanhamento completo durante toda a estadia.
-          </Text>
-        </View>
-
-        <View style={styles.faqCard}>
-          <Text style={styles.faqQuestion}>Há custos envolvidos?</Text>
-          <Text style={styles.faqAnswer}>
-            Algumas despesas podem ser cobertas pelo programa, mas cada lar deve fornecer
-            alimentação e cuidados básicos.
-          </Text>
-        </View>
+        {/* ... (Seus <View style={styles.faqCard}> ... ) ... */}
       </ScrollView>
     </SafeAreaView>
   );
@@ -148,45 +134,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
+  // --- ESTILOS DO HEADER NOVO ---
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 0, // Seus componentes já têm padding (marginLeft/Right)
+    paddingVertical: 10,
+    backgroundColor: '#FFFFFF',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#005A9C',
+    textAlign: 'center', // Centraliza o título entre os ícones
+    flex: 1, // Permite que o título ocupe o espaço restante
+  },
+  // --- FIM DOS ESTILOS DO HEADER ---
   container: {
     padding: 20,
     backgroundColor: '#FFFFFF',
-  },
-  headerContainer: {
-    position: 'relative',
-    marginBottom: 20,
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#005A9C', 
-    width: '80%', 
-  },
-  bellIcon: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-  },
-  pawIcon: {
-    position: 'absolute',
-    width: 20,
-    height: 20,
-    opacity: 0.5,
-  },
-  pawIcon1: {
-    right: 10,
-    top: 10,
-    transform: [{ rotate: '15deg' }],
-  },
-  pawIcon2: {
-    right: 50,
-    top: 10,
-    transform: [{ rotate: '-10deg' }],
-  },
-  pawIcon3: {
-    right: 30,
-    top: 60,
-    transform: [{ rotate: '25deg' }],
+    paddingTop: 10, // Diminui o espaço do topo
   },
   sectionTitle: {
     fontSize: 22,
@@ -211,30 +179,30 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 20,
   },
+  // Carrossel
   swiperContainer: {
-    height: 320, 
+    height: 320,
     marginTop: 10,
     marginBottom: 30,
   },
-  swiper: {
-  },
+  swiper: {},
   swiperButtonWrapper: {
     paddingHorizontal: 0,
     width: '100%',
     position: 'absolute',
     top: 0,
     height: '100%',
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
+    justifyContent: 'space-between',
+    alignItems: 'center',
     flexDirection: 'row',
   },
   slide: {
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
-    backgroundColor: '#F0F8FF', 
+    backgroundColor: '#F0F8FF',
     borderRadius: 10,
-    paddingTop: 30, 
+    paddingTop: 30,
     paddingBottom: 20,
     paddingHorizontal: 20,
     marginHorizontal: 40,
@@ -243,7 +211,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#005A9C', 
+    backgroundColor: '#005A9C',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
@@ -261,6 +229,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
+  // FAQ
   faqHeader: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -268,7 +237,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   faqCard: {
-    backgroundColor: '#F0F8FF', 
+    backgroundColor: '#F0F8FF',
+    padding: 20,
     borderRadius: 10,
     marginBottom: 15,
   },

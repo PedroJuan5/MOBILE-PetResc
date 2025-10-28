@@ -1,146 +1,269 @@
-  import React, { useState, useLayoutEffect, useMemo } from "react";
-  import { SafeAreaView, View, Text, StyleSheet, FlatList, TouchableOpacity, ImageSourcePropType } from "react-native";
-  import { Ionicons } from "@expo/vector-icons";
-  import { useNavigation } from "expo-router";
-  import { PetCard } from "../../../components/adocao/PetCard";
-  import { FiltrosModal } from "../../../components/adocao/FiltrosModal";
+import React from 'react';
+import {View,Text,ScrollView,Image,StyleSheet,TouchableOpacity,} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import Swiper from 'react-native-swiper';
+import { Feather, FontAwesome, FontAwesome5 } from '@expo/vector-icons'; // Importe os ícones
+import CustomHeaderLeft from '../../../components/elementosEsquerda';
+import CustomHeaderRight from '../../../components/elementosDireita';
+import { DenuncieModal } from '../../../components/denuncieModal';
 
-  interface Pet {
-    id: string;
-    nome: string;
-    raca: string;
-    genero: string;
-    especie: string;
-    idade: string;
-    tamanho: string;
-    imagem: ImageSourcePropType;
-  }
+export default function AdotarScreen() {
+  const router = useRouter();
 
-  interface Filtros {
-    nome?: string;
-    isGato?: boolean;
-    isCao?: boolean;
-    isMacho?: boolean;
-    isFemea?: boolean;
-    porte?: string;
-    raca?: string;
-    idade?: string;
-  }
+  // --- Funções de Navegação ---
 
-  /* Dados de exemplo (substitua pela API kaique quando der ) */
-  const PETS_COMPLETOS: Pet[] = [
-    { id: "1", nome: "Branquinho", raca: "SRD", genero: "Macho", especie: "Gato", idade: "Adulto", tamanho: "Pequeno", imagem: require("../../../assets/images/pets/branquinho.png") },
-    { id: "2", nome: "Frajola",   raca: "SRD", genero: "Fêmea", especie: "Gato", idade: "Filhote", tamanho: "Pequeno", imagem: require("../../../assets/images/pets/frajola.png") },
-    { id: "3", nome: "Zeus",      raca: "Pitbull", genero: "Macho", especie: "Cachorro", idade: "Adulto", tamanho: "Grande", imagem: require("../../../assets/images/pets/zeus.png") },
-    { id: "4", nome: "Paçoca",    raca: "SRD", genero: "Macho", especie: "Cachorro", idade: "Idoso", tamanho: "Medio", imagem: require("../../../assets/images/pets/paçoca.png") },
-    { id: "5", nome: "Neguinho",  raca: "SRD", genero: "Macho", especie: "Cachorro", idade: "Filhote", tamanho: "Pequeno", imagem: require("../../../assets/images/pets/neguinho.png") },
-    { id: "6", nome: "Caramelo",  raca: "SRD", genero: "Macho", especie: "Cachorro", idade: "Adulto", tamanho: "Medio", imagem: require("../../../assets/images/pets/caramelo.png") },
+  // 1. Navega para o formulário de ADOÇÃO que já fizemos
+  const handleFormPress = () => {
+    router.push('/formulario-interesse');
+  };
+
+  // 2. Navega para a sua aba de Pets
+  const handlePetsPress = () => {
+    // Usamos o caminho (tabs) para manter a barra de navegação
+    router.push('/(tabs)/pets');
+  };
+
+  // --- Dados para o Carrossel de Adoção ---
+  const adocaoSlides = [
+    {
+      key: 'interesse',
+      title: 'Formulário de interesse',
+      description:
+        'Faça o formulário de inscrição que disponibilizamos aqui que a ONG/protetor entrará em contato com você.',
+      iconName: 'pencil-square-o', // Ícone da imagem (FontAwesome)
+      iconLib: FontAwesome,
+    },
+    {
+      key: 'avaliacao',
+      title: 'Avaliação de adoção',
+      description:
+        'A ONG irá fazer a análise do cadastro e perfil do adotante e o pet escolhido. Você recebe a aprovação por telefone/email.',
+      iconName: 'bar-chart', // Ícone da imagem (FontAwesome)
+      iconLib: FontAwesome,
+    },
+    {
+      key: 'completa',
+      title: 'Adoção completa',
+      description:
+        'Caso seja aprovado, você busca seu pet no dia combinado com a ONG/protetor.',
+      iconName: 'paw', // Placeholder (FontAwesome5)
+      iconLib: FontAwesome5,
+    },
   ];
 
-  export default function TelaAdotar() {
-    //controla visibilidade do modal de filtros
-    const [filtroVisivel, setFiltroVisivel] = useState(false);
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* --- Seção Header --- */}
+        <View style={styles.headerContainer}>
+          <Text style={styles.headerTitle}>Conheça seu novo melhor amigo!</Text>
+          {/* Ícones de patinha - ajuste o caminho da imagem */}
+          <Image
+            source={require('../../../assets/images/ui/patinhas.png')} // Mude para seu ícone de patinha
+            style={[styles.pawIcon, styles.pawIcon1]}
+          />
+          <Image
+            source={require('../../../assets/images/ui/patinhas.png')} // Mude para seu ícone de patinha
+            style={[styles.pawIcon, styles.pawIcon2]}
+          />
+          <Feather name="bell" size={24} color="#555" style={styles.bellIcon} />
+        </View>
 
-    // filtros que o usuário aplicou; começa vazio = sem filtros
-    const [filtrosAplicados, setFiltrosAplicados] = useState<Filtros>({});
-
-    const navigation = useNavigation();
-
-    // função chamada pelo modal quando o usuario aplica filtros
-    const aplicarFiltros = (f: Filtros) => {
-      setFiltrosAplicados(f);
-    };
-
-    const petsFiltrados = useMemo(() => {
-      if (Object.keys(filtrosAplicados).length === 0) return PETS_COMPLETOS;
-
-      return PETS_COMPLETOS.filter((pet) => {
-        const f = filtrosAplicados;
-
-        // --- CORREÇÕES APLICADAS AQUI ---
-        if (f.nome && !pet.nome.toLowerCase().includes(f.nome.toLowerCase())) return false; // Usando pet.nome
-        if (f.isGato === false && pet.especie === "Gato") return false;
-        if (f.isCao === false && pet.especie === "Cachorro") return false;
-        if (f.isMacho === false && pet.genero === "Macho") return false;
-        if (f.isFemea === false && pet.genero === "Fêmea") return false;
-        if (f.porte && pet.tamanho.toLowerCase() !== f.porte.toLowerCase()) return false;
-        if (f.raca && !pet.raca.toLowerCase().includes(f.raca.toLowerCase())) return false; // Usando pet.raca
-        if (f.idade && pet.idade.toLowerCase() !== f.idade.toLowerCase()) return false; // Comparando pet.idade com f.idade
-
-        return true;
-      });
-    }, [filtrosAplicados]);
-
-    //configura o cabeçalho: título e botao que abre o modal de filtros
-    useLayoutEffect(() => {
-      navigation.setOptions({
-        headerTitle: "Pets para adoção",
-        headerLeft: () => (
-          <TouchableOpacity onPress={() => setFiltroVisivel(true)} style={{ marginLeft: 15 }} accessibilityLabel="Abrir filtros">
-            <Ionicons name="menu" size={28} color="#ffffffff" />
-          </TouchableOpacity>
-        ),
-      });
-    }, [navigation]);
-
-    return (
-      <SafeAreaView style={styles.areaSegura}>
-        {/* modal de filtros: recebe visibilidade e callback de aplicação */}
-        <FiltrosModal
-          visible={filtroVisivel}
-          onClose={() => setFiltroVisivel(false)}
-          onApplyFilters={aplicarFiltros}
+        {/* --- Imagem Principal --- */}
+        <Image
+          // Troque para a imagem do cachorro e gato
+          source={require('../../../assets/images/ui/caoegato.png')}
+          style={styles.mainImage}
         />
 
-        <View style={styles.container}>
-          <View style={styles.subCabecalho}>
-            <Text style={styles.titulo}>Animais em destaque</Text>
-            <TouchableOpacity accessibilityLabel="Trocar ordem" onPress={() => { /* aqui você pode abrir um menu de ordenação */ }}>
-              <Ionicons name="swap-horizontal" size={24} color="#2D68A6" />
-            </TouchableOpacity>
-          </View>
+        {/* --- Texto Explicativo --- */}
+        <Text style={styles.paragraph}>
+          Nosso sistema de adoção foi desenvolvido para conectar animais em situação de
+          vulnerabilidade a pessoas responsáveis que desejam oferecer um lar. Ao preencher o
+          formulário, você fornece informações importantes que ajudam a ONG a avaliar o perfil do
+          adotante e garantir que o animal tenha um ambiente seguro e adequado.
+        </Text>
 
-          <FlatList
-            data={petsFiltrados}
-            renderItem={({ item }) => <PetCard pet={item} />}
-            keyExtractor={(item) => item.id}
-            numColumns={2}
-            showsVerticalScrollIndicator={false}
-            ListEmptyComponent={<Text style={styles.textoVazio}>Nenhum animal encontrado.</Text>}
-            //se a lista crescer vou colocar um getItemLayout e initialNumToRender
-          />
+        {/* --- Botões de Ação --- */}
+        <View style={styles.buttonRow}>
+          <TouchableOpacity style={styles.button} onPress={handleFormPress}>
+            <Text style={styles.buttonText}>Formulário</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.buttonOutline]}
+            onPress={handlePetsPress}
+          >
+            <Text style={[styles.buttonText, styles.buttonOutlineText]}>Pets disponíveis</Text>
+          </TouchableOpacity>
         </View>
-      </SafeAreaView>
-    );
-  }
 
-  const styles = StyleSheet.create({
-    areaSegura: {
-      flex: 1,
-      backgroundColor: "#ffffff",
-    },
-    container: {
-      flex: 1,
-      paddingHorizontal: 20,
-    },
+        {/* --- Seção Carrossel (Swiper) --- */}
+        <View style={styles.swiperContainer}>
+          <Swiper
+            style={styles.swiper}
+            showsButtons={true}
+            showsPagination={false}
+            loop={false}
+            buttonWrapperStyle={styles.swiperButtonWrapper}
+            nextButton={<Feather name="chevron-right" size={30} color="#005A9C" />}
+            prevButton={<Feather name="chevron-left" size={30} color="#005A9C" />}
+          >
+            {adocaoSlides.map((slide) => {
+              const IconComponent = slide.iconLib; // Pega o componente de ícone (FA ou FA5)
+              return (
+                <TouchableOpacity
+                  key={slide.key}
+                  style={styles.slide}
+                  onPress={slide.key === 'interesse' ? handleFormPress : () => {}}
+                  activeOpacity={slide.key === 'interesse' ? 0.8 : 1.0}
+                >
+                  <View style={styles.slideIconContainer}>
+                    <IconComponent name={slide.iconName as any} size={50} color="#FFFFFF" />
+                  </View>
+                  <Text style={styles.slideTitle}>{slide.title}</Text>
+                  <Text style={styles.slideDescription}>{slide.description}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </Swiper>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
 
-    subCabecalho: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      padding: 8,
-      marginTop: 10,
-      marginBottom: 5,
-    },
-    titulo: {
-      fontSize: 18,
-      fontWeight: "600",
-      color: "#3A5C7A",
-    },
-
-    textoVazio: {
-      textAlign: "center",
-      marginTop: 50,
-      color: "#3A5C7A",
-    },
-  });
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  container: {
+    padding: 20,
+    backgroundColor: '#FFFFFF',
+  },
+  // Header
+  headerContainer: {
+    position: 'relative',
+    marginBottom: 20,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#005A9C',
+    width: '80%',
+  },
+  bellIcon: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  pawIcon: {
+    position: 'absolute',
+    width: 20,
+    height: 20,
+    opacity: 0.5,
+  },
+  pawIcon1: {
+    right: 10,
+    top: 10,
+    transform: [{ rotate: '15deg' }],
+  },
+  pawIcon2: {
+    right: 50,
+    top: 10,
+    transform: [{ rotate: '-10deg' }],
+  },
+  // Conteúdo Principal
+  mainImage: {
+    width: '100%',
+    height: 250,
+    resizeMode: 'cover',
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  paragraph: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: '#333',
+    textAlign: 'left',
+    marginBottom: 20,
+  },
+  // Botões
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 30,
+  },
+  button: {
+    flex: 1, // Para dividir o espaço
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    backgroundColor: '#005A9C',
+    borderRadius: 8,
+    alignItems: 'center',
+    marginHorizontal: 5, // Espaço entre os botões
+  },
+  buttonOutline: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#005A9C',
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  buttonOutlineText: {
+    color: '#005A9C',
+  },
+  // Carrossel
+  swiperContainer: {
+    height: 320,
+    marginBottom: 20,
+  },
+  swiper: {},
+  swiperButtonWrapper: {
+    paddingHorizontal: 0,
+    width: '100%',
+    position: 'absolute',
+    top: 0,
+    height: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  slide: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    backgroundColor: '#F0F8FF',
+    borderRadius: 10,
+    paddingTop: 30,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    marginHorizontal: 40, // Espaço para as setas
+  },
+  slideIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#005A9C',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  slideTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#005A9C',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  slideDescription: {
+    fontSize: 14,
+    color: '#333',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+});
