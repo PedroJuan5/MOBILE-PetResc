@@ -1,9 +1,8 @@
+import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import {View,Text,ScrollView,Image,StyleSheet,TouchableOpacity,SafeAreaView,} from 'react-native';
-import { useRouter } from 'expo-router';
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
 import Swiper from 'react-native-swiper';
-import { FontAwesome, Feather, FontAwesome5 } from '@expo/vector-icons';
 
 export default function VoluntariosScreen() {
   const router = useRouter();
@@ -112,7 +111,7 @@ export default function VoluntariosScreen() {
                 <Text style={styles.slideDescription}>{slide.description}</Text>
               </TouchableOpacity>
             ))}
-          </ScrollView>
+          </Swiper>
         </View>
 
         {/* --- perguntas frequentes --- */}
