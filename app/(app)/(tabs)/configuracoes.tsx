@@ -25,13 +25,13 @@ export default function ConfigScreen() {
 
   <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/endereco')}>
           <Ionicons name="home-outline" size={22} color="#2D68A6" />
-          <Text style={styles.itemText}>Endereçoo</Text>
+          <Text style={styles.itemText}>Endereço</Text>
           <Feather name="chevron-right" size={20} color="#2D68A6" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/notificacoes')}>
           <Ionicons name="notifications-outline" size={22} color="#2D68A6" />
-          <Text style={styles.itemText}>Notificaçãoaa</Text>
+          <Text style={styles.itemText}>Notificação</Text>
           <Feather name="chevron-right" size={20} color="#2D68A6" />
         </TouchableOpacity>
 
