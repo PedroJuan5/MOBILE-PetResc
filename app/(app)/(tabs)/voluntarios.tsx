@@ -1,21 +1,8 @@
 import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React from 'react';
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
 import Swiper from 'react-native-swiper';
-
-// --- IMPORTE SEUS COMPONENTES DE HEADER E MODAL ---
-import { DenuncieModal } from '../../../components/denuncieModal';// Verifique o caminho
-import CustomHeaderRight from '../../../components/elementosDireita'; // Verifique o caminho
-import CustomHeaderLeft from '../../../components/elementosEsquerda'; // Verifique o caminho
 
 export default function VoluntariosScreen() {
   const router = useRouter();
@@ -185,7 +172,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 30,
   },
-  swiper: {},
+  swiperContent: {
+    // Ensure slides align horizontally and take full width for paging
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  swiper: {
+  },
   swiperButtonWrapper: {
     paddingHorizontal: 0,
     width: '100%',
