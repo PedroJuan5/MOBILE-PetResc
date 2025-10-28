@@ -1,49 +1,44 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
-import {
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-// Adiciona FontAwesome5 para os novos ícones
-import { Feather, FontAwesome5 } from '@expo/vector-icons';
+import {View,Text,ScrollView,Image,StyleSheet,TouchableOpacity,SafeAreaView,} from 'react-native';
+import { useRouter } from 'expo-router';
+import Swiper from 'react-native-swiper';
+import { FontAwesome, Feather, FontAwesome5 } from '@expo/vector-icons';
 
 export default function VoluntariosScreen() {
   const router = useRouter();
 
-  // Função para navegar para a tela de formulário
-  const handleFormPress = () => {
-    // Crie uma tela para o formulário e coloque o caminho aqui
-    // Exemplo: router.push('/(tabs)/formulario-interesse');
-    console.log('Navegar para o formulário de interesse');
+  //funçao para navegar para a tela de formulário
+// Esta função agora recebe a "key" do slide
+  const handleSlidePress = (key: string) => {
+    // Só navega se for o primeiro slide
+    if (key === 'interesse') {
+      router.push('/formulario-interesse');
+    }
   };
 
-  // Dados para os slides do carrossel
+  // dados para os slides do carrossel
   const formularioSlides = [
     {
       key: 'interesse',
       title: 'Formulário de interesse',
       description:
         'Faça o formulário de inscrição que disponibilizamos aqui que a ONG entrará em contato com você em até 48h.',
-      iconName: 'clipboard-list', // Ícone do FontAwesome5
+      iconName: 'clipboard-list', 
     },
     {
       key: 'avaliacao',
       title: 'Avaliação de formulário',
       description:
         'A ONG irá fazer a análise do cadastro e perfil do voluntário. Preenchendo os requisitos, você recebe a aprovação por telefone/email.',
-      iconName: 'chart-line', // Ícone do FontAwesome5
+      iconName: 'chart-line', 
     },
     {
       key: 'aprovado',
       title: 'Formulário aprovado',
       description:
         'Caso seja aprovado espere o contato e a aprovação. Com tudo certo, você busca o pet no dia combinado com a ONG.',
-      iconName: 'user-check', // Ícone do FontAwesome5
+      iconName: 'user-check', 
     },
   ];
 
@@ -55,15 +50,15 @@ export default function VoluntariosScreen() {
           <Text style={styles.headerTitle}>Veja a diferença que você pode fazer!</Text>
           {/* Ícones de patinha - ajuste o caminho da imagem */}
           <Image
-            source={require('../../../assets/images/ui/patinhas.png')} // Mude para seu ícone de patinha
+            source={require('../../../assets/images/ui/patinhas.png')} 
             style={[styles.pawIcon, styles.pawIcon1]}
           />
           <Image
-            source={require('../../../assets/images/ui/patinhas.png')} // Mude para seu ícone de patinha
+            source={require('../../../assets/images/ui/patinhas.png')} 
             style={[styles.pawIcon, styles.pawIcon2]}
           />
           <Image
-            source={require('../../../assets/images/ui/patinhas.png')} // Mude para seu ícone de patinha
+            source={require('../../../assets/images/ui/patinhas.png')} 
             style={[styles.pawIcon, styles.pawIcon3]}
           />
           <Feather name="bell" size={24} color="#555" style={styles.bellIcon} />
@@ -77,33 +72,38 @@ export default function VoluntariosScreen() {
           um lar definitivo ou um cuidador permanente.
         </Text>
 
-        {/* --- Imagem Principal --- */}
+        {/* --- Imagem principal --- */}
         <Image
           source={require('../../../assets/images/ui/gatoVoluntario.png')}
           style={styles.mainImage}
         />
 
-        {/* --- Texto Explicativo --- */}
+        {/* --- texto Explicativo --- */}
         <Text style={styles.paragraph}>
           Este gesto transforma vidas, permitindo que os animais recebam tratamento adequado, evitem o
           isolamento em abrigos e aprendam a confiar novamente, enquanto as famílias que acolhem se
           sentem gratificadas por fazer a diferença.
         </Text>
 
-        {/* --- Seção Formulário (Carrossel) --- */}
+        {/* --- Seção Formulario (carrossel) --- */}
         <View style={styles.swiperContainer}>
-          <ScrollView
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.swiperContent}
+          <Swiper
+            style={styles.swiper}
+            showsButtons={true} // Mostra as setas < e >
+            showsPagination={false} //esconde os pontinhos de paginação
+            loop={false} // nao deixa o carrossel em loop
+            buttonWrapperStyle={styles.swiperButtonWrapper}
+            nextButton={<Feather name="chevron-right" size={30} color="#005A9C" />}
+            prevButton={<Feather name="chevron-left" size={30} color="#005A9C" />}
           >
-            {formularioSlides.map((slide) => (
+           {formularioSlides.map((slide) => (
               <TouchableOpacity
                 key={slide.key}
                 style={styles.slide}
-                onPress={handleFormPress}
-                activeOpacity={0.8}
+                // Chama a função handleSlidePress passando a key
+                onPress={() => handleSlidePress(slide.key)}
+                // Desabilita o feedback de toque para os slides não-clicáveis
+                activeOpacity={slide.key === 'interesse' ? 0.8 : 1.0}
               >
                 <View style={styles.slideIconContainer}>
                   <FontAwesome5 name={slide.iconName} size={50} color="#FFFFFF" />
@@ -115,7 +115,7 @@ export default function VoluntariosScreen() {
           </ScrollView>
         </View>
 
-        {/* --- Perguntas Frequentes --- */}
+        {/* --- perguntas frequentes --- */}
         <Text style={styles.faqHeader}>Perguntas frequentes:</Text>
 
         <View style={styles.faqCard}>
@@ -160,8 +160,8 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#005A9C', // Cor principal (azul)
-    width: '80%', // Para dar espaço para os ícones
+    color: '#005A9C', 
+    width: '80%', 
   },
   bellIcon: {
     position: 'absolute',
@@ -212,10 +212,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 20,
   },
-
-  // --- Estilos do Carrossel (Swiper) ---
   swiperContainer: {
-    height: 320, // Altura fixa para o carrossel
+    height: 320, 
     marginTop: 10,
     marginBottom: 30,
   },
@@ -225,16 +223,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   swiper: {
-    // O Swiper em si
   },
   swiperButtonWrapper: {
-    paddingHorizontal: 0, // Remover padding padrão
+    paddingHorizontal: 0,
     width: '100%',
     position: 'absolute',
     top: 0,
     height: '100%',
-    justifyContent: 'space-between', // Coloca as setas nas extremidades
-    alignItems: 'center', // Centraliza verticalmente
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
     flexDirection: 'row',
   },
   slide: {
@@ -246,16 +243,13 @@ const styles = StyleSheet.create({
     paddingTop: 30, 
     paddingBottom: 20,
     paddingHorizontal: 20,
-
-    // Make slide width roughly equal to screen minus padding
-    width: 300,
-    marginHorizontal: 10,
+    marginHorizontal: 40,
   },
   slideIconContainer: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#005A9C', // Círculo azul escuro
+    backgroundColor: '#005A9C', 
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
@@ -273,8 +267,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
-
-  // --- Estilos do FAQ (os seus, mantidos) ---
   faqHeader: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -282,8 +274,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   faqCard: {
-    backgroundColor: '#F0F8FF', // Azul bem claro
-    padding: 20,
+    backgroundColor: '#F0F8FF', 
     borderRadius: 10,
     marginBottom: 15,
   },
