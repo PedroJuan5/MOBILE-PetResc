@@ -1,8 +1,13 @@
+import React, { useState } from 'react';
 import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React from 'react';
 import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
 import Swiper from 'react-native-swiper';
+import { DenuncieModal } from '../../../components/DenuncieModal';
+import CustomHeaderRight from '../../../components/elementosDireita';
+import CustomHeaderLeft from '../../../components/elementosEsquerda';
+
+
 
 export default function VoluntariosScreen() {
   const router = useRouter();
@@ -15,7 +20,7 @@ export default function VoluntariosScreen() {
   // Navega para o NOVO formulário de voluntários
   const handleFormPress = () => {
     // Este é o novo formulário que você precisa criar
-    router.push('/formulario-voluntario');
+    router.push('/formulario-voluntarios');
   };
 
   // Dados para o carrossel de VOLUNTÁRIOS (Lar Temporário)

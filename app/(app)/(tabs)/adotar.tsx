@@ -6,7 +6,7 @@ import Swiper from 'react-native-swiper';
 import { Feather, FontAwesome, FontAwesome5 } from '@expo/vector-icons'; // Importe os ícones
 import CustomHeaderLeft from '../../../components/elementosEsquerda';
 import CustomHeaderRight from '../../../components/elementosDireita';
-import { DenuncieModal } from '../../../components/denuncieModal';
+import { DenuncieModal } from '../../../components/DenuncieModal';
 
 export default function AdotarScreen() {
   const router = useRouter();

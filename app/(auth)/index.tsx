@@ -5,7 +5,7 @@ import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Modal, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 // Importe os componentes e o contexto de autenticação
-import { DenuncieModal } from '../../components/denuncieModal';
+import { DenuncieModal } from '../../components/DenuncieModal';
 import { useAuth } from '../../context/AuthContext';
 
 // --- Componentes Reutilizáveis para esta tela ---
