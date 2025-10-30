@@ -8,7 +8,6 @@ export default function CustomHeaderRight() {
 
   return (
     <View style={styles.container}>
-      {/* Botão de Notificações */}
       <TouchableOpacity
         onPress={() => router.push('/notificacoes')}
         style={styles.button}
