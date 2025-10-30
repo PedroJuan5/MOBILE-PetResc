@@ -43,11 +43,7 @@ export default function RootLayout() {
     <Tabs
       initialRouteName="home"
       screenOptions={{
-<<<<<<< HEAD
-        headerShown: false, 
-=======
         headerShown: false,
->>>>>>> 3676450e6ff9941e687afb0e30ef89b443fd61f0
         headerTitleAlign: "center",
         tabBarActiveTintColor: "#2D68A6",
         tabBarInactiveTintColor: "#3A5C7A",
