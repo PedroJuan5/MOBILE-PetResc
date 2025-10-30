@@ -41,7 +41,6 @@ export const FiltrosModal = ({ visible, onClose, onApplyFilters }: FiltrosModalP
     <Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
       {/* backdrop: fecha o modal ao tocar fora */}
       <Pressable style={styles.fundoEscuro} onPress={onClose}>
-        {/* container do modal impedimos o fechamento ao tocar dentro */}
         <Pressable style={styles.containerModal} onPress={(e) => e.stopPropagation()}>
           <SafeAreaView style={{ flex: 1 }}>
             <ScrollView contentContainerStyle={styles.conteudo}>
