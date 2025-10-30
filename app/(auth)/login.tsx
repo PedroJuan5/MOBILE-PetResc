@@ -4,42 +4,36 @@ import { useRouter } from "expo-router";
 import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert,} from "react-native";
 import { useAuth } from "../../context/AuthContext";
 
-
 export default function TelaLogin() {
   const router = useRouter();
-  const { signIn } = useAuth(); 
+  const { signIn } = useAuth();
 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [carregando, setCarregando] = useState(false);
 
   const entrar = async () => {
+    // ... (sua função 'entrar' continua a mesma)
     if (!email.trim() || !senha) {
       Alert.alert("Atenção", "Por favor, preencha email e senha");
       return;
     }
-
     if (typeof signIn !== "function") {
       Alert.alert("Erro", "Serviço de autenticação indisponível");
       return;
     }
-
     setCarregando(true);
-
     try {
       await signIn({ email: email, password: senha });
-
       router.replace('/home');
-      
-
     } catch (err: any) {
-     console.warn("signIn falhou:", err.message);
-     Alert.alert("Erro no Login", err.message);
-
+      console.warn("signIn falhou:", err.message);
+      Alert.alert("Erro no Login", err.message);
     } finally {
       setCarregando(false);
     }
   };
+
   return (
     <SafeAreaView style={styles.container}>
       {/*botao de voltar */}
@@ -48,7 +42,6 @@ export default function TelaLogin() {
         onPress={() => router.back()}
         accessibilityLabel="Voltar"
       >
-        {/*AntDesign usa "arrowleft"; fazemos cast para evitar erro de tipagem temporário */}
         <AntDesign name={"arrowleft" as any} size={24} color="#1c5b8f" />
       </TouchableOpacity>
 
@@ -66,6 +59,7 @@ export default function TelaLogin() {
           value={email}
           onChangeText={setEmail}
           editable={!carregando}
+          maxLength={100} // <<< ADICIONADO
         />
 
         {/*campo de senha */}
@@ -77,59 +71,29 @@ export default function TelaLogin() {
           value={senha}
           onChangeText={setSenha}
           editable={!carregando}
+          maxLength={50} // <<< ADICIONADO
         />
 
         {/*divisor com "Ou" */}
         <View style={styles.divisor}>
-          <View style={styles.linha} />
-          <Text style={styles.ou}>Ou</Text>
-          <View style={styles.linha} />
+          {/* ... (resto do seu JSX) ... */}
         </View>
-      
-        <View style={styles.sociais}>
-          <TouchableOpacity
-            style={styles.botaoSocial}
-            accessibilityLabel="Entrar com Google"
-            onPress={() => Alert.alert("Google", "Login social não implementado")}
-            disabled={carregando}
-          >
-            <Text>Google</Text>
-          </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.botaoSocial}
-            accessibilityLabel="Entrar com Apple"
-            onPress={() => Alert.alert("Apple", "Login social não implementado")}
-            disabled={carregando}
-          >
-            <Text>Apple</Text>
-          </TouchableOpacity>
+        <View style={styles.sociais}>
+          {/* ... (resto do seu JSX) ... */}
         </View>
       </View>
 
       {/* Rodape com ação principal e link para cadastro */}
       <View style={styles.rodape}>
-        <TouchableOpacity
-          style={[styles.botaoEntrar, carregando && { opacity: 0.6 }]}
-          onPress={entrar}
-          disabled={carregando}
-        >
-          <Text style={styles.textoBotao}>{carregando ? "Entrando..." : "Entrar"}</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.textoCadastro}>
-          Sem conta?{" "}
-          <Text style={styles.linkCadastro} onPress={() => router.push('/signup')}>
-            Criar conta
-          </Text>
-        </Text>
+        {/* ... (resto do seu JSX) ... */}
       </View>
     </SafeAreaView>
   );
 }
 
-
 const styles = StyleSheet.create({
+  // ... (seus estilos continuam os mesmos)
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
@@ -139,7 +103,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignSelf: "flex-start",
   },
-
   conteudo: {
     flex: 1,
     paddingHorizontal: 20,
@@ -158,7 +121,6 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     textAlign: "center",
   },
-
   input: {
     backgroundColor: "#1c5b8f",
     borderRadius: 8,
@@ -167,7 +129,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#fff",
   },
-
   divisor: {
     flexDirection: "row",
     alignItems: "center",
@@ -183,7 +144,6 @@ const styles = StyleSheet.create({
     color: "#aaa",
     fontSize: 14,
   },
-
   sociais: {
     flexDirection: "row",
     justifyContent: "center",
@@ -199,7 +159,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
   rodape: {
     backgroundColor: "#ffffff",
     borderTopLeftRadius: 25,
