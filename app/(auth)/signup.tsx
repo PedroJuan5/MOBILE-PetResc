@@ -57,14 +57,7 @@ export default function CadastroScreen() {
         <Text style={styles.orText}>Ou</Text>
         <View style={styles.line} />
       </View>
-      <View style={styles.socialContainer}>
-        <TouchableOpacity style={styles.socialButton}>
-          <Text>G</Text>
-        </TouchableOpacity>a
-        <TouchableOpacity style={styles.socialButton}>
-          <Text></Text>
-        </TouchableOpacity>
-      </View>
+      
       <View style={styles.bottomCard}>
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
           <Text style={styles.nextButtonText}>Próximo</Text>
