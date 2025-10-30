@@ -1,31 +1,44 @@
-import React, { useEffect } from 'react';
-import { Stack, useRouter } from 'expo-router';
-import { useAuth } from '../../context/AuthContext';
 
-export default function AppLayout() {
-  const { session, isLoading } = useAuth();
+import React, { useEffect } from 'react';
+import { SplashScreen, Slot, useRouter, useSegments } from 'expo-router';
+import { AuthProvider, useAuth } from '@/context/AuthContext'; 
+
+SplashScreen.preventAutoHideAsync();
+
+function RootLayoutNav() {
+  const { user, isLoading } = useAuth();
+  const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
-    // Se a verificação de login já terminou E o usuário NÃO está logado...
-    if (!isLoading && !session) {
-      // ...expulsa o usuário de volta para a tela de entrada.
-      router.replace('/');
-    }
-  }, [session, isLoading]);
+    if (!isLoading) {
+      const inAuthGroup = segments[0] === '(auth)';
 
-  // Enquanto a sessão está sendo verificada ou se o usuário não está logado,
-  // não renderiza nada para evitar que a tela privada "pisque" rapidamente.
-  if (isLoading || !session) {
+      if (user && inAuthGroup) {
+         // Se LOGADO e na tela de login -> VAI PARA A HOME
+        SplashScreen.hideAsync();
+        router.replace('/(tabs)/home' as any); // 2. 'as any' para o erro de tipo
+      } else if (!user && !inAuthGroup) {
+        // Se NÃO LOGADO e tentando acessar a área logada -> VAI PARA O LOGIN
+        SplashScreen.hideAsync();
+        router.replace('/login' as any); // 2. 'as any' para o erro de tipo
+      } else {
+         SplashScreen.hideAsync();
+      }
+    }
+  }, [user, isLoading, segments]);
+
+  if (isLoading) {
     return null;
   }
 
-  // Se passou pelas verificações, o usuário tem permissão para ver a área privada.
+  return <Slot />;
+}
+
+export default function RootLayout() {
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="perfil" options={{ title: "Meu Perfil", presentation: 'modal' }} />
-      <Stack.Screen name="notificacoes" options={{ title: "Notificação" }} />
-    </Stack>
+    <AuthProvider>
+      <RootLayoutNav />
+    </AuthProvider>
   );
 }
