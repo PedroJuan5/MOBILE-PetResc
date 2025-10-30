@@ -3,12 +3,7 @@ import { useNavigation, useRouter } from 'expo-router';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Modal, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-<<<<<<< HEAD
-// Importe os componentes e o contexto de autenticação
 import { DenuncieModal } from '../../components/DenuncieModal';
-=======
-import { DenuncieModal } from '../../components/denuncieModal';
->>>>>>> 9b139b1cedcc7850e2c6e1cc63761cbc3309750a
 import { useAuth } from '../../context/AuthContext';
 
 const FeatureCard = ({ icon, title, description }: { icon: string, title: string, description: string }) => (
