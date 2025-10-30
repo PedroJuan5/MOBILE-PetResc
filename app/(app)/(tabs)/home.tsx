@@ -2,10 +2,17 @@ import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {Image,ImageSourcePropType,ScrollView,StyleSheet,Text,TouchableOpacity,View,} from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
+<<<<<<< HEAD
 import CustomHeaderLeft from '../../../components/elementosEsquerda';
 import CustomHeaderRight from '../../../components/elementosDireita';
 import { DenuncieModal } from '../../../components/DenuncieModal';
 
+=======
+
+import CustomHeaderLeft from '../../../components/elementosEsquerda';
+import CustomHeaderRight from '../../../components/elementosDireita';
+import { DenuncieModal } from '../../../components/denuncieModal';
+>>>>>>> 9b139b1cedcc7850e2c6e1cc63761cbc3309750a
 
 //tipos para TypeScript
 interface Animal {
@@ -30,7 +37,6 @@ interface CartaoOngProps {
   ong: Ong;
 }
 
-//dados de exemplo
 const ANIMAIS: Animal[] = [
   {
     id: "1",
@@ -107,12 +113,9 @@ const CartaoOng = ({ ong }: CartaoOngProps) => (
   </View>
 );
 
-// Tela principal
 export default function HomeScreen() {
-  // --- 3. ADICIONAR LÓGICA DO MODAL ---
   const [modalVisible, setModalVisible] = useState(false);
   const handleDenunciePress = () => setModalVisible(true);
-  // --- FIM DA LÓGICA DO MODAL ---
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -167,39 +170,29 @@ export default function HomeScreen() {
   );
 }
 
-//Estilos
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#FFFFFF" },
   
-  // --- 6. NOVOS ESTILOS DO HEADER ---
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 0, // Seus componentes já têm padding
+    paddingHorizontal: 0, 
     paddingVertical: 10,
     backgroundColor: '#FFFFFF',
-    // Adicionamos a sombra que você tinha na imagem de design
     borderBottomWidth: 1,
     borderBottomColor: '#EEE', 
   },
   headerTitle: {
-    fontSize: 22, // Usei um tamanho padrão que fica bom entre os ícones
-    fontWeight: '700', // Mantém o peso original
-    color: '#2D68A6', // Mantém a cor original
+    fontSize: 22,
+    fontWeight: '700', 
+    color: '#2D68A6', 
     textAlign: 'center',
-    flex: 1, // Permite que ele se centralize corretamente
+    flex: 1, 
   },
-  // --- FIM DOS NOVOS ESTILOS ---
 
-  // Ajustei o padding do container para não colar no header
   container: { padding: 20, paddingTop: 10 }, 
 
-  // --- 7. ESTILOS ANTIGOS REMOVIDOS ---
-  // cabecalho: { marginBottom: 20, position: "relative" },
-  // titulo: { ... },
-  // pata: { ... },
-  // --- FIM DOS ESTILOS REMOVIDOS ---
 
   subTitulo: {
     fontSize: 18,

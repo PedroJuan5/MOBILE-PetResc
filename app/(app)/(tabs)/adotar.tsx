@@ -11,27 +11,22 @@ import { DenuncieModal } from '../../../components/DenuncieModal';
 export default function AdotarScreen() {
   const router = useRouter();
 
-  // --- Funções de Navegação ---
 
-  // 1. Navega para o formulário de ADOÇÃO que já fizemos
   const handleFormPress = () => {
     router.push('/formulario-interesse');
   };
 
-  // 2. Navega para a sua aba de Pets
   const handlePetsPress = () => {
-    // Usamos o caminho (tabs) para manter a barra de navegação
     router.push('/(tabs)/pets');
   };
 
-  // --- Dados para o Carrossel de Adoção ---
   const adocaoSlides = [
     {
       key: 'interesse',
       title: 'Formulário de interesse',
       description:
         'Faça o formulário de inscrição que disponibilizamos aqui que a ONG/protetor entrará em contato com você.',
-      iconName: 'pencil-square-o', // Ícone da imagem (FontAwesome)
+      iconName: 'pencil-square-o', // Ícone da imagem (FontAwesome
       iconLib: FontAwesome,
     },
     {
@@ -39,7 +34,7 @@ export default function AdotarScreen() {
       title: 'Avaliação de adoção',
       description:
         'A ONG irá fazer a análise do cadastro e perfil do adotante e o pet escolhido. Você recebe a aprovação por telefone/email.',
-      iconName: 'bar-chart', // Ícone da imagem (FontAwesome)
+      iconName: 'bar-chart',
       iconLib: FontAwesome,
     },
     {
@@ -47,7 +42,7 @@ export default function AdotarScreen() {
       title: 'Adoção completa',
       description:
         'Caso seja aprovado, você busca seu pet no dia combinado com a ONG/protetor.',
-      iconName: 'paw', // Placeholder (FontAwesome5)
+      iconName: 'paw', 
       iconLib: FontAwesome5,
     },
   ];
@@ -60,11 +55,11 @@ export default function AdotarScreen() {
           <Text style={styles.headerTitle}>Conheça seu novo melhor amigo!</Text>
           {/* Ícones de patinha - ajuste o caminho da imagem */}
           <Image
-            source={require('../../../assets/images/ui/patinhas.png')} // Mude para seu ícone de patinha
+            source={require('../../../assets/images/ui/patinhas.png')} 
             style={[styles.pawIcon, styles.pawIcon1]}
           />
           <Image
-            source={require('../../../assets/images/ui/patinhas.png')} // Mude para seu ícone de patinha
+            source={require('../../../assets/images/ui/patinhas.png')} 
             style={[styles.pawIcon, styles.pawIcon2]}
           />
           <Feather name="bell" size={24} color="#555" style={styles.bellIcon} />
@@ -72,7 +67,6 @@ export default function AdotarScreen() {
 
         {/* --- Imagem Principal --- */}
         <Image
-          // Troque para a imagem do cachorro e gato
           source={require('../../../assets/images/ui/caoegato.png')}
           style={styles.mainImage}
         />
@@ -110,7 +104,7 @@ export default function AdotarScreen() {
             prevButton={<Feather name="chevron-left" size={30} color="#005A9C" />}
           >
             {adocaoSlides.map((slide) => {
-              const IconComponent = slide.iconLib; // Pega o componente de ícone (FA ou FA5)
+              const IconComponent = slide.iconLib; 
               return (
                 <TouchableOpacity
                   key={slide.key}

@@ -37,15 +37,12 @@ import { FiltrosModal } from "../../components/adocao/FiltrosModal";
   ];
 
   export default function TelaAdotar() {
-    //controla visibilidade do modal de filtros
     const [filtroVisivel, setFiltroVisivel] = useState(false);
 
-    // filtros que o usuário aplicou; começa vazio = sem filtros
     const [filtrosAplicados, setFiltrosAplicados] = useState<Filtros>({});
 
     const navigation = useNavigation();
 
-    // função chamada pelo modal quando o usuario aplica filtros
     const aplicarFiltros = (f: Filtros) => {
       setFiltrosAplicados(f);
     };
@@ -56,21 +53,19 @@ import { FiltrosModal } from "../../components/adocao/FiltrosModal";
       return PETS_COMPLETOS.filter((pet) => {
         const f = filtrosAplicados;
 
-        // --- CORREÇÕES APLICADAS AQUI ---
-        if (f.nome && !pet.nome.toLowerCase().includes(f.nome.toLowerCase())) return false; // Usando pet.nome
+        if (f.nome && !pet.nome.toLowerCase().includes(f.nome.toLowerCase())) return false; 
         if (f.isGato === false && pet.especie === "Gato") return false;
         if (f.isCao === false && pet.especie === "Cachorro") return false;
         if (f.isMacho === false && pet.genero === "Macho") return false;
         if (f.isFemea === false && pet.genero === "Fêmea") return false;
         if (f.porte && pet.tamanho.toLowerCase() !== f.porte.toLowerCase()) return false;
-        if (f.raca && !pet.raca.toLowerCase().includes(f.raca.toLowerCase())) return false; // Usando pet.raca
-        if (f.idade && pet.idade.toLowerCase() !== f.idade.toLowerCase()) return false; // Comparando pet.idade com f.idade
+        if (f.raca && !pet.raca.toLowerCase().includes(f.raca.toLowerCase())) return false; 
+        if (f.idade && pet.idade.toLowerCase() !== f.idade.toLowerCase()) return false; 
 
         return true;
       });
     }, [filtrosAplicados]);
 
-    //configura o cabeçalho: título e botao que abre o modal de filtros
     useLayoutEffect(() => {
       navigation.setOptions({
         headerTitle: "Pets para adoção",
@@ -106,7 +101,6 @@ import { FiltrosModal } from "../../components/adocao/FiltrosModal";
             numColumns={2}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={<Text style={styles.textoVazio}>Nenhum animal encontrado.</Text>}
-            //se a lista crescer vou colocar um getItemLayout e initialNumToRender
           />
         </View>
       </SafeAreaView>

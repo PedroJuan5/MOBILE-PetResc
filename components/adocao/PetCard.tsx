@@ -2,15 +2,13 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ImageSourcePropType } from 'react-native';
 import { Link } from 'expo-router';
 
-// O "contrato" do Pet, garantindo que ele tenha todas as propriedades necessárias
-// --- CORREÇÃO AQUI: Alterado para bater com os dados de adotar.tsx ---
 interface Pet {
 
   id: string;
-  nome: string;   // Era 'name'
-  raca: string;   // Era 'breed'
-  genero: string; // Era 'gender'
-  imagem: ImageSourcePropType; // Era 'image'
+  nome: string;   
+  raca: string;  
+  genero: string; 
+  imagem: ImageSourcePropType; 
   especie: string;
   idade: string;
   tamanho: string;

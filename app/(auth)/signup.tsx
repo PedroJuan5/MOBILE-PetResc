@@ -10,11 +10,11 @@ export default function CadastroScreen() {
   const [cpf, setCpf] = useState('');
   const [email, setEmail] = useState('');
 
-  const handleNext = () => {
-    if (!nome || !email) {
-      Alert.alert("Erro", "Nome e Email são obrigatórios.");
-      return;
-    }
+     const handleNext = () => { 
+          if (!nome || !email || !cpf) { 
+       Alert.alert("Erro", "Nome, CPF e Email são obrigatórios.");
+     return;
+   }
      router.push({ pathname: '/(auth)/signup2', params: { nome, cpf, email } });
 
   };
@@ -57,14 +57,7 @@ export default function CadastroScreen() {
         <Text style={styles.orText}>Ou</Text>
         <View style={styles.line} />
       </View>
-      <View style={styles.socialContainer}>
-        <TouchableOpacity style={styles.socialButton}>
-          <Text>G</Text>
-        </TouchableOpacity>a
-        <TouchableOpacity style={styles.socialButton}>
-          <Text></Text>
-        </TouchableOpacity>
-      </View>
+      
       <View style={styles.bottomCard}>
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
           <Text style={styles.nextButtonText}>Próximo</Text>
@@ -82,7 +75,6 @@ export default function CadastroScreen() {
   );
 }
 
-// Seus estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
