@@ -29,8 +29,7 @@ export default function TelaLogin() {
     try {
       await signIn({ email: email, password: senha });
 
-
-      router.push('/(tabs)/home' as any);
+      router.replace('/home');
       
 
     } catch (err: any) {

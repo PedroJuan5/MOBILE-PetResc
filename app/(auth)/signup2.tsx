@@ -34,20 +34,11 @@ export default function CadastroScreen2() {
 
       await api.post('/auth/register', userData);
       
-      console.log(" CADASTRO REALIZADO COM SUCESSO NO BACKEND!");
-      console.log("Tentando exibir o alerta e navegar...");
+      console.log("CADASTRO REALIZADO COM SUCESSO!");
+      console.log("Navegando para /login");
 
-      Alert.alert(
-        "Cadastro Realizado!",
-        "Sua conta foi criada com sucesso. Agora você pode fazer o login.",
-        [{ 
-            text: "OK", 
-            onPress: () => {
-                console.log("Botão OK do alerta foi pressionado. Navegando para /login");
-                router.push('/login');
-            }
-        }] 
-      );
+      router.push('/login');
+
 
     } catch (error) {
       let errorMessage = "Não foi possível realizar o cadastro. Verifique os dados e tente novamente.";
@@ -58,13 +49,12 @@ export default function CadastroScreen2() {
       } else {
         console.error("Erro inesperado:", error);
       }
-                         
+            
       Alert.alert("Erro no Cadastro", errorMessage);
 
-    } finally {
-      setIsLoading(false);
+      setIsLoading(false); 
     }
-};
+  };
 return (
     <View style={styles.container}>
       {/* Header */}
