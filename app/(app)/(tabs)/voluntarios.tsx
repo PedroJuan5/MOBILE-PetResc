@@ -18,14 +18,13 @@ export default function VoluntariosScreen() {
     router.push('/formulario-voluntario');
   };
 
-  // Dados para o carrossel de VOLUNTÁRIOS (Lar Temporário)
   const voluntarioSlides = [
     {
       key: 'interesse',
       title: 'Formulário de interesse',
       description:
         'Faça o formulário de inscrição que disponibilizamos aqui que a ONG entrará em contato com você em até 48h.',
-      iconName: 'clipboard-list', // (FontAwesome5)
+      iconName: 'clipboard-list',
       iconLib: FontAwesome5,
     },
     {
@@ -33,7 +32,7 @@ export default function VoluntariosScreen() {
       title: 'Avaliação de formulário',
       description:
         'A ONG irá fazer a análise do cadastro e perfil do voluntário. Preenchendo os requisitos, você recebe a aprovação por telefone/email.',
-      iconName: 'chart-line', // (FontAwesome5)
+      iconName: 'chart-line', 
       iconLib: FontAwesome5,
     },
     {
@@ -41,7 +40,7 @@ export default function VoluntariosScreen() {
       title: 'Formulário aprovado',
       description:
         'Caso seja aprovado espere o contato e a aprovação. Com tudo certo, você busca o pet no dia combinado com a ONG.',
-      iconName: 'user-check', // (FontAwesome5)
+      iconName: 'user-check', 
       iconLib: FontAwesome5,
     },
   ];
@@ -68,7 +67,7 @@ export default function VoluntariosScreen() {
 
         {/* --- Imagem Principal --- */}
         <Image
-          source={require('../../../assets/images/ui/gatoVoluntario.png')} // Imagem do gato na casinha
+          source={require('../../../assets/images/ui/gatoVoluntario.png')}
           style={styles.mainImage}
         />
 
@@ -121,12 +120,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  // --- ESTILOS DO HEADER NOVO ---
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 0, // Seus componentes já têm padding (marginLeft/Right)
+    paddingHorizontal: 0, 
     paddingVertical: 10,
     backgroundColor: '#FFFFFF',
   },
@@ -134,14 +132,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#005A9C',
-    textAlign: 'center', // Centraliza o título entre os ícones
-    flex: 1, // Permite que o título ocupe o espaço restante
+    textAlign: 'center', 
+    flex: 1, 
   },
-  // --- FIM DOS ESTILOS DO HEADER ---
   container: {
     padding: 20,
     backgroundColor: '#FFFFFF',
-    paddingTop: 10, // Diminui o espaço do topo
+    paddingTop: 10, 
   },
   sectionTitle: {
     fontSize: 22,
@@ -173,7 +170,6 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   swiperContent: {
-    // Ensure slides align horizontally and take full width for paging
     alignItems: 'center',
     paddingHorizontal: 20,
   },

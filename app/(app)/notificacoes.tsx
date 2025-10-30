@@ -1,11 +1,7 @@
 import React, { useState } from "react";import {SafeAreaView,View,Text,StyleSheet,TouchableOpacity,ScrollView,} from "react-native";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 
-/*
-  Exemplo de notificações.
-  UNREAD = não lidas, READ = lidas.
-  Em produção, esses arrays virão da API.
-*/
+
 const UNREAD = [
   { id: "1", icon: "alert-circle", text: "Termos de uso e privacidade" },
   { id: "2", icon: "gift", text: "Nova campanha de doação iniciada!" },
@@ -15,10 +11,8 @@ const READ = [
   { id: "4", icon: "checkmark-circle", text: "Seu cadastro foi concluído." },
 ];
 
-/*
-  componente simples que renderiza uma linha de notificação
-  TouchableOpacity para permitir futuras ações ao tocar
-*/
+
+
 const ItemNotificacao = ({ item }: { item: { id: string; icon: string; text: string } }) => (
   <TouchableOpacity style={styles.row} accessibilityRole="button">
     <Ionicons name={item.icon as any} size={24} color="#3A5C7A" />
@@ -28,10 +22,8 @@ const ItemNotificacao = ({ item }: { item: { id: string; icon: string; text: str
 );
 
 export default function Notificacoes() {
-  // controle da aba ativa: 'UNREAD' ou 'READ'
   const [aba, setAba] = useState<"UNREAD" | "READ">("UNREAD");
 
-  // seleciona a lista correta com base na aba ativa
   const lista = aba === "READ" ? READ : UNREAD;
 
   return (
@@ -154,7 +146,6 @@ const styles = StyleSheet.create({
     transform: [{ rotate: "30deg" }],
   },
 
-  // Estilos extras (mantidos para possíveis textos/títulos)
   title: {
     fontSize: 24,
     fontWeight: "700",

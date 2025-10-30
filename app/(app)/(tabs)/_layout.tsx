@@ -1,4 +1,3 @@
-// Arquivo: app/(app)/(tabs)/_layout.tsx (VERSÃO CORRIGIDA)
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,7 +20,7 @@ export default function TabLayout() {
         name="home"
         options={{
           title: 'Início',
-          headerShown: false, // Perfeito
+          headerShown: false, 
           tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
         }}
       />
@@ -29,7 +28,7 @@ export default function TabLayout() {
         name="adotar"
         options={{
           title: 'Adoção',
-          headerShown: true, // Adicionado para consistência
+          headerShown: true,
           tabBarIcon: ({ color, size }) => <Ionicons name="paw-outline" size={size} color={color} />,
         }}
       />

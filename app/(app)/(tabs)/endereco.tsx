@@ -9,16 +9,13 @@ export default function EnderecoScreen() {
   const navigation = useNavigation();
 
   useLayoutEffect(() => {
-    // Esconder o cabeçalho nativo para evitar o título "pets/endereco"
     try {
       (navigation as any).setOptions?.({ headerShown: false });
     } catch (e) {
-      // ignore in environments where navigation isn't available
     }
   }, [navigation]);
 
   const handleSalvar = () => {
-    // Aqui você pode adicionar a lógica para salvar o endereço
     console.log('Novo endereço salvo:', endereco);
     // Voltar para a tela anterior
     router.back();

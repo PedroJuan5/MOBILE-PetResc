@@ -1,14 +1,11 @@
-// Arquivo: app/(auth)/index.tsx
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRouter } from 'expo-router';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Modal, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-// Importe os componentes e o contexto de autenticação
 import { DenuncieModal } from '../../components/denuncieModal';
 import { useAuth } from '../../context/AuthContext';
 
-// --- Componentes Reutilizáveis para esta tela ---
 const FeatureCard = ({ icon, title, description }: { icon: string, title: string, description: string }) => (
   <View style={styles.featureCard}>
     <View style={styles.featureIconContainer}>
@@ -29,7 +26,6 @@ const StatCard = ({ value, label }: { value: string, label: string }) => (
   </View>
 );
 
-// --- Componente principal da tela de entrada pública ---
 export default function PublicIndex() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [signupModalVisible, setSignupModalVisible] = useState(false);
@@ -37,14 +33,12 @@ export default function PublicIndex() {
   const router = useRouter();
   const { session, isLoading } = useAuth();
 
-  // Efeito para redirecionar se o usuário já estiver logado
   useEffect(() => {
     if (!isLoading && session) {
       router.replace('/home');
     }
   }, [session, isLoading]);
 
-  // Efeito para configurar o cabeçalho customizado
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: true,
@@ -87,7 +81,7 @@ export default function PublicIndex() {
               style={styles.option}
               onPress={() => {
                 setSignupModalVisible(false);
-                router.push('/signup'); // rota de cadastro de usuário
+                router.push('/signup'); 
               }}
             >
               <Ionicons name="person-outline" size={20} color="#2D68A6" />
@@ -100,7 +94,7 @@ export default function PublicIndex() {
               style={styles.option}
               onPress={() => {
                 setSignupModalVisible(false);
-                router.push('/signup-ong'); // rota de cadastro de ONG
+                router.push('/signup-ong'); 
               }}
             >
               <Ionicons name="paw-outline" size={20} color="#2D68A6" />

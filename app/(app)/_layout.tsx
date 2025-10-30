@@ -15,13 +15,12 @@ function RootLayoutNav() {
       const inAuthGroup = segments[0] === '(auth)';
 
       if (user && inAuthGroup) {
-         // Se LOGADO e na tela de login -> VAI PARA A HOME
+         
         SplashScreen.hideAsync();
-        router.replace('/(tabs)/home' as any); // 2. 'as any' para o erro de tipo
+        router.replace('/(tabs)/home' as any);
       } else if (!user && !inAuthGroup) {
-        // Se NÃO LOGADO e tentando acessar a área logada -> VAI PARA O LOGIN
         SplashScreen.hideAsync();
-        router.replace('/login' as any); // 2. 'as any' para o erro de tipo
+        router.replace('/login' as any);
       } else {
          SplashScreen.hideAsync();
       }
