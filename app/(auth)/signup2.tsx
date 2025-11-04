@@ -7,17 +7,15 @@ import MaskInput from "react-native-mask-input";
 
 export default function CadastroScreen2() {
   const router = useRouter();
-  
-  const { nome, cpf, email } = useLocalSearchParams();
+  const { nome, cpf, email } = useLocalSearchParams() as any;
 
-  const [telefone, setTelefone] = useState(''); // Armazena o valor com máscara
-  const [telefoneUnmasked, setTelefoneUnmasked] = useState(''); // Armazena o valor sem máscara
+  const [telefone, setTelefone] = useState('');
+  const [telefoneUnmasked, setTelefoneUnmasked] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleFinalizeCadastro = async () => {
-  
     if (!telefone.trim() || !password || !confirmPassword) {
       Alert.alert("Erro", "Todos os campos são obrigatórios.");
       return;
@@ -51,7 +49,7 @@ export default function CadastroScreen2() {
       
       console.log("CADASTRO REALIZADO COM SUCESSO!");
       Alert.alert("Sucesso", "Cadastro realizado! Por favor, faça o login."); 
-      router.push('/login');
+      router.replace('/(auth)/login');
 
     } catch (error) {
       let errorMessage = "Não foi possível realizar o cadastro. Verifique os dados e tente novamente.";
@@ -68,7 +66,7 @@ export default function CadastroScreen2() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => router.push('/login')}>
+      <TouchableOpacity style={styles.backButton} onPress={() => { console.log('Voltar do signup2'); router.back(); }}>
         <AntDesign name="arrow-left" size={24} color="#1c5b8f" />
       </TouchableOpacity>
       <Text style={styles.title}>Cadastre-se</Text>
@@ -107,8 +105,8 @@ export default function CadastroScreen2() {
 
       <View style={styles.bottomCard}>
         <TouchableOpacity
-          style={styles.nextButton}
-          onPress={handleFinalizeCadastro}
+          style={[styles.nextButton, isLoading && { opacity: 0.7 }]}
+          onPress={() => { console.log('Finalizar cadastro'); handleFinalizeCadastro(); }}
           disabled={isLoading}
         >
           {isLoading ? (
@@ -118,7 +116,7 @@ export default function CadastroScreen2() {
           )}
         </TouchableOpacity>
         <Text style={styles.loginText}>
-          Já tem conta? <Text style={styles.loginLink} onPress={() => router.push('/login')}>Login</Text>
+          Já tem conta? <Text style={styles.loginLink} onPress={() => { console.log('Ir para login'); router.replace('/(auth)/login'); }}>Login</Text>
         </Text>
       </View>
     </View>
