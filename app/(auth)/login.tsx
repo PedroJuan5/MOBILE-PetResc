@@ -1,7 +1,16 @@
 import React, { useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert,} from "react-native";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { useAuth } from "../../context/AuthContext";
 
 export default function TelaLogin() {
@@ -13,7 +22,6 @@ export default function TelaLogin() {
   const [carregando, setCarregando] = useState(false);
 
   const entrar = async () => {
-    // ... (sua função 'entrar' continua a mesma)
     if (!email.trim() || !senha) {
       Alert.alert("Atenção", "Por favor, preencha email e senha");
       return;
@@ -25,10 +33,11 @@ export default function TelaLogin() {
     setCarregando(true);
     try {
       await signIn({ email: email, password: senha });
-      router.replace('/home');
+      console.log("Login bem sucedido, navegando para home...");
+      router.replace('/(tabs)/home');
     } catch (err: any) {
-      console.warn("signIn falhou:", err.message);
-      Alert.alert("Erro no Login", err.message);
+      console.warn("signIn falhou:", err?.message || err);
+      Alert.alert("Erro no Login", err?.message || "Erro desconhecido");
     } finally {
       setCarregando(false);
     }
@@ -36,10 +45,12 @@ export default function TelaLogin() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/*botao de voltar */}
       <TouchableOpacity
         style={styles.botaoVoltar}
-        onPress={() => router.back()}
+        onPress={() => {
+          console.log("Voltar pressionado");
+          router.back();
+        }}
         accessibilityLabel="Voltar"
       >
         <AntDesign name={"arrowleft" as any} size={24} color="#1c5b8f" />
@@ -49,7 +60,6 @@ export default function TelaLogin() {
         <Text style={styles.titulo}>Bem-vindo de volta</Text>
         <Text style={styles.subtitulo}>Entre com seu email e senha</Text>
 
-        {/*campo de email */}
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -59,10 +69,9 @@ export default function TelaLogin() {
           value={email}
           onChangeText={setEmail}
           editable={!carregando}
-          maxLength={100} // <<< ADICIONADO
+          maxLength={100}
         />
 
-        {/*campo de senha */}
         <TextInput
           style={styles.input}
           placeholder="Senha"
@@ -71,29 +80,58 @@ export default function TelaLogin() {
           value={senha}
           onChangeText={setSenha}
           editable={!carregando}
-          maxLength={50} // <<< ADICIONADO
+          maxLength={50}
         />
 
-        {/*divisor com "Ou" */}
         <View style={styles.divisor}>
-          {/* ... (resto do seu JSX) ... */}
+          <View style={styles.linha} />
+          <Text style={styles.ou}>Ou</Text>
+          <View style={styles.linha} />
         </View>
 
         <View style={styles.sociais}>
-          {/* ... (resto do seu JSX) ... */}
+          <TouchableOpacity style={styles.botaoSocial} onPress={() => console.log('Social 1')}>
+            <Text>Google</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.botaoSocial} onPress={() => console.log('Social 2')}>
+            <Text>Facebook</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
-      {/* Rodape com ação principal e link para cadastro */}
       <View style={styles.rodape}>
-        {/* ... (resto do seu JSX) ... */}
+        <TouchableOpacity
+          style={[styles.botaoEntrar, carregando && { opacity: 0.7 }]}
+          onPress={() => {
+            console.log("Entrar pressionado");
+            entrar();
+          }}
+          disabled={carregando}
+          accessibilityLabel="Entrar"
+        >
+          {carregando ? (
+            <ActivityIndicator color="#1c5b8f" />
+          ) : (
+            <Text style={styles.textoBotao}>Entrar</Text>
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            console.log("Ir para signup");
+            router.push('/(auth)/signup');
+          }}
+        >
+          <Text style={styles.textoCadastro}>
+            Não tem conta? <Text style={styles.linkCadastro}>Cadastre-se</Text>
+          </Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  // ... (seus estilos continuam os mesmos)
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
