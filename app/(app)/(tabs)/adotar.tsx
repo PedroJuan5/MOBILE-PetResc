@@ -7,7 +7,7 @@ import { Feather, FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 
 import CustomHeaderLeft from '../../../components/elementosEsquerda'; 
 import CustomHeaderRight from '../../../components/elementosDireita'; 
-import {DenuncieModal }from '../../../components/DenuncieModal';
+import {DenuncieModal }from '../../../components/denuncieModal';
 
 export default function AdotarScreen() {
   const router = useRouter();

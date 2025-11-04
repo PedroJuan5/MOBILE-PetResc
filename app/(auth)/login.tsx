@@ -34,7 +34,7 @@ export default function TelaLogin() {
     try {
       await signIn({ email: email, password: senha });
       console.log("Login bem sucedido, navegando para home...");
-      router.replace('/(tabs)/home');
+      router.replace('/(app)/(tabs)/home');
     } catch (err: any) {
       console.warn("signIn falhou:", err?.message || err);
       Alert.alert("Erro no Login", err?.message || "Erro desconhecido");
