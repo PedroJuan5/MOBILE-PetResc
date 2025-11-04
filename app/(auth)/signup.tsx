@@ -29,6 +29,10 @@ export default function CadastroScreen() {
     });
   };
 
+  const goToLogin = () => {
+    router.push('/(auth)/login');
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => { console.log('Voltar do signup1'); router.back(); }}>
@@ -57,6 +61,10 @@ export default function CadastroScreen() {
       <View style={styles.bottomCard}>
         <TouchableOpacity style={styles.nextButton} onPress={() => { console.log('Prosseguir pressionado'); handleNext(); }}>
           <Text style={styles.nextButtonText}>Prosseguir</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.loginButton} onPress={goToLogin}>
+          <Text style={styles.loginButtonText}>Já tem cadastro? Entrar</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -115,11 +123,20 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 12,
     alignItems: 'center',
-    marginBottom: 25,
+    marginBottom: 12,
   },
   nextButtonText: {
     color: '#1c5b8f',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  loginButton: {
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  loginButtonText: {
+    color: '#1c5b8f',
+    fontSize: 16,
+    textDecorationLine: 'underline',
   },
 });
