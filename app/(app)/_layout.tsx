@@ -1,7 +1,7 @@
 
+import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { Slot, SplashScreen, useRouter, useSegments } from 'expo-router';
 import React, { useEffect } from 'react';
-import { SplashScreen, Slot, useRouter, useSegments } from 'expo-router';
-import { AuthProvider, useAuth } from '@/context/AuthContext'; 
 
 SplashScreen.preventAutoHideAsync();
 
@@ -19,8 +19,11 @@ function RootLayoutNav() {
         SplashScreen.hideAsync();
         router.replace('/(tabs)/home' as any);
       } else if (!user && !inAuthGroup) {
+        console.log("Chegou aqui")
+        console.log(user)
+        console.log(inAuthGroup)
         SplashScreen.hideAsync();
-        router.replace('/login' as any);
+        router.replace('/' as any);
       } else {
          SplashScreen.hideAsync();
       }

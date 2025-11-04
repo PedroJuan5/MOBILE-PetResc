@@ -3,7 +3,7 @@ import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
 import Swiper from 'react-native-swiper';
-import { DenuncieModal } from '../../../components/DenuncieModal';
+import { DenuncieModal } from '../../../components/denuncieModal';
 import CustomHeaderRight from '../../../components/elementosDireita';
 import CustomHeaderLeft from '../../../components/elementosEsquerda';
 
