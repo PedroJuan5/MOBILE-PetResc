@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import {View, Text, ScrollView, Image, StyleSheet, TouchableOpacity,} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import Swiper from 'react-native-swiper';
 import { Feather, FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Swiper from 'react-native-swiper';
 
-import CustomHeaderLeft from '../../../components/elementosEsquerda'; 
-import CustomHeaderRight from '../../../components/elementosDireita'; 
-import {DenuncieModal }from '../../../components/denuncieModal';
+import { DenuncieModal } from '../../../components/DenuncieModal';
+import CustomHeaderRight from '../../../components/elementosDireita';
+import CustomHeaderLeft from '../../../components/elementosEsquerda';
 
 export default function AdotarScreen() {
   const router = useRouter();
