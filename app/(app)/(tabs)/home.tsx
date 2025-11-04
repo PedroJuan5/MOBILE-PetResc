@@ -1,10 +1,10 @@
-import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import {Image,ImageSourcePropType,ScrollView,StyleSheet,Text,TouchableOpacity,View,} from "react-native";
+import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import CustomHeaderLeft from '../../../components/elementosEsquerda';
+import { DenuncieModal } from '../../../components/DenuncieModal';
 import CustomHeaderRight from '../../../components/elementosDireita';
-import { DenuncieModal } from '../../../components/denuncieModal';
+import CustomHeaderLeft from '../../../components/elementosEsquerda';
 
 //tipos para TypeScript
 interface Animal {
