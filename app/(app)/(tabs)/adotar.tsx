@@ -21,7 +21,7 @@ export default function AdotarScreen() {
  
   // Esta função é chamada quando o botão é pressionado
   const handlePetsPress = () => {
-   // router.push('/pets');
+    router.push('/pets-disponiveis');
   };
  
   const adocaoSlides = [
