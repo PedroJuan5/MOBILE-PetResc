@@ -15,7 +15,7 @@ export default function AccountScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Header com botão voltar */}
+      {/* header com botão voltar */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}

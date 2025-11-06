@@ -6,21 +6,12 @@ import { DenuncieModal } from '../../../components/denuncieModal';
 import CustomHeaderRight from '../../../components/elementosDireita';
 import CustomHeaderLeft from '../../../components/elementosEsquerda';
 
-//tipos para TypeScript
+
 interface Animal {
-  id: string;
-  nome: string;
-  imagem: ImageSourcePropType;
-  raca: string;
-  sexo: string;
-  larTemporario: boolean;
-  status: string;
+  id: string; nome: string; imagem: ImageSourcePropType; raca: string; sexo: string; larTemporario: boolean; status: string;
 }
 interface Ong {
-  id: string;
-  nome: string;
-  imagem: ImageSourcePropType;
-  endereco: string;
+  id: string; nome: string; imagem: ImageSourcePropType; endereco: string;
 }
 interface CartaoAnimalProps {
   animal: Animal;
@@ -28,64 +19,25 @@ interface CartaoAnimalProps {
 interface CartaoOngProps {
   ong: Ong;
 }
-
 const ANIMAIS: Animal[] = [
-  {
-    id: "1",
-    nome: "Amendoim",
-    imagem: require("../../../assets/images/pets/caramelo.png"),
-    raca: "Sem raça definida (SRD)",
-    sexo: "F",
-    larTemporario: true,
-    status: "Disponível",
-  },
-  {
-    id: "2",
-    nome: "Bigodes",
-    imagem: require("../../../assets/images/ui/gatoHome.png"),
-    raca: "Siamês",
-    sexo: "M",
-    larTemporario: false,
-    status: "Em tratamento",
-  },
+  { id: "1", nome: "Amendoim", imagem: require("../../../assets/images/pets/caramelo.png"), raca: "Sem raça definida (SRD)", sexo: "F", larTemporario: true, status: "Disponível", },
+  { id: "2", nome: "Bigodes", imagem: require("../../../assets/images/ui/gatoHome.png"), raca: "Siamês", sexo: "M", larTemporario: false, status: "Em tratamento", },
 ];
-
 const ONGS: Ong[] = [
-  {
-    id: "1",
-    nome: "Abrigo do Bairro",
-    imagem: require("../../../assets/images/pets/jimjim.png"),
-    endereco:
-      "Rua do Saber, 223 - Vila Santo Antônio, Cotia - SP, 06706-281",
-  },
-  {
-    id: "2",
-    nome: "Resgate Feliz",
-    imagem: require("../../../assets/images/pets/mel.png"),
-    endereco:
-      "Avenida da Inovação, 1420 - Vila Santa Antônia, Cotia - SP, 06708-282",
-  },
+  { id: "1", nome: "Abrigo do Bairro", imagem: require("../../../assets/images/pets/jimjim.png"), endereco: "Rua do Saber, 223 - Vila Santo Antônio, Cotia - SP, 06706-281", },
+  { id: "2", nome: "Resgate Feliz", imagem: require("../../../assets/images/pets/mel.png"), endereco: "Avenida da Inovação, 1420 - Vila Santa Antônia, Cotia - SP, 06708-282", },
 ];
-
-//componentes reutilizáveis
 const CartaoAnimal = ({ animal }: CartaoAnimalProps) => (
   <View style={styles.cartaoAnimal}>
     <Image source={animal.imagem} style={styles.imagemAnimal} />
     <View style={styles.infoAnimal}>
       <Text style={styles.nomeAnimal}>{animal.nome}</Text>
-      <Text style={styles.detalheAnimal}>
-        {animal.raca}  {animal.sexo}
-      </Text>
-      <Text style={styles.detalheAnimal}>
-        {animal.larTemporario ? "Lar temporário" : "Abrigo"}
-      </Text>
-      <Text style={[styles.detalheAnimal, { fontWeight: "700" }]}>
-        Status: {animal.status}
-      </Text>
+      <Text style={styles.detalheAnimal}>{animal.raca}  {animal.sexo}</Text>
+      <Text style={styles.detalheAnimal}>{animal.larTemporario ? "Lar temporário" : "Abrigo"}</Text>
+      <Text style={[styles.detalheAnimal, { fontWeight: "700" }]}>Status: {animal.status}</Text>
     </View>
   </View>
 );
-
 const CartaoOng = ({ ong }: CartaoOngProps) => (
   <View style={styles.cartaoOng}>
     <Image source={ong.imagem} style={styles.imagemOng} />
@@ -94,12 +46,7 @@ const CartaoOng = ({ ong }: CartaoOngProps) => (
       <Text style={styles.enderecoOng}>{ong.endereco}</Text>
       <TouchableOpacity style={styles.botaoMaps}>
         <Text style={styles.textoBotaoMaps}>Abrir no MAPS</Text>
-        <Ionicons
-          name="location"
-          size={16}
-          color="#2D68A6"
-          style={{ marginLeft: 6 }}
-        />
+        <Ionicons name="location" size={16} color="#2D68A6" style={{ marginLeft: 6 }} />
       </TouchableOpacity>
     </View>
   </View>
@@ -112,21 +59,16 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       
-      {/* --- 4. SEU NOVO HEADER CUSTOMIZADO --- */}
-      <View style={styles.headerContainer}>
-        <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
-        {/* Mantive o mesmo texto do seu título antigo */}
-        <Text style={styles.headerTitle}>Conheça seu novo melhor amigo!</Text>
-        <CustomHeaderRight />
-      </View>
-
-      {/* --- 5. SEU MODAL (renderizado mas invisível) --- */}
       <DenuncieModal visible={modalVisible} onClose={() => setModalVisible(false)} />
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           
-          {/* --- O CABEÇALHO ANTIGO FOI REMOVIDO DAQUI --- */}
+          <View style={styles.iconHeaderContainer}>
+            <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
+            <CustomHeaderRight />
+          </View>
+          <Text style={styles.tituloDePagina}>Conheça seu novo melhor amigo!</Text>
 
           <Text style={styles.subTitulo}>Meus animais</Text>
           <ScrollView horizontal showsVerticalScrollIndicator={false}>
@@ -164,28 +106,21 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#FFFFFF" },
-  
-  headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 0, 
-    paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEE', 
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: '700', 
-    color: '#2D68A6', 
-    textAlign: 'center',
-    flex: 1, 
-  },
-
   container: { padding: 20, paddingTop: 10 }, 
-
-
+  iconHeaderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', 
+    alignItems: 'center',
+    marginBottom: 10, 
+  },
+  tituloDePagina: {
+    fontSize: 26,
+    fontWeight: "700",
+    color: "#2D68A6",
+    width: "70%", // Como na sua imagem
+    marginBottom: 20,
+    marginTop: 10,
+  },
   subTitulo: {
     fontSize: 18,
     fontWeight: "600",
@@ -193,7 +128,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 15,
   },
-
   cartaoAnimal: {
     width: 300,
     height: 120,
@@ -207,7 +141,6 @@ const styles = StyleSheet.create({
   infoAnimal: { flex: 1, padding: 10, justifyContent: "center" },
   nomeAnimal: { fontSize: 16, fontWeight: "700", color: "#2D68A6" },
   detalheAnimal: { fontSize: 13, color: "#3A5C7A", marginTop: 9},
-
   boxContribuicao: {
     flexDirection: "row",
     alignItems: "center",
@@ -215,7 +148,6 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   textoContribuicao: { flex: 1, marginRight: 10 },
-
   paragrafoContribuicao: {
     fontSize: 14,
     color: "#3A5C7A",
@@ -231,7 +163,6 @@ const styles = StyleSheet.create({
   },
   textoBotaoDoar: { color: "#2D68A6", fontWeight: "700" },
   imagemContribuicao: { width: 130, height: 180, resizeMode: "contain" },
-
   cartaoOng: {
     backgroundColor: "#E6F0FA",
     borderRadius: 15,

@@ -6,15 +6,14 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 export default function ConfigScreen() {
   const router = useRouter();
   return (
+    
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <Ionicons name="chevron-back" size={24} color="#2D68A6" />
         <Text style={styles.headerTitle}>Configurações</Text>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Conta */}
         <Text style={styles.sectionTitle}>Conta</Text>
 
         <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/configperfil')}>
@@ -47,7 +46,6 @@ export default function ConfigScreen() {
           <Feather name="chevron-right" size={20} color="#2D68A6" />
         </TouchableOpacity>
 
-        {/* Ajuda */}
         <Text style={[styles.sectionTitle, { marginTop: 25 }]}>Ajuda</Text>
 
         <TouchableOpacity style={styles.item}>
@@ -62,15 +60,16 @@ export default function ConfigScreen() {
           <Feather name="chevron-right" size={20} color="#2D68A6" />
         </TouchableOpacity>
 
-        {/* Footer */}
         <View style={styles.footer}>
           <TouchableOpacity>
             <Text style={styles.deleteText}>Deletar conta</Text>
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.logout}>
             <Feather name="log-out" size={20} color="#2D68A6" />
             <Text style={styles.logoutText}>Saída</Text>
           </TouchableOpacity>
+
         </View>
       </ScrollView>
     </View>

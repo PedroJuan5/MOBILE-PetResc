@@ -4,26 +4,23 @@ import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Swiper from 'react-native-swiper';
-
 import { DenuncieModal } from '../../../components/denuncieModal';
-import CustomHeaderRight from '../../../components/elementosDireita';
-import CustomHeaderLeft from '../../../components/elementosEsquerda';
+import CustomHeaderRight from '../../../components/elementosDireita'; 
+import CustomHeaderLeft from '../../../components/elementosEsquerda'; 
 
 export default function AdotarScreen() {
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
   const handleDenunciePress = () => setModalVisible(true);
+
   const handleFormPress = () => {
     router.push('/formulario-interesse');
   };
-
-
- 
-  // Esta função é chamada quando o botão é pressionado
+  
   const handlePetsPress = () => {
-    router.push('/pets-disponiveis');
+    router.push('/pets-disponiveis'); 
   };
- 
+  
   const adocaoSlides = [
     {
       key: 'interesse',
@@ -53,17 +50,20 @@ export default function AdotarScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.headerContainer}>
-        <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
-        <Text style={styles.headerTitle}>Conheça seu novo melhor amigo!</Text>
-        <CustomHeaderRight />
-      </View>
 
       <DenuncieModal visible={modalVisible} onClose={() => setModalVisible(false)} />
 
       <ScrollView contentContainerStyle={styles.container}>
+
+        <View style={styles.iconHeaderContainer}>
+            <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
+            <CustomHeaderRight />
+        </View>
+
+        <Text style={styles.tituloDePagina}>Conheça seu novo melhor amigo!</Text>
+        
         <Image
-          source={require('../../../assets/images/ui/caoegato.png')} // Mude se o caminho estiver errado
+          source={require('../../../assets/images/ui/caoegato.png')} 
           style={styles.mainImage}
         />
         <Text style={styles.paragraph}>
@@ -125,28 +125,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  headerContainer: {
+  iconHeaderContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 0,
-    paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEE',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#005A9C',
-    textAlign: 'center',
-    flex: 1,
+    marginBottom: 10,
+    marginTop: 10,
   },
   container: {
     padding: 20,
     backgroundColor: '#FFFFFF',
     paddingTop: 10,
   },
+  tituloDePagina: {
+    fontSize: 26,
+    fontWeight: "700",
+    color: "#2D68A6",
+    width: "70%",
+    marginBottom: 20,
+    marginTop: 10,
+  },
+
   mainImage: {
     width: '100%',
     height: 250,
@@ -155,8 +154,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   paragraph: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 18,
+    lineHeight: 28,
     color: '#333',
     textAlign: 'left',
     marginBottom: 20,
@@ -164,7 +163,7 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 30,
+    marginBottom: 35,
   },
   button: {
     flex: 1,
