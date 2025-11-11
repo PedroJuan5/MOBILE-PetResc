@@ -163,7 +163,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 10,
   },
-
   mainImage: {
     width: '100%',
     height: 250,
@@ -187,7 +186,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 15,
-    backgroundColor: '#005A9C',
+    backgroundColor: '#74c5ffff',
     borderRadius: 8,
     alignItems: 'center',
     marginHorizontal: 5,
@@ -195,7 +194,7 @@ const styles = StyleSheet.create({
   buttonOutline: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#005A9C',
+    borderColor: '#5dbbffff',
   },
   buttonText: {
     color: '#FFFFFF',
@@ -203,7 +202,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   buttonOutlineText: {
-    color: '#005A9C',
+    color: '#2ba8e2ff',
   },
   swiperContainer: {
     height: 320,

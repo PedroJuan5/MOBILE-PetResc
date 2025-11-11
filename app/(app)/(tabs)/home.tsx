@@ -1,17 +1,45 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from "react-native";
+// <<< MUDANÇA 1/3: Importar Linking e Alert >>>
+import {  Image,  ImageSourcePropType,  ScrollView,  StyleSheet,  Text,  TouchableOpacity,  View, Linking,  Alert  } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DenuncieModal } from '../../../components/denuncieModal';
 import CustomHeaderRight from '../../../components/elementosDireita';
 import CustomHeaderLeft from '../../../components/elementosEsquerda';
 
+/*
+ Pega um endereço em string, formata para URL e tenta abrir no Maps
+ */
+const handleOpenMaps = async (endereco: string) => {
+  // Codifica o endereço para ser usado em uma URL (troca espaços por %20)
+  const encodedAddress = encodeURIComponent(endereco);
+  const url = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
 
+  try {
+    //tenta abrir a URL
+    await Linking.openURL(url);
+  } catch (err) {
+    // Se falhar (ex: app do Maps não instalado), mostra um alerta
+    Alert.alert('Erro', 'Não foi possível abrir o aplicativo de mapas.');
+    console.error('Falha ao abrir o link do Maps:', err);
+  }
+};
+
+//tipos para TypeScript
 interface Animal {
-  id: string; nome: string; imagem: ImageSourcePropType; raca: string; sexo: string; larTemporario: boolean; status: string;
+  id: string;
+  nome: string;
+  imagem: ImageSourcePropType;
+  raca: string;
+  sexo: string;
+  larTemporario: boolean;
+  status: string;
 }
 interface Ong {
-  id: string; nome: string; imagem: ImageSourcePropType; endereco: string;
+  id: string;
+  nome: string;
+  imagem: ImageSourcePropType;
+  endereco: string;
 }
 interface CartaoAnimalProps {
   animal: Animal;
@@ -19,38 +47,90 @@ interface CartaoAnimalProps {
 interface CartaoOngProps {
   ong: Ong;
 }
+
 const ANIMAIS: Animal[] = [
-  { id: "1", nome: "Amendoim", imagem: require("../../../assets/images/pets/caramelo.png"), raca: "Sem raça definida (SRD)", sexo: "F", larTemporario: true, status: "Disponível", },
-  { id: "2", nome: "Bigodes", imagem: require("../../../assets/images/ui/gatoHome.png"), raca: "Siamês", sexo: "M", larTemporario: false, status: "Em tratamento", },
+  {
+    id: "1",
+    nome: "Amendoim",
+    imagem: require("../../../assets/images/pets/caramelo.png"),
+    raca: "Sem raça definida (SRD)",
+    sexo: "F",
+    larTemporario: true,
+    status: "Disponível",
+  },
+  {
+    id: "2",
+    nome: "Bigodes",
+    imagem: require("../../../assets/images/ui/gatoHome.png"),
+    raca: "Siamês",
+    sexo: "M",
+    larTemporario: false,
+    status: "Em tratamento",
+  },
 ];
+
 const ONGS: Ong[] = [
-  { id: "1", nome: "Abrigo do Bairro", imagem: require("../../../assets/images/pets/jimjim.png"), endereco: "Rua do Saber, 223 - Vila Santo Antônio, Cotia - SP, 06706-281", },
-  { id: "2", nome: "Resgate Feliz", imagem: require("../../../assets/images/pets/mel.png"), endereco: "Avenida da Inovação, 1420 - Vila Santa Antônia, Cotia - SP, 06708-282", },
+  {
+    id: "1",
+    nome: "Abrigo do Bairro",
+    imagem: require("../../../assets/images/pets/jimjim.png"),
+    endereco:
+      "Rua do Saber, 223 - Vila Santo Antônio, Cotia - SP, 06706-281",
+  },
+  {
+    id: "2",
+    nome: "Resgate Feliz",
+    imagem: require("../../../assets/images/pets/mel.png"),
+    endereco:
+      "Avenida da Inovação, 1420 - Vila Santa Antônia, Cotia - SP, 06708-282",
+  },
 ];
+
+//componentes reutilizáveis
 const CartaoAnimal = ({ animal }: CartaoAnimalProps) => (
   <View style={styles.cartaoAnimal}>
     <Image source={animal.imagem} style={styles.imagemAnimal} />
     <View style={styles.infoAnimal}>
       <Text style={styles.nomeAnimal}>{animal.nome}</Text>
-      <Text style={styles.detalheAnimal}>{animal.raca}  {animal.sexo}</Text>
-      <Text style={styles.detalheAnimal}>{animal.larTemporario ? "Lar temporário" : "Abrigo"}</Text>
-      <Text style={[styles.detalheAnimal, { fontWeight: "700" }]}>Status: {animal.status}</Text>
+      <Text style={styles.detalheAnimal}>
+        {animal.raca}  {animal.sexo}
+      </Text>
+      <Text style={styles.detalheAnimal}>
+        {animal.larTemporario ? "Lar temporário" : "Abrigo"}
+      </Text>
+      <Text style={[styles.detalheAnimal, { fontWeight: "700" }]}>
+        Status: {animal.status}
+      </Text>
     </View>
   </View>
 );
+
+// <<< MUDANÇA 3/3: Adicionar o onPress ao botão >>>
 const CartaoOng = ({ ong }: CartaoOngProps) => (
   <View style={styles.cartaoOng}>
     <Image source={ong.imagem} style={styles.imagemOng} />
     <View style={styles.infoOng}>
       <Text style={styles.nomeOng}>{ong.nome}</Text>
       <Text style={styles.enderecoOng}>{ong.endereco}</Text>
-      <TouchableOpacity style={styles.botaoMaps}>
+      
+      {/* Adicionamos a propriedade 'onPress' ao botão */}
+      <TouchableOpacity 
+        style={styles.botaoMaps}
+        onPress={() => handleOpenMaps(ong.endereco)} // Chama a função com o endereço da ONG
+      >
         <Text style={styles.textoBotaoMaps}>Abrir no MAPS</Text>
-        <Ionicons name="location" size={16} color="#2D68A6" style={{ marginLeft: 6 }} />
+        <Ionicons
+          name="location"
+          size={16}
+          color="#2D68A6"
+          style={{ marginLeft: 6 }}
+        />
       </TouchableOpacity>
     </View>
   </View>
 );
+// --- FIM DA MUDANÇA ---
+
 
 export default function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -68,6 +148,7 @@ export default function HomeScreen() {
             <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
             <CustomHeaderRight />
           </View>
+
           <Text style={styles.tituloDePagina}>Conheça seu novo melhor amigo!</Text>
 
           <Text style={styles.subTitulo}>Meus animais</Text>
@@ -109,15 +190,16 @@ const styles = StyleSheet.create({
   container: { padding: 20, paddingTop: 10 }, 
   iconHeaderContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between', 
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10, 
+    marginBottom: 10,
+    marginTop: 10,
   },
   tituloDePagina: {
     fontSize: 26,
     fontWeight: "700",
     color: "#2D68A6",
-    width: "70%", // Como na sua imagem
+    width: "70%",
     marginBottom: 20,
     marginTop: 10,
   },
