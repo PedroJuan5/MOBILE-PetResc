@@ -10,7 +10,6 @@ export default function TabLayout() {
         headerTitleAlign: "center",
         tabBarActiveTintColor: "#2D68A6",
         tabBarInactiveTintColor: "#3A5C7A",
-        headerTitleAlign: "center",
         headerStyle: {
           backgroundColor: '#2D68A6',
         },
