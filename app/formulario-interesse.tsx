@@ -29,7 +29,7 @@ interface FormData {
 
 export default function FormularioInteresseScreen() {
   const router = useRouter();
-  const [step, setStep] = useState(1); //o passo "lógico" atual (1 a 11)
+  const [step, setStep] = useState(1); 
 
   const [formData, setFormData] = useState<FormData>({
     termsAccepted: false,
@@ -63,26 +63,25 @@ export default function FormularioInteresseScreen() {
     let current = step;
 
     if (formData.viuPetInteresse === 'sim') {
-      total = 9; // Caminho mais curto (1-8 + 11)
-      if (step === 11) current = 9; // O passo 11 é o 9º passo
+      total = 9;
+      if (step === 11) current = 9; 
     } else if (formData.viuPetInteresse === 'nao') {
       total = 10;
       if (step === 9) current = 9;
       if (step === 10) current = 10;
     } else {
-      // antes do passo 8, não sabemos o caminho
       total = 10;
     }
     return { currentProgressStep: current, totalProgressSteps: total };
   }, [step, formData.viuPetInteresse]);
-  //fim da Lógica da Barra de Progresso 
+ 
 
   //função para lidar com o botao "Voltar"
   const handleBack = () => {
     if (step === 1) {
-      router.back(); //volta para a tela de voluntários
+      router.back(); 
     } else if (step === 11 || step === 9) {
-      setStep(8); //se estava no passo 11 ou 9, volta para o 8
+      setStep(8); 
     } else {
       setStep(step - 1);
     }
@@ -90,7 +89,7 @@ export default function FormularioInteresseScreen() {
 
   //função para lidar com o botão "Próximo"
   const handleNext = () => {
-    // Validações de cada passo
+    //validações de cada passo
     if (step === 2 && !formData.termsAccepted) {
       Alert.alert('Atenção', 'Você precisa aceitar os termos para continuar.');
       return;
@@ -132,14 +131,13 @@ export default function FormularioInteresseScreen() {
         return;
       }
       if (formData.viuPetInteresse === 'sim') {
-        setStep(11); //p ula para o passo do "Código do Pet"
+        setStep(11); 
       } else {
-        setStep(9); //continua para o passo "Tipo de Pet"
+        setStep(9);
       }
-      return; //importante para nao avançar mais
+      return; 
     }
-    //fim da Lógica de Ramificação
-
+    
     // validação do caminho "Não sei qual pet"
     if (step === 9 && !formData.tipoPetInteresse) {
       Alert.alert('Atenção', 'Por favor, selecione o tipo de pet.');
@@ -150,30 +148,27 @@ export default function FormularioInteresseScreen() {
         Alert.alert('Atenção', 'Por favor, selecione a preferência de sexo.');
         return;
       }
-      //fim de envio (Caminho 1) 
+      
       submitForm();
       return;
     }
 
-    //validação do caminho "Já sei qual pet"
     if (step === 11) {
       if (!formData.codigoPet) {
         Alert.alert('Atenção', 'Por favor, insira o código do pet.');
         return;
       }
-      // fim de envio(Caminho 2)
+
       submitForm();
       return;
     }
 
-    //se passou em tudo, avança para o próximo passo (linear)
     if (step < 8) {
       setStep(step + 1);
     }
   };
 
   const submitForm = () => {
-    //enviar os dados do formulário para o servidor ou processá-los
     console.log('Formulário completo:', formData);
     Alert.alert(
       'Formulário Enviado!',
@@ -182,7 +177,7 @@ export default function FormularioInteresseScreen() {
     router.back(); //volta para a tela de voluntários
   };
 
-  //componente de Botão de Escolha Única (reutilizável)
+
   const SingleChoiceOption = ({
     label,
     value,
@@ -209,7 +204,6 @@ export default function FormularioInteresseScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* --- Header customizado com Barra de progresso --- */}
       <Stack.Screen
         options={{
           headerTitle: '',
@@ -239,9 +233,9 @@ export default function FormularioInteresseScreen() {
       />
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Renderiza o passo atual com base no estado 'step' */}
+      
 
-        {/* --- Passo 1: Boas-vindas --- */}
+  
         {step === 1 && (
           <View style={styles.stepContainer}>
             <Text style={styles.stepTitle}>Formulário de interesse em adoção</Text>
@@ -256,7 +250,7 @@ export default function FormularioInteresseScreen() {
           </View>
         )}
 
-        {/* --- Passo 2: Antes de começar (Termos) --- */}
+       
         {step === 2 && (
           <View style={styles.stepContainer}>
             <Text style={styles.stepTitle}>Antes de começar</Text>
@@ -277,7 +271,6 @@ export default function FormularioInteresseScreen() {
           </View>
         )}
 
-        {/* --- Passo 3: Informações Pessoais --- */}
         {step === 3 && (
           <View style={styles.stepContainer}>
             <Text style={styles.stepTitle}>Informações pessoais</Text>
@@ -325,12 +318,11 @@ export default function FormularioInteresseScreen() {
           </View>
         )}
 
-        {/* --- Passo 4: Endereço --- */}
         {step === 4 && (
           <View style={styles.stepContainer}>
             <Text style={styles.stepTitle}>Endereço</Text>
             <Text style={styles.inputLabel}>CEP</Text>
-            {/* Componente de máscara CORRETO */}
+
             <MaskInput
               style={styles.input}
               value={formData.cep}
@@ -368,7 +360,6 @@ export default function FormularioInteresseScreen() {
           </View>
         )}
 
-        {/* --- Passo 5: Tipo de Moradia --- */}
         {step === 5 && (
           <View style={styles.stepContainer}>
             <Text style={styles.stepTitle}>Tipo de moradia:</Text>
@@ -384,7 +375,6 @@ export default function FormularioInteresseScreen() {
           </View>
         )}
 
-        {/* --- Passo 6: Porte Aceito --- */}
         {step === 6 && (
           <View style={styles.stepContainer}>
             <Text style={styles.stepTitle}>Quais portes são aceitos:</Text>
@@ -395,7 +385,6 @@ export default function FormularioInteresseScreen() {
           </View>
         )}
 
-        {/* --- Passo 7: Animais Aceitos --- */}
         {step === 7 && (
           <View style={styles.stepContainer}>
             <Text style={styles.stepTitle}>Quais animais são aceitos:</Text>
@@ -406,7 +395,6 @@ export default function FormularioInteresseScreen() {
           </View>
         )}
 
-        {/* --- Passo 8: Viu Pet? (Ramificação) --- */}
         {step === 8 && (
           <View style={styles.stepContainer}>
             <Text style={styles.stepTitle}>Você já viu algum pet que tem interesse em adotar?</Text>
@@ -425,7 +413,6 @@ export default function FormularioInteresseScreen() {
           </View>
         )}
 
-        {/* --- Passo 9: Tipo de Pet (Caminho 'Não') --- */}
         {step === 9 && (
           <View style={styles.stepContainer}>
             <Text style={styles.stepTitle}>Qual tipo de pet que tem interesse em adotar?</Text>
@@ -450,7 +437,6 @@ export default function FormularioInteresseScreen() {
           </View>
         )}
 
-        {/* --- Passo 10: Preferência Sexo (Caminho 'Não') --- */}
         {step === 10 && (
           <View style={styles.stepContainer}>
             <Text style={styles.stepTitle}>Qual a sua preferência que o pet seja:</Text>
@@ -475,7 +461,6 @@ export default function FormularioInteresseScreen() {
           </View>
         )}
 
-        {/* --- Passo 11: Código do Pet (Caminho 'Sim') --- */}
         {step === 11 && (
           <View style={styles.stepContainer}>
             <Text style={styles.stepTitle}>Qual é o código do pet?</Text>
@@ -493,7 +478,6 @@ export default function FormularioInteresseScreen() {
         )}
       </ScrollView>
 
-      {/* --- Botão de Próximo (Fixo) --- */}
       <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
         <Feather
           name={
@@ -577,7 +561,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: '#FAFAFA',
   },
-  //Botões de Escolha Única (Moradia, Porte, etc)
   choiceOption: {
     flexDirection: 'row',
     alignItems: 'center',

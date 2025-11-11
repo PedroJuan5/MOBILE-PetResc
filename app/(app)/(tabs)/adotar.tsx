@@ -1,32 +1,34 @@
-import React from 'react';
-import {View,Text,ScrollView,Image,StyleSheet,TouchableOpacity,} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Feather, FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Swiper from 'react-native-swiper';
-import { Feather, FontAwesome, FontAwesome5 } from '@expo/vector-icons'; // Importe os ícones
-import CustomHeaderLeft from '../../../components/elementosEsquerda';
+
+import { DenuncieModal } from '../../../components/denuncieModal';
 import CustomHeaderRight from '../../../components/elementosDireita';
-import { DenuncieModal } from '../../../components/DenuncieModal';
+import CustomHeaderLeft from '../../../components/elementosEsquerda';
 
 export default function AdotarScreen() {
   const router = useRouter();
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const handleDenunciePress = () => setModalVisible(true);
 
   const handleFormPress = () => {
     router.push('/formulario-interesse');
   };
-
+  
   const handlePetsPress = () => {
-    router.push('/(tabs)/pets');
+    router.push('/pets-disponiveis'); 
   };
-
+  
   const adocaoSlides = [
     {
       key: 'interesse',
       title: 'Formulário de interesse',
       description:
         'Faça o formulário de inscrição que disponibilizamos aqui que a ONG/protetor entrará em contato com você.',
-      iconName: 'pencil-square-o', // Ícone da imagem (FontAwesome
+      iconName: 'pencil-square-o',
       iconLib: FontAwesome,
     },
     {
@@ -42,36 +44,29 @@ export default function AdotarScreen() {
       title: 'Adoção completa',
       description:
         'Caso seja aprovado, você busca seu pet no dia combinado com a ONG/protetor.',
-      iconName: 'paw', 
+      iconName: 'paw',
       iconLib: FontAwesome5,
     },
   ];
 
   return (
     <SafeAreaView style={styles.safeArea}>
+
+      <DenuncieModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+
       <ScrollView contentContainerStyle={styles.container}>
-        {/* --- Seção Header --- */}
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerTitle}>Conheça seu novo melhor amigo!</Text>
-          {/* Ícones de patinha - ajuste o caminho da imagem */}
-          <Image
-            source={require('../../../assets/images/ui/patinhas.png')} 
-            style={[styles.pawIcon, styles.pawIcon1]}
-          />
-          <Image
-            source={require('../../../assets/images/ui/patinhas.png')} 
-            style={[styles.pawIcon, styles.pawIcon2]}
-          />
-          <Feather name="bell" size={24} color="#555" style={styles.bellIcon} />
+
+        <View style={styles.iconHeaderContainer}>
+            <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
+            <CustomHeaderRight />
         </View>
 
-        {/* --- Imagem Principal --- */}
+        <Text style={styles.tituloDePagina}>Conheça seu novo melhor amigo!</Text>
+        
         <Image
-          source={require('../../../assets/images/ui/caoegato.png')}
+          source={require('../../../assets/images/ui/caoegato.png')} 
           style={styles.mainImage}
         />
-
-        {/* --- Texto Explicativo --- */}
         <Text style={styles.paragraph}>
           Nosso sistema de adoção foi desenvolvido para conectar animais em situação de
           vulnerabilidade a pessoas responsáveis que desejam oferecer um lar. Ao preencher o
@@ -79,20 +74,19 @@ export default function AdotarScreen() {
           adotante e garantir que o animal tenha um ambiente seguro e adequado.
         </Text>
 
-        {/* --- Botões de Ação --- */}
         <View style={styles.buttonRow}>
           <TouchableOpacity style={styles.button} onPress={handleFormPress}>
             <Text style={styles.buttonText}>Formulário</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             style={[styles.button, styles.buttonOutline]}
             onPress={handlePetsPress}
           >
             <Text style={[styles.buttonText, styles.buttonOutlineText]}>Pets disponíveis</Text>
           </TouchableOpacity>
-        </View>
 
-        {/* --- Seção Carrossel (Swiper) --- */}
+        </View>
         <View style={styles.swiperContainer}>
           <Swiper
             style={styles.swiper}
@@ -104,7 +98,7 @@ export default function AdotarScreen() {
             prevButton={<Feather name="chevron-left" size={30} color="#005A9C" />}
           >
             {adocaoSlides.map((slide) => {
-              const IconComponent = slide.iconLib; 
+              const IconComponent = slide.iconLib;
               return (
                 <TouchableOpacity
                   key={slide.key}
@@ -132,43 +126,49 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 0,
+    paddingVertical: 10,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEE',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#005A9C',
+    textAlign: 'center',
+    flex: 1,
+  },
   container: {
     padding: 20,
     backgroundColor: '#FFFFFF',
+    paddingTop: 10,
   },
-  // Header
-  headerContainer: {
-    position: 'relative',
+  iconHeaderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    marginTop: 10,
+  },
+  container: {
+    padding: 20,
+    backgroundColor: '#FFFFFF',
+    paddingTop: 10,
+  },
+  tituloDePagina: {
+    fontSize: 26,
+    fontWeight: "700",
+    color: "#2D68A6",
+    width: "70%",
     marginBottom: 20,
+    marginTop: 10,
   },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#005A9C',
-    width: '80%',
-  },
-  bellIcon: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-  },
-  pawIcon: {
-    position: 'absolute',
-    width: 20,
-    height: 20,
-    opacity: 0.5,
-  },
-  pawIcon1: {
-    right: 10,
-    top: 10,
-    transform: [{ rotate: '15deg' }],
-  },
-  pawIcon2: {
-    right: 50,
-    top: 10,
-    transform: [{ rotate: '-10deg' }],
-  },
-  // Conteúdo Principal
+
   mainImage: {
     width: '100%',
     height: 250,
@@ -177,26 +177,25 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   paragraph: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 18,
+    lineHeight: 28,
     color: '#333',
     textAlign: 'left',
     marginBottom: 20,
   },
-  // Botões
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 30,
+    marginBottom: 35,
   },
   button: {
-    flex: 1, // Para dividir o espaço
+    flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 15,
     backgroundColor: '#005A9C',
     borderRadius: 8,
     alignItems: 'center',
-    marginHorizontal: 5, // Espaço entre os botões
+    marginHorizontal: 5,
   },
   buttonOutline: {
     backgroundColor: '#FFFFFF',
@@ -211,7 +210,6 @@ const styles = StyleSheet.create({
   buttonOutlineText: {
     color: '#005A9C',
   },
-  // Carrossel
   swiperContainer: {
     height: 320,
     marginBottom: 20,
@@ -236,7 +234,7 @@ const styles = StyleSheet.create({
     paddingTop: 30,
     paddingBottom: 20,
     paddingHorizontal: 20,
-    marginHorizontal: 40, // Espaço para as setas
+    marginHorizontal: 40,
   },
   slideIconContainer: {
     width: 100,

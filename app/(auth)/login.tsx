@@ -1,13 +1,21 @@
 import React, { useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert,} from "react-native";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { useAuth } from "../../context/AuthContext";
-
 
 export default function TelaLogin() {
   const router = useRouter();
-  const { signIn } = useAuth(); 
+  const { signIn } = useAuth();
 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -18,37 +26,33 @@ export default function TelaLogin() {
       Alert.alert("Atenção", "Por favor, preencha email e senha");
       return;
     }
-
     if (typeof signIn !== "function") {
       Alert.alert("Erro", "Serviço de autenticação indisponível");
       return;
     }
-
     setCarregando(true);
-
     try {
       await signIn({ email: email, password: senha });
-
-      router.replace('/home');
-      
-
+      console.log("Login bem sucedido, navegando para home...");
+      router.replace('/(app)/(tabs)/home');
     } catch (err: any) {
-     console.warn("signIn falhou:", err.message);
-     Alert.alert("Erro no Login", err.message);
-
+      console.warn("signIn falhou:", err?.message || err);
+      Alert.alert("Erro no Login", err?.message || "Erro desconhecido");
     } finally {
       setCarregando(false);
     }
   };
+
   return (
     <SafeAreaView style={styles.container}>
-      {/*botao de voltar */}
       <TouchableOpacity
         style={styles.botaoVoltar}
-        onPress={() => router.back()}
+        onPress={() => {
+          console.log("Voltar pressionado");
+          router.back();
+        }}
         accessibilityLabel="Voltar"
       >
-        {/*AntDesign usa "arrowleft"; fazemos cast para evitar erro de tipagem temporário */}
         <AntDesign name={"arrowleft" as any} size={24} color="#1c5b8f" />
       </TouchableOpacity>
 
@@ -56,7 +60,6 @@ export default function TelaLogin() {
         <Text style={styles.titulo}>Bem-vindo de volta</Text>
         <Text style={styles.subtitulo}>Entre com seu email e senha</Text>
 
-        {/*campo de email */}
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -66,9 +69,9 @@ export default function TelaLogin() {
           value={email}
           onChangeText={setEmail}
           editable={!carregando}
+          maxLength={100}
         />
 
-        {/*campo de senha */}
         <TextInput
           style={styles.input}
           placeholder="Senha"
@@ -77,57 +80,56 @@ export default function TelaLogin() {
           value={senha}
           onChangeText={setSenha}
           editable={!carregando}
+          maxLength={50}
         />
 
-        {/*divisor com "Ou" */}
         <View style={styles.divisor}>
           <View style={styles.linha} />
           <Text style={styles.ou}>Ou</Text>
           <View style={styles.linha} />
         </View>
-      
+
         <View style={styles.sociais}>
-          <TouchableOpacity
-            style={styles.botaoSocial}
-            accessibilityLabel="Entrar com Google"
-            onPress={() => Alert.alert("Google", "Login social não implementado")}
-            disabled={carregando}
-          >
+          <TouchableOpacity style={styles.botaoSocial} onPress={() => console.log('Social 1')}>
             <Text>Google</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.botaoSocial}
-            accessibilityLabel="Entrar com Apple"
-            onPress={() => Alert.alert("Apple", "Login social não implementado")}
-            disabled={carregando}
-          >
-            <Text>Apple</Text>
+          <TouchableOpacity style={styles.botaoSocial} onPress={() => console.log('Social 2')}>
+            <Text>Facebook</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Rodape com ação principal e link para cadastro */}
       <View style={styles.rodape}>
         <TouchableOpacity
-          style={[styles.botaoEntrar, carregando && { opacity: 0.6 }]}
-          onPress={entrar}
+          style={[styles.botaoEntrar, carregando && { opacity: 0.7 }]}
+          onPress={() => {
+            console.log("Entrar pressionado");
+            entrar();
+          }}
           disabled={carregando}
+          accessibilityLabel="Entrar"
         >
-          <Text style={styles.textoBotao}>{carregando ? "Entrando..." : "Entrar"}</Text>
+          {carregando ? (
+            <ActivityIndicator color="#1c5b8f" />
+          ) : (
+            <Text style={styles.textoBotao}>Entrar</Text>
+          )}
         </TouchableOpacity>
 
-        <Text style={styles.textoCadastro}>
-          Sem conta?{" "}
-          <Text style={styles.linkCadastro} onPress={() => router.push('/signup')}>
-            Criar conta
+        <TouchableOpacity
+          onPress={() => {
+            console.log("Ir para signup");
+            router.push('/(auth)/signup');
+          }}
+        >
+          <Text style={styles.textoCadastro}>
+            Não tem conta? <Text style={styles.linkCadastro}>Cadastre-se</Text>
           </Text>
-        </Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -139,7 +141,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignSelf: "flex-start",
   },
-
   conteudo: {
     flex: 1,
     paddingHorizontal: 20,
@@ -158,7 +159,6 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     textAlign: "center",
   },
-
   input: {
     backgroundColor: "#1c5b8f",
     borderRadius: 8,
@@ -167,7 +167,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#fff",
   },
-
   divisor: {
     flexDirection: "row",
     alignItems: "center",
@@ -183,7 +182,6 @@ const styles = StyleSheet.create({
     color: "#aaa",
     fontSize: 14,
   },
-
   sociais: {
     flexDirection: "row",
     justifyContent: "center",
@@ -199,7 +197,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
   rodape: {
     backgroundColor: "#ffffff",
     borderTopLeftRadius: 25,
