@@ -72,7 +72,7 @@ export default function AdotarScreen() {
 
         <View style={styles.cartao}>
           <Image
-            source={{ uri: "https://placekitten.com/400/300" }}
+            source={require('../../../assets/images/ui/gato-preto-branco.png')}
             style={styles.imagemCima}
           />
           <View style={styles.caixaTexto}>
@@ -87,12 +87,21 @@ export default function AdotarScreen() {
             <Text style={styles.texto}>Doadores{"\n"}Ativos</Text>
           </View>
           <Image
-            source={{
-              uri: "https://images.unsplash.com/photo-1601758124092-1a5f5e1c61bb",
-            }}
+            source={require('../../../assets/images/ui/doacao.png')}
             style={styles.imagemBaixo}
           />
         </View>
+
+        <View style={styles.cartao}>
+        <Image
+          source={require('../../../assets/images/ui/doacao.png')}
+          style={styles.imagemCima}
+        />
+        <View style={styles.caixaTexto}>
+          <Text style={styles.numero}>85</Text>
+          <Text style={styles.texto}>Campanhas{"\n"}Realizadas</Text>
+        </View>
+      </View>
         
       </ScrollView>
     </SafeAreaView>
