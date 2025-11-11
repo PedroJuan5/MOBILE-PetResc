@@ -155,11 +155,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginTop: 10,
   },
-  container: {
-    padding: 20,
-    backgroundColor: '#FFFFFF',
-    paddingTop: 10,
-  },
   tituloDePagina: {
     fontSize: 26,
     fontWeight: "700",
