@@ -4,9 +4,10 @@ import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Swiper from 'react-native-swiper';
+
 import { DenuncieModal } from '../../../components/denuncieModal';
-import CustomHeaderRight from '../../../components/elementosDireita'; 
-import CustomHeaderLeft from '../../../components/elementosEsquerda'; 
+import CustomHeaderRight from '../../../components/elementosDireita';
+import CustomHeaderLeft from '../../../components/elementosEsquerda';
 
 export default function AdotarScreen() {
   const router = useRouter();
@@ -124,6 +125,28 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 0,
+    paddingVertical: 10,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEE',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#005A9C',
+    textAlign: 'center',
+    flex: 1,
+  },
+  container: {
+    padding: 20,
+    backgroundColor: '#FFFFFF',
+    paddingTop: 10,
   },
   iconHeaderContainer: {
     flexDirection: 'row',

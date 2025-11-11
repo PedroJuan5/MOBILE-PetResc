@@ -1,5 +1,7 @@
-import React, { useState } from "react";import {SafeAreaView,View,Text,StyleSheet,TouchableOpacity,ScrollView,} from "react-native";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { Stack } from 'expo-router';
+import React, { useState } from "react";
+import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from "react-native";
 
 
 const UNREAD = [
@@ -29,6 +31,8 @@ export default function Notificacoes() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
+        {/* Define opções de header apenas para esta tela (usa o header do Stack) */}
+  <Stack.Screen options={{ title: 'Notificações', headerShown: true }} />
         {/* Abas (Lidos / Não lidos) */}
         <View style={styles.tabsContainer}>
           <TouchableOpacity

@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 
 SplashScreen.preventAutoHideAsync();
 
+// Esta é a sua lógica de navegação e autenticação
 function RootLayoutNav() {
   const { user, isLoading } = useAuth();
   const segments = useSegments();
@@ -18,6 +19,9 @@ function RootLayoutNav() {
         SplashScreen.hideAsync();
         router.replace('/(tabs)/home' as any);
       } else if (!user && !inAuthGroup) {
+        console.log("Chegou aqui");
+        console.log(user);
+        console.log(inAuthGroup);
         SplashScreen.hideAsync();
         router.replace('/' as any); 
       } else {
@@ -26,7 +30,7 @@ function RootLayoutNav() {
     }
   }, [user, isLoading, segments]);
   if (isLoading) {
-    return null;
+    return null; // A SplashScreen continua visível
   }
 
   return (

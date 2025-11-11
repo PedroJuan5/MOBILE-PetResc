@@ -7,10 +7,9 @@ export default function TabLayout() {
     <Tabs
       initialRouteName="home"
       screenOptions={{
-        headerShown: false,
+        headerTitleAlign: "center",
         tabBarActiveTintColor: "#2D68A6",
         tabBarInactiveTintColor: "#3A5C7A",
-        headerTitleAlign: "center",
         headerStyle: {
           backgroundColor: '#2D68A6',
         },

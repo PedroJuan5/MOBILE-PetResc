@@ -34,13 +34,13 @@ export default function ConfigScreen() {
           <Feather name="chevron-right" size={20} color="#2D68A6" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item}>
+        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/privacidade')}>
           <Ionicons name="shield-outline" size={22} color="#2D68A6" />
           <Text style={styles.itemText}>Privacidade</Text>
           <Feather name="chevron-right" size={20} color="#2D68A6" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item}>
+        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/seguranca')}>
           <Ionicons name="lock-closed-outline" size={22} color="#2D68A6" />
           <Text style={styles.itemText}>Segurança</Text>
           <Feather name="chevron-right" size={20} color="#2D68A6" />
@@ -48,13 +48,13 @@ export default function ConfigScreen() {
 
         <Text style={[styles.sectionTitle, { marginTop: 25 }]}>Ajuda</Text>
 
-        <TouchableOpacity style={styles.item}>
+        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/contateNos')}>
           <MaterialIcons name="support-agent" size={22} color="#2D68A6" />
           <Text style={styles.itemText}>Contate-nos</Text>
           <Feather name="chevron-right" size={20} color="#2D68A6" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item}>
+        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/faq')}>
           <Ionicons name="help-circle-outline" size={22} color="#2D68A6" />
           <Text style={styles.itemText}>FAQ</Text>
           <Feather name="chevron-right" size={20} color="#2D68A6" />
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     marginTop: 40,
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
     borderTopWidth: 0.5,
