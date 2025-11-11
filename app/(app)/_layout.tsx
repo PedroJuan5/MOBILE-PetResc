@@ -14,6 +14,7 @@ function RootLayoutNav() {
     if (!isLoading) {
       const inAuthGroup = segments[0] === '(auth)';
 
+  
       if (user && inAuthGroup) {
         SplashScreen.hideAsync();
         router.replace('/(tabs)/home' as any);
@@ -22,13 +23,12 @@ function RootLayoutNav() {
         console.log(user);
         console.log(inAuthGroup);
         SplashScreen.hideAsync();
-        router.replace('/' as any); // Ou router.replace('/(auth)');
+        router.replace('/' as any); 
       } else {
         SplashScreen.hideAsync();
       }
     }
   }, [user, isLoading, segments]);
-
   if (isLoading) {
     return null; // A SplashScreen continua visível
   }
@@ -36,11 +36,26 @@ function RootLayoutNav() {
   return (
     <Stack
       screenOptions={{
-        // Esconde o cabeçalho azul padrão do Stack
         headerShown: false,
       }}
     >
+
       <Stack.Screen name="(tabs)" />
+      
+      {/* Telas de Adoção */}
+      <Stack.Screen name="formulario-interesse" />
+      <Stack.Screen name="pets-disponiveis" />
+      
+      <Stack.Screen name="pet/[id]" />
+
+      {/* Telas de Voluntariado */}
+      <Stack.Screen name="formulario-voluntarios" />
+      
+      {/* Telas de Configuração (que movemos anteriormente) */}
+      <Stack.Screen name="meus-dados" />
+      <Stack.Screen name="seguranca" />
+      <Stack.Screen name="notificacoes" />
+      
     </Stack>
   );
 }

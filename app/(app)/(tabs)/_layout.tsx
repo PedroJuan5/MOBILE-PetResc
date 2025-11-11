@@ -10,6 +10,7 @@ export default function TabLayout() {
         headerTitleAlign: "center",
         tabBarActiveTintColor: "#2D68A6",
         tabBarInactiveTintColor: "#3A5C7A",
+        headerTitleAlign: "center",
         headerStyle: {
           backgroundColor: '#2D68A6',
         },
@@ -20,7 +21,6 @@ export default function TabLayout() {
         name="home"
         options={{
           title: 'Início',
-          headerShown: false, 
           tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
         }}
       />
@@ -28,7 +28,6 @@ export default function TabLayout() {
         name="adotar"
         options={{
           title: 'Adoção',
-          headerShown: true,
           tabBarIcon: ({ color, size }) => <Ionicons name="paw-outline" size={size} color={color} />,
         }}
       />
@@ -36,7 +35,6 @@ export default function TabLayout() {
         name="doar"
         options={{
           title: "Doar",
-          headerShown: true,
           tabBarIcon: ({ color, size }) => <Ionicons name="gift-outline" size={size} color={color} />,
         }}
       />
@@ -44,7 +42,6 @@ export default function TabLayout() {
         name="voluntarios"
         options={{
           title: "Voluntários",
-          headerShown: true,
           tabBarIcon: ({ color, size }) => <Ionicons name="heart-outline" size={size} color={color} />,
         }}
       />
@@ -52,8 +49,13 @@ export default function TabLayout() {
         name="registro-animal"
         options={{
           title: "Registro",
-          headerShown: true,
           tabBarIcon: ({ color, size }) => <Ionicons name="add-circle-outline" size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="pets-disponiveis"
+        options={{
+          href: null, 
         }}
       />
     </Tabs>

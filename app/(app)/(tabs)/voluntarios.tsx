@@ -7,81 +7,80 @@ import { DenuncieModal } from '../../../components/denuncieModal';
 import CustomHeaderRight from '../../../components/elementosDireita';
 import CustomHeaderLeft from '../../../components/elementosEsquerda';
 
+const voluntarioSlides = [
+  {
+    key: 'interesse',
+    title: 'Formulário de interesse',
+    description:
+      'Faça o formulário de inscrição que disponibilizamos aqui que a ONG entrará em contato com você em até 48h.',
+    iconName: 'clipboard-list',
+    iconLib: FontAwesome5,
+  },
+  {
+    key: 'avaliacao',
+    title: 'Avaliação de formulário',
+    description:
+      'A ONG irá fazer a análise do cadastro e perfil do voluntário. Preenchendo os requisitos, você recebe a aprovação por telefone/email.',
+    iconName: 'chart-line', 
+    iconLib: FontAwesome5,
+  },
+  {
+    key: 'aprovado',
+    title: 'Formulário aprovado',
+    description:
+      'Caso seja aprovado espere o contato e a aprovação. Com tudo certo, você busca o pet no dia combinado com a ONG.',
+    iconName: 'user-check', 
+    iconLib: FontAwesome5,
+  },
+];
 
-//a
+const faqData = [
+  {
+    pergunta: "Por quanto tempo devo cuidar do animal?",
+    resposta: "O período varia conforme a necessidade do animal, geralmente de algumas semanas a meses.",
+  },
+  {
+    pergunta: "Preciso ter experiência com animais?",
+    resposta: "Não. Fornecemos orientação e acompanhamento completo durante toda a estadia.",
+  },
+  {
+    pergunta: "Há custos envolvidos?",
+    resposta: "Algumas despesas podem ser cobertas pelo programa, mas cada lar deve fornecer alimentação e cuidados básicos.",
+  },
+];
+
 export default function VoluntariosScreen() {
   const router = useRouter();
-
-  // --- LÓGICA DO MODAL DE DENÚNCIA ---
   const [modalVisible, setModalVisible] = useState(false);
   const handleDenunciePress = () => setModalVisible(true);
-  // --- FIM DA LÓGICA DO MODAL ---
-
-  // Navega para o NOVO formulário de voluntários
   const handleFormPress = () => {
-    // Este é o novo formulário que você precisa criar
     router.push('/formulario-voluntarios');
   };
 
-  const voluntarioSlides = [
-    {
-      key: 'interesse',
-      title: 'Formulário de interesse',
-      description:
-        'Faça o formulário de inscrição que disponibilizamos aqui que a ONG entrará em contato com você em até 48h.',
-      iconName: 'clipboard-list',
-      iconLib: FontAwesome5,
-    },
-    {
-      key: 'avaliacao',
-      title: 'Avaliação de formulário',
-      description:
-        'A ONG irá fazer a análise do cadastro e perfil do voluntário. Preenchendo os requisitos, você recebe a aprovação por telefone/email.',
-      iconName: 'chart-line', 
-      iconLib: FontAwesome5,
-    },
-    {
-      key: 'aprovado',
-      title: 'Formulário aprovado',
-      description:
-        'Caso seja aprovado espere o contato e a aprovação. Com tudo certo, você busca o pet no dia combinado com a ONG.',
-      iconName: 'user-check', 
-      iconLib: FontAwesome5,
-    },
-  ];
-
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* --- SEU HEADER CUSTOMIZADO --- */}
-      <View style={styles.headerContainer}>
-        <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
-        <Text style={styles.headerTitle}>Veja a diferença que você pode fazer!</Text>
-        <CustomHeaderRight />
-      </View>
-
-      {/* --- SEU MODAL (renderizado mas invisível) --- */}
+    
       <DenuncieModal visible={modalVisible} onClose={() => setModalVisible(false)} />
 
       <ScrollView contentContainerStyle={styles.container}>
-        {/* --- O que é Lar Temporário --- */}
+        
+        <View style={styles.iconHeaderContainer}>
+            <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
+            <CustomHeaderRight />
+        </View>
+
         <Text style={styles.sectionTitle}>O que é um Lar Temporário?</Text>
         <Text style={styles.paragraph}>
-          É um lar humano acolhedor que abriga temporariamente animais resgatados em situação de
-          vulnerabilidade... (etc)
+       É um lar humano acolhedor que abriga temporariamente animais resgatados em situação de vulnerabilidade, oferecendo-lhes um ambiente seguro, carinho e cuidados até que encontrem um lar definitivo ou um cuidador permanente.
         </Text>
 
-        {/* --- Imagem Principal --- */}
         <Image
           source={require('../../../assets/images/ui/gatoVoluntario.png')}
           style={styles.mainImage}
         />
-
-        {/* --- Texto Explicativo --- */}
         <Text style={styles.paragraph}>
-          Este gesto transforma vidas, permitindo que os animais recebam tratamento adequado... (etc)
+         Este gesto transforma vidas, permitindo que os animais recebam tratamento adequado, evitem o isolamento em abrigos e aprendam a confiar novamente, enquanto as famílias que acolhem se sentem gratificadas por fazer a diferença. 
         </Text>
-
-        {/* --- Carrossel de VOLUNTÁRIO --- */}
         <View style={styles.swiperContainer}>
           <Swiper
             style={styles.swiper}
@@ -112,9 +111,15 @@ export default function VoluntariosScreen() {
           </Swiper>
         </View>
 
-        {/* --- Perguntas Frequentes --- */}
         <Text style={styles.faqHeader}>Perguntas frequentes:</Text>
-        {/* ... (Seus <View style={styles.faqCard}> ... ) ... */}
+
+        {faqData.map((faq, index) => (
+          <View key={index} style={styles.faqCard}>
+            <Text style={styles.faqQuestion}>{faq.pergunta}</Text>
+            <Text style={styles.faqAnswer}>{faq.resposta}</Text>
+          </View>
+        ))}
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -125,20 +130,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  headerContainer: {
+  iconHeaderContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 0, 
-    paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#005A9C',
-    textAlign: 'center', 
-    flex: 1, 
+    marginBottom: 10,
+    marginTop: 10,
   },
   container: {
     padding: 20,
@@ -168,7 +165,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 20,
   },
-  // Carrossel
   swiperContainer: {
     height: 320,
     marginTop: 10,
@@ -223,7 +219,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
-  // FAQ
   faqHeader: {
     fontSize: 20,
     fontWeight: 'bold',
