@@ -1,8 +1,9 @@
+// app/(app)/pet/[id].tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 
-// interface de exemplo
+// Interface de exemplo
 interface PetDetalhado {
   id: string;
   nome: string;
@@ -18,13 +19,13 @@ export default function PetDetalheScreen() {
   const [pet, setPet] = useState<PetDetalhado | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // busca os dados do Pet (simulação)
+  // Busca os dados do Pet (simulação)
   useEffect(() => {
     if (id) {
       setTimeout(() => {
         setPet({
           id: id,
-          nome: `Detalhes do ${id}`, 
+          nome: `Detalhes do ${id}`,
           imagem: require('../../../assets/images/pets/caramelo.png'),
           raca: 'SRD',
           idade: '2 anos',
@@ -41,24 +42,29 @@ export default function PetDetalheScreen() {
       <Stack.Screen
         options={{
           title: pet ? pet.nome : 'Carregando...',
-          headerBackTitleVisible: false,
+          // --- CORREÇÃO AQUI ---
+          headerBackTitle: '', // Usa uma string vazia em vez de 'headerBackTitleVisible'
           headerShown: true,
           headerStyle: { backgroundColor: '#005A9C' },
           headerTintColor: '#FFFFFF',
         }}
       />
 
+      {/* 1. Mostra o "loading" */}
       {loading && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#005A9C" />
         </View>
       )}
+
+      {/* 2. Mostra "Não encontrado" */}
       {!loading && !pet && (
         <View style={styles.loadingContainer}>
           <Text>Pet não encontrado.</Text>
         </View>
       )}
 
+      {/* 3. Mostra o conteúdo */}
       {!loading && pet && (
         <ScrollView style={styles.container}>
           <Image source={pet.imagem} style={styles.image} />
@@ -75,6 +81,7 @@ export default function PetDetalheScreen() {
   );
 }
 
+// --- ESTILOS ---
 const styles = StyleSheet.create({
   container: {
     flex: 1,

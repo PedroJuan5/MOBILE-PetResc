@@ -29,6 +29,7 @@ function RootLayoutNav() {
       }
     }
   }, [user, isLoading, segments]);
+  
   if (isLoading) {
     return null; // A SplashScreen continua visível
   }
@@ -44,7 +45,10 @@ function RootLayoutNav() {
       
       {/* Telas de Adoção */}
       <Stack.Screen name="formulario-interesse" />
-      <Stack.Screen name="pets-disponiveis" />
+      
+      {/* --- ESTA LINHA FOI REMOVIDA --- */}
+      {/* <Stack.Screen name="pets-disponiveis" /> */}
+      {/* --- FIM DA CORREÇÃO --- */}
       
       <Stack.Screen name="pet/[id]" />
 

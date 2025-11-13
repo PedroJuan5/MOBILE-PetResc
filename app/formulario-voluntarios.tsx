@@ -1,19 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {ActivityIndicator,Alert,SafeAreaView,ScrollView,StyleSheet, Text, TextInput,TouchableOpacity, View,} from 'react-native';
 import MaskInput from 'react-native-mask-input';
 
+//Definição de Tipos 
 interface FormDataState {
   nome: string;
   cpf: string;
@@ -49,21 +40,11 @@ type StepProps = {
   updateUnmasked?: (key: keyof FormDataState, value: string) => void;
 };
 
-
+// Componente para Múltipla Escolha (Quadrado)
 const CustomCheckbox = ({ label, isSelected, onSelect }: { label: string, isSelected: boolean, onSelect: () => void }) => (
   <TouchableOpacity style={styles.optionButton} onPress={onSelect}>
     <Ionicons
-      name={isSelected ? 'md-checkbox' : 'md-square-outline'}
-      size={26}
-      color={isSelected ? '#005A9C' : '#a0a0a0'}
-    />
-    <Text style={styles.optionLabel}>{label}</Text>
-  </TouchableOpacity>
-);
-const CustomRadio = ({ label, isSelected, onSelect }: { label: string, isSelected: boolean, onSelect: () => void }) => (
-  <TouchableOpacity style={styles.optionButton} onPress={onSelect}>
-    <Ionicons
-      name={isSelected ? 'md-radio-button-on' : 'md-radio-button-off'}
+      name={isSelected ? 'checkbox' : 'square-outline'}
       size={26}
       color={isSelected ? '#005A9C' : '#a0a0a0'}
     />
@@ -71,6 +52,20 @@ const CustomRadio = ({ label, isSelected, onSelect }: { label: string, isSelecte
   </TouchableOpacity>
 );
 
+// Componente para Escolha Única (Redondo)
+const CustomRadio = ({ label, isSelected, onSelect }: { label: string, isSelected: boolean, onSelect: () => void }) => (
+  <TouchableOpacity style={styles.optionButton} onPress={onSelect}>
+    <Ionicons
+      name={isSelected ? 'radio-button-on' : 'radio-button-off'}
+      size={26}
+      color={isSelected ? '#005A9C' : '#a0a0a0'}
+    />
+    <Text style={styles.optionLabel}>{label}</Text>
+  </TouchableOpacity>
+);
+
+
+//Informações Pessoais
 const Step1 = ({ formData, updateFormData, updateUnmasked }: StepProps) => (
   <>
     <Text style={styles.stepTitle}>Informações pessoais</Text>
@@ -89,7 +84,7 @@ const Step1 = ({ formData, updateFormData, updateUnmasked }: StepProps) => (
       value={formData.cpf}
       onChangeText={(masked, unmasked) => {
         updateFormData('cpf', masked);
-        updateUnmasked!('cpfUnmasked', unmasked);
+        updateUnmasked!('cpfUnmasked', unmasked); // '!' garante ao TS que a função existe
       }}
       mask={[/\d/,/\d/,/\d/,'.',/\d/,/\d/,/\d/,'.',/\d/,/\d/,/\d/,'-',/\d/,/\d/]}
       keyboardType="numeric"
@@ -131,6 +126,7 @@ const Step1 = ({ formData, updateFormData, updateUnmasked }: StepProps) => (
   </>
 );
 
+//endereço
 const Step2 = ({ formData, updateFormData, updateUnmasked }: StepProps) => (
   <>
     <Text style={styles.stepTitle}>Endereço</Text>
@@ -182,6 +178,7 @@ const Step2 = ({ formData, updateFormData, updateUnmasked }: StepProps) => (
   </>
 );
 
+//sobre o espaço disponível
 const Step3 = ({ formData, updateFormData }: StepProps) => (
   <>
     <Text style={styles.stepTitle}>Sobre o espaço disponível</Text>
@@ -204,7 +201,7 @@ const Step3 = ({ formData, updateFormData }: StepProps) => (
     <Text style={styles.label}>Quais portes aceita?</Text>
     <View style={styles.optionRow}>
       <CustomCheckbox label="Pequeno" isSelected={formData.portesAceitos.includes('Pequeno')} onSelect={() => updateFormData('portesAceitos', 'Pequeno', true)} />
-      <CustomCheckbox label="Médio" isSelected={formData.portesAceitos.includes('Médio')} onSelect={() => updateFormData('portesAceitos', 'Médio', true)} />
+      <CustomCheckbox label="Médio" isSelected={formData.portesAceitos.includes('Médio')} onSelect={() => updateFormData('portesAceitos', 'Média', true)} />
       <CustomCheckbox label="Grande" isSelected={formData.portesAceitos.includes('Grande')} onSelect={() => updateFormData('portesAceitos', 'Grande', true)} />
     </View>
 
@@ -217,6 +214,7 @@ const Step3 = ({ formData, updateFormData }: StepProps) => (
   </>
 );
 
+//experiência com animais
 const Step4 = ({ formData, updateFormData }: StepProps) => (
   <>
     <Text style={styles.stepTitle}>Experiência com animais</Text>
@@ -240,6 +238,7 @@ const Step4 = ({ formData, updateFormData }: StepProps) => (
   </>
 );
 
+//recursos e condições
 const Step5 = ({ formData, updateFormData }: StepProps) => (
   <>
     <Text style={styles.stepTitle}>Recursos e condições</Text>
@@ -266,6 +265,7 @@ const Step5 = ({ formData, updateFormData }: StepProps) => (
   </>
 );
 
+//Finalizando
 const Step6 = ({ formData, updateFormData }: StepProps) => (
   <>
     <Text style={styles.stepTitle}>Finalizando formulário</Text>
@@ -283,6 +283,7 @@ const Step6 = ({ formData, updateFormData }: StepProps) => (
   </>
 );
 
+//formulário Enviado
 const Step7 = () => (
   <View style={styles.successContainer}>
     <Ionicons name="checkmark-circle-outline" size={80} color="#005A9C" />
@@ -296,6 +297,8 @@ const Step7 = () => (
   </View>
 );
 
+
+//Dados Iniciais do Formulário 
 const initialState: FormDataState = {
   nome: '',
   cpf: '',
@@ -403,10 +406,10 @@ export default function FormularioVoluntariosScreen() {
           headerShown: true,
           headerTitleAlign: 'center',
           headerTitleStyle: { fontSize: 16, fontWeight: 'bold', color: '#333' },
-          // @ts-ignore (Ignora o "falso positivo" do 'elevation')
+          // @ts-ignore - Ignora o erro de tipo do editor para 'elevation' e 'shadowOpacity'
           headerStyle: { backgroundColor: '#FFFFFF', elevation: 0, shadowOpacity: 0 },
           
-          // @ts-ignore (Ignora o "falso positivo" do tipo do 'headerLeft')
+          // @ts-ignore - Ignora o erro de tipo do editor para 'headerLeft'
           headerLeft: () =>
             step > 1 && step < 7 ? (
               <TouchableOpacity onPress={handleBack} style={{ paddingLeft: 20 }}>
@@ -515,7 +518,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
     alignItems: 'flex-end',
-    // @ts-ignore --- CORREÇÃO 3 (Ignora o "falso positivo" do 'elevation')
     elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },

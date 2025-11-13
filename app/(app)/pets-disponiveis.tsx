@@ -7,7 +7,7 @@ import {
   FlatList,
   TouchableOpacity,
   ImageSourcePropType,
-  Image, // <<< 1. IMPORTAR O COMPONENTE DE IMAGEM
+  Image, 
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRouter } from "expo-router"; // Importe o useRouter
