@@ -14,36 +14,74 @@ export default function PrivacidadeScreen() {
           <Ionicons name="arrow-back" size={24} color="#2D68A6" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Privacidade</Text>
-        <View style={{ width: 24 }} /> {/* Espaço para alinhar o título */}
+        <View style={{ width: 24 }} />
       </View>
 
       {/* Conteúdo */}
-      <ScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Termos de Uso */}
         <Text style={styles.sectionTitle}>Termos de uso</Text>
         <Text style={styles.paragraph}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-          Mauris interdum sapien sodales mi sagittis hendrerit. 
-          Curabitur ut lectus nec orci cursus rhoncus. 
-          Donec a ultrices risus. Mauris ut erat ut urna rhoncus 
-          facilisis a eu neque. Ut iaculis viverra laoreet. 
-          In interdum, augue non auctor pharetra, felis ante gravida ante, 
-          quis mattis quam eros non quam. Vivamus scelerisque ante nec dapibus 
-          convallis. Vestibulum quis scelerisque leo. Vestibulum quis porttitor 
-          tellus, non finibus nibh. Quisque ut tempor nulla, sed consectetur tortor.
+          Bem-vindo(a) ao nosso aplicativo de doação e adoção de pets! Ao utilizar a
+          plataforma, você concorda com os termos abaixo. Caso não concorde, recomendamos
+          não utilizar nossos serviços.
         </Text>
 
+        <Text style={styles.paragraph}>
+          Nosso objetivo é aproximar pessoas interessadas em doar ou adotar animais,
+          promovendo a adoção responsável. Não realizamos vendas ou intermediações
+          financeiras entre usuários.
+        </Text>
+
+        <Text style={styles.paragraph}>
+          Para utilizar o aplicativo, o usuário deve fornecer informações verdadeiras e
+          atualizadas. É proibido criar perfis falsos, divulgar anúncios de venda, ou
+          publicar conteúdos ofensivos ou enganosos.
+        </Text>
+
+        <Text style={styles.paragraph}>
+          A plataforma atua apenas como intermediária de contato entre adotantes e
+          doadores, não se responsabilizando pelas informações fornecidas por terceiros ou
+          por compromissos firmados fora do ambiente digital.
+        </Text>
+
+        <Text style={styles.paragraph}>
+          Reservamo-nos o direito de suspender contas que violem estes termos ou utilizem
+          o serviço de forma inadequada. O uso contínuo da plataforma após atualizações
+          implica a aceitação das novas versões dos termos.
+        </Text>
+
+        {/* Política de Privacidade */}
+        <Text style={styles.sectionTitle}>Política de Privacidade</Text>
+        <Text style={styles.paragraph}>
+          Valorizamos sua privacidade e seguimos a Lei Geral de Proteção de Dados
+          (LGPD). Coletamos apenas informações essenciais para o funcionamento do app, como
+          nome, e-mail, telefone e dados sobre os pets cadastrados.
+        </Text>
+
+        <Text style={styles.paragraph}>
+          Seus dados são utilizados para melhorar sua experiência, facilitar o contato com
+          outros usuários e garantir a segurança da plataforma. Não compartilhamos suas
+          informações com terceiros sem consentimento.
+        </Text>
+
+        <Text style={styles.paragraph}>
+          Adotamos medidas técnicas e administrativas para proteger seus dados contra
+          acessos não autorizados. Você pode solicitar, a qualquer momento, a exclusão ou
+          atualização de suas informações.
+        </Text>
+
+        <Text style={styles.paragraph}>
+          Para mais informações ou dúvidas, entre em contato pelo e-mail:
+          suporte@petco.com.br
+        </Text>
+
+        {/* Seção adicional (Serviço) */}
         <Text style={styles.sectionTitle}>Serviço PetCo</Text>
         <Text style={styles.paragraph}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-          Mauris interdum sapien sodales mi sagittis hendrerit. 
-          Curabitur ut lectus nec orci cursus rhoncus. 
-          Donec a ultrices risus. Mauris ut erat ut urna rhoncus 
-          facilisis a eu neque. Ut iaculis viverra laoreet. 
-          In interdum, augue non auctor pharetra, felis ante gravida ante, 
-          quis mattis quam eros non quam. Vivamus scelerisque ante nec dapibus convallis.
+          Nosso serviço tem como missão promover conexões seguras entre pessoas e animais.
+          Acreditamos que cada adoção é um ato de amor e responsabilidade. Trabalhamos para
+          garantir que cada pet encontre um lar adequado e amoroso.
         </Text>
       </ScrollView>
     </View>
@@ -54,7 +92,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     paddingTop: 60,
   },
   header: {
@@ -80,10 +118,10 @@ const styles = StyleSheet.create({
   },
   paragraph: {
     fontSize: 15,
-    lineHeight: 22,
+    lineHeight: 20,
+    padding: 0,
     color: '#4A4A4A',
     textAlign: 'justify',
     marginBottom: 16,
   },
 });
-

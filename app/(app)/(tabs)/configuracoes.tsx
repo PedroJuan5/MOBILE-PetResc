@@ -61,10 +61,6 @@ export default function ConfigScreen() {
         </TouchableOpacity>
 
         <View style={styles.footer}>
-          <TouchableOpacity>
-            <Text style={styles.deleteText}>Deletar conta</Text>
-          </TouchableOpacity>
-
           <TouchableOpacity style={styles.logout}>
             <Feather name="log-out" size={20} color="#2D68A6" />
             <Text style={styles.logoutText}>Saída</Text>
@@ -115,12 +111,10 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   footer: {
-    marginTop: 40,
+    marginTop: 10,
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderTopWidth: 0.5,
-    borderTopColor: '#ddd',
     paddingTop: 15,
   },
   deleteText: {
