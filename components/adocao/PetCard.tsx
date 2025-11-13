@@ -3,7 +3,6 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, ImageSourcePropType } 
 import { Link } from 'expo-router';
 
 interface Pet {
-
   id: string;
   nome: string;   
   raca: string;  

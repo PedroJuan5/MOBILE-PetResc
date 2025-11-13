@@ -3,7 +3,7 @@ import { Modal, View, Text, StyleSheet, Pressable,TextInput,Switch,ScrollView,Bu
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
 
-/* Tipagem dos props do modal */
+// Tipagem dos props do modal 
 interface FiltrosModalProps {
   visible: boolean;
   onClose: () => void;
@@ -109,7 +109,6 @@ export const FiltrosModal = ({ visible, onClose, onApplyFilters }: FiltrosModalP
     </Modal>
   );
 };
-
 
 const styles = StyleSheet.create({
   fundoEscuro: {
