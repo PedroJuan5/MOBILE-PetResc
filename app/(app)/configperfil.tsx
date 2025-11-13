@@ -1,16 +1,84 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useState } from "react";
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function AccountScreen() {
   const router = useRouter();
   const [name, setName] = useState("Username");
   const [username, setUsername] = useState("User00");
   const [email, setEmail] = useState("username@gmail.com");
+  const [avatarUri, setAvatarUri] = useState<string | null>(null);
 
   const handleSave = () => {
     alert("Alterações salvas com sucesso!");
+  };
+
+  const pickAvatar = async () => {
+    // pedir permissão
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permissão necessária', 'Precisamos de acesso às suas fotos para alterar a foto de perfil.');
+      return;
+    }
+
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.7,
+      });
+
+      // compatibilidade com diferentes versões do expo-image-picker
+      const wasCancelled = (result as any).cancelled ?? (result as any).canceled ?? false;
+      if (!wasCancelled) {
+        const uri = (result as any).assets?.[0]?.uri ?? (result as any).uri;
+        if (uri) {
+          setAvatarUri(uri);
+          // aqui você pode chamar uma função para enviar a imagem ao servidor
+        }
+      }
+    } catch (err) {
+      console.warn('Erro ao selecionar imagem:', err);
+    }
+  };
+
+  const pickFromCamera = async () => {
+    // pedir permissão de câmera
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permissão necessária', 'Precisamos de acesso à câmera para tirar a foto.');
+      return;
+    }
+
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.7,
+      });
+
+      const wasCancelled = (result as any).cancelled ?? (result as any).canceled ?? false;
+      if (!wasCancelled) {
+        const uri = (result as any).assets?.[0]?.uri ?? (result as any).uri;
+        if (uri) {
+          setAvatarUri(uri);
+        }
+      }
+    } catch (err) {
+      console.warn('Erro ao tirar foto:', err);
+    }
+  };
+
+  const pickAvatarMenu = () => {
+    Alert.alert('Alterar foto', 'Escolha a fonte da imagem', [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Galeria', onPress: () => pickAvatar() },
+      { text: 'Câmera', onPress: () => pickFromCamera() },
+    ]);
   };
 
   return (
@@ -39,11 +107,15 @@ export default function AccountScreen() {
         </View>
         <View style={styles.avatarContainer}>
           <View style={styles.avatar}>
-            <Ionicons name="person-outline" size={40} color="#a0bcd5" />
+              {avatarUri ? (
+                <Image source={{ uri: avatarUri }} style={{ width: 70, height: 70, borderRadius: 35 }} />
+              ) : (
+                <Ionicons name="person-outline" size={40} color="#a0bcd5" />
+              )}
           </View>
-          <TouchableOpacity style={styles.editIconAvatar}>
-            <Ionicons name="create-outline" size={18} color="#2D68A6" />
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.editIconAvatar} onPress={pickAvatarMenu} accessibilityRole="button" accessibilityLabel="Alterar foto de perfil">
+              <Ionicons name="create-outline" size={18} color="#2D68A6" />
+            </TouchableOpacity>
         </View>
       </View>
 
