@@ -6,7 +6,7 @@ import Swiper from 'react-native-swiper';
 import { Feather, FontAwesome, FontAwesome5 } from '@expo/vector-icons'; // Importe os ícones
 import CustomHeaderLeft from '../../../components/elementosEsquerda';
 import CustomHeaderRight from '../../../components/elementosDireita';
-import { DenuncieModal } from '../../../components/DenuncieModal';
+import { DenuncieModal } from '../../../components/denuncieModal';
 
 export default function AdotarScreen() {
   const router = useRouter();
@@ -17,7 +17,7 @@ export default function AdotarScreen() {
   };
 
   const handlePetsPress = () => {
-    router.push('/(tabs)/pets');
+    router.push('/pets-disponiveis');
   };
 
   const adocaoSlides = [
