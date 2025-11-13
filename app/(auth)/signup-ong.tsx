@@ -51,7 +51,7 @@ export default function LoginCadastroScreen() {
                 placeholder="Digite sua senha"
                 placeholderTextColor="#999"
                 secureTextEntry={!showPassword}
-                style={[styles.input, { flex: 1, marginBottom: 0 }]}
+                style={[styles.input, {  flex: 1, marginBottom: 0 }]}
               />
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                 <Ionicons
@@ -64,9 +64,9 @@ export default function LoginCadastroScreen() {
 
             <TouchableOpacity onPress={() => router.push('/esqueci-senha')}>
               <Text style={styles.forgot}>Esqueceu a senha?</Text>
-            </TouchableOpacity> 
+            </TouchableOpacity>
 
-               <TouchableOpacity onPress={() => router.push('/home-ong')}>
+            <TouchableOpacity style={styles.button} onPress={() => router.push('/home-ong')} accessibilityRole="button" accessibilityLabel="Entrar">
               <Text style={styles.buttonText}>Entrar</Text>
             </TouchableOpacity>
 

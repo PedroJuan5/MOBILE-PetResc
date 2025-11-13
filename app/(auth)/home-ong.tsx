@@ -1,6 +1,6 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const HomeScreen = () => {
   return (
@@ -43,7 +43,7 @@ const HomeScreen = () => {
           {/* Card 2 */}
           <View style={styles.card}>
             <Image
-              source={{ uri: "https://placekitten.com/200/200" }}
+              source={{ uri: "https://placekitten.com/200x200" }}
               style={styles.image}
             />
             <View style={styles.cardContent}>
@@ -110,6 +110,8 @@ const styles = StyleSheet.create({
   header: {
     alignItems: "center",
     marginBottom: 10,
+    fontFamily: "more-sugar",
+    
   },
   icons: {
     flexDirection: "row",
