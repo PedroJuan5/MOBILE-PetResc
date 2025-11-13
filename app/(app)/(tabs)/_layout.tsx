@@ -7,17 +7,10 @@ export default function TabLayout() {
     <Tabs
       initialRouteName="home"
       screenOptions={{
-        // --- ADICIONE ESTA LINHA ---
-        headerShown: false, // Isso desliga o cabeçalho azul do topo
-        // --- FIM DA MUDANÇA ---
-
-        // O resto das suas opções continua valendo
+        headerShown: false, 
         headerTitleAlign: "center",
         tabBarActiveTintColor: "#2D68A6",
         tabBarInactiveTintColor: "#3A5C7A",
-        
-        // Essas duas opções abaixo não farão mais efeito,
-        // pois o header está desligado
         headerStyle: {
           backgroundColor: '#2D68A6',
         },

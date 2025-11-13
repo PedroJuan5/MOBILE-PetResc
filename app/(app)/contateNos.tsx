@@ -1,38 +1,23 @@
 import React from 'react';
-import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from 'react-native';
-// Certifique-se de ter o 'expo-vector-icons' instalado
+import {SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
-// Cores baseadas na imagem
-const primaryColor = '#205a8dff'; // Azul para o título e botão
+const primaryColor = '#205a8dff';
 const textColor = '#205a8dff';
 const secondaryTextColor = '#6c757d';
 
 const ContatoScreen = () => {
   const router = useRouter();
   return (
-    // SafeAreaView para lidar com entalhes (notches) em dispositivos iOS
-    <SafeAreaView style={styles.safeArea}>
-      {/* ScrollView para garantir que o conteúdo seja rolável em telas menores */}
-      <ScrollView style={styles.container}>
-        {/* Header - Simula a barra superior */}
+   
+    <SafeAreaView style={styles.safeArea}>  
+      <ScrollView style={styles.container}> 
         <View style={styles.header}>
-          {/* Ícone de voltar */}
           <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color={primaryColor} />
           </TouchableOpacity>
-          {/* Título principal */}
           <Text style={styles.title}>Contate-nos</Text>
-          {/* Espaço para alinhar o título ao centro se fosse necessário, deixei à esquerda como na imagem */}
         </View>
 
         {/* Seção principal de informações */}
@@ -81,7 +66,6 @@ const ContatoScreen = () => {
             {/* Campo Mensagem */}
             <View style={styles.inputGroup}>
               <Text style={styles.formLabel}>• Mensagem:</Text>
-              {/* O TextInput de mensagem na imagem é menor, mas idealmente seria multiline para mensagens */}
               <TextInput style={styles.input} />
             </View>
             
@@ -98,11 +82,10 @@ const ContatoScreen = () => {
   );
 };
 
-// Estilos
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff', // Fundo branco
+    backgroundColor: '#fff', 
   },
   container: {
     paddingHorizontal: 20,
@@ -113,14 +96,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 10,
     paddingBottom: 20,
-    // Na imagem, a seta e o título estão alinhados, mas sem uma barra visível,
-    // este padding simula o espaço da barra superior.
   },
   title: {
     fontSize: 22,
-    fontWeight: '500', // Semibold
+    fontWeight: '500', 
     color: primaryColor,
-    marginLeft: 15, // Espaço entre o ícone e o título
+    marginLeft: 15,
   },
   content: {
     paddingBottom: 40,
@@ -147,9 +128,8 @@ const styles = StyleSheet.create({
   listItem: {
     fontSize: 14,
     color: textColor,
-    marginLeft: 10, // Indentação para os itens da lista
+    marginLeft: 10, 
     lineHeight: 20,
-    
   },
   form: {
     marginTop: 10,
@@ -162,13 +142,13 @@ const styles = StyleSheet.create({
   formLabel: {
     fontSize: 13,
     color: '#205a8dff',
-    width: 90, // Largura fixa para alinhar os TextInputs
+    width: 90,
     fontWeight: 'bold',
    
   },
   input: {
-    flex: 1, // Ocupa o restante do espaço
-    height: 30, // Altura pequena como na imagem
+    flex: 1, 
+    height: 30, 
     borderBottomWidth: 1,
     borderBottomColor: secondaryTextColor,
     paddingVertical: 0,
@@ -176,10 +156,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
     color: '#205a8dff',
     padding: 5,
-    
   },
   buttonContainer: {
-    // Alinha o botão à direita como na imagem
     alignItems: 'flex-end',
     marginTop: 40,
   },
@@ -187,7 +165,7 @@ const styles = StyleSheet.create({
     backgroundColor: primaryColor,
     paddingVertical: 8,
     paddingHorizontal: 25,
-    borderRadius: 8, // Borda arredondada
+    borderRadius: 8,
   },
   buttonText: {
     color: '#fff',

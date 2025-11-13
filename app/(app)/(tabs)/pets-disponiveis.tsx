@@ -1,27 +1,13 @@
-// app/(app)/(tabs)/pets-disponiveis.tsx
-
 import React, { useState, useMemo } from "react";
-import {
-  SafeAreaView, // <<< 1. ADICIONADO
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  ImageSourcePropType,
-  Image,
-} from "react-native";
+import { SafeAreaView,  View, Text, StyleSheet, FlatList, TouchableOpacity, ImageSourcePropType, Image,} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-// <<< 2. REMOVIDO useNavigation, MANTIDO useRouter
 import { useRouter } from "expo-router"; 
 import { FiltrosModal } from "../../../components/adocao/FiltrosModal";
-
-// <<< 3. IMPORTAR OS COMPONENTES DE HEADER E MODAL
 import { DenuncieModal } from '../../../components/denuncieModal';
 import CustomHeaderRight from '../../../components/elementosDireita';
 import CustomHeaderLeft from '../../../components/elementosEsquerda';
 
-// ... (Sua interface Pet e Filtros aqui) ...
+
 interface Pet {
   id: string; nome: string; raca: string; genero: string; especie: string; idade: string; tamanho: string; imagem: ImageSourcePropType;
 }
@@ -29,7 +15,7 @@ interface Filtros {
   nome?: string; isGato?: boolean; isCao?: boolean; isMacho?: boolean; isFemea?: boolean; porte?: string; raca?: string; idade?: string;
 }
 
-// ... (Seus dados PETS_COMPLETOS aqui, com os caminhos de imagem corrigidos) ...
+//daodos dos pets, kaique substitua pela api depois
 const PETS_COMPLETOS: Pet[] = [
   { id: "1", nome: "Branquinho", raca: "SRD", genero: "Macho", especie: "Gato", idade: "Adulto", tamanho: "Pequeno", imagem: require("../../../assets/images/pets/branquinho.png") },
   { id: "2", nome: "Frajola",   raca: "SRD", genero: "Fêmea", especie: "Gato", idade: "Filhote", tamanho: "Pequeno", imagem: require("../../../assets/images/pets/frajola.png") },
@@ -54,7 +40,7 @@ export default function TelaPetsDisponiveis() {
   };
 
   const petsFiltrados = useMemo(() => {
-    // ... (Sua lógica de filtro, está correta) ...
+
     if (Object.keys(filtrosAplicados).length === 0) return PETS_COMPLETOS;
     return PETS_COMPLETOS.filter((pet) => {
       const f = filtrosAplicados;
@@ -70,40 +56,32 @@ export default function TelaPetsDisponiveis() {
     });
   }, [filtrosAplicados]);
 
-  // <<< 5. REMOVIDO o useLayoutEffect
-
   const handlePetPress = (petId: string) => {
-    // Esta navegação para a tela de detalhes (que cobre as abas) está correta
     router.push(`/pet/${petId}`);
   };
 
   return (
-    // <<< 6. ADICIONADO O SAFEAREADVIEW
     <SafeAreaView style={styles.safeArea}>
-      
-      {/* <<< 7. ADICIONADO O HEADER FIXO (igual ao da home) */}
+  
       <View style={styles.headerContainer}>
         <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
-        {/* Você pode mudar este título */}
         <Text style={styles.headerTitle}>Pets Disponíveis</Text>
         <CustomHeaderRight />
       </View>
       
-      {/* <<< 8. ADICIONADO O MODAL DE DENÚNCIA */}
+    
       <DenuncieModal visible={modalVisible} onClose={() => setModalVisible(false)} />
 
-      {/* modal de filtros: recebe visibilidade e callback de aplicação */}
+     
       <FiltrosModal
         visible={filtroVisivel}
         onClose={() => setFiltroVisivel(false)}
         onApplyFilters={aplicarFiltros}
       />
 
-      {/* O Container do Conteúdo */}
       <View style={styles.container}>
         <View style={styles.subCabecalho}>
           <Text style={styles.titulo}>Animais em destaque</Text>
-          {/* Botão de Filtro (Menu) - agora dentro da página */}
           <TouchableOpacity 
             accessibilityLabel="Abrir filtros" 
             onPress={() => setFiltroVisivel(true)}
@@ -112,7 +90,6 @@ export default function TelaPetsDisponiveis() {
           </TouchableOpacity>
         </View>
 
-        {/* A Lista de Pets (FlatList) */}
         <FlatList
           data={petsFiltrados}
           renderItem={({ item }) => (
@@ -139,13 +116,10 @@ export default function TelaPetsDisponiveis() {
 }
 
 const styles = StyleSheet.create({
-  // <<< 9. ADICIONADO O ESTILO DO SAFEAREADVIEW
   safeArea: {
     flex: 1,
     backgroundColor: "#ffffff",
   },
-  
-  // <<< 10. ADICIONADO O ESTILO DO HEADER FIXO
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -163,8 +137,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     flex: 1, 
   },
-  // --- FIM DOS ESTILOS ADICIONADOS ---
-
   container: {
     flex: 1,
     paddingHorizontal: 20,
@@ -188,7 +160,6 @@ const styles = StyleSheet.create({
     marginTop: 50,
     color: "#3A5C7A",
   },
-  // ... (O resto dos seus estilos de Card continuam iguais) ...
   petCard: {
     flex: 1,
     margin: 8,

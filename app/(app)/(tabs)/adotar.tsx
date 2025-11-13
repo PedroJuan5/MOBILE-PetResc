@@ -4,10 +4,9 @@ import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Swiper from 'react-native-swiper';
-
 import { DenuncieModal } from '../../../components/denuncieModal';
-import CustomHeaderRight from '../../../components/elementosDireita';
-import CustomHeaderLeft from '../../../components/elementosEsquerda';
+import CustomHeaderRight from '../../../components/elementosDireita'; 
+import CustomHeaderLeft from '../../../components/elementosEsquerda'; 
 
 export default function AdotarScreen() {
   const router = useRouter();
@@ -51,17 +50,30 @@ export default function AdotarScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-
+      
       <DenuncieModal visible={modalVisible} onClose={() => setModalVisible(false)} />
 
       <ScrollView contentContainerStyle={styles.container}>
-
+        
         <View style={styles.iconHeaderContainer}>
             <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
             <CustomHeaderRight />
         </View>
 
-        <Text style={styles.tituloDePagina}>Conheça seu novo melhor amigo!</Text>
+        <View style={styles.titleContainer}>
+          <Text style={styles.tituloDePagina}>Conheça seu novo melhor amigo!</Text>
+   
+          <Image 
+            source={require("../../../assets/images/ui/pata.png")} 
+            style={[styles.paw, styles.paw1]} 
+            resizeMode="contain"
+          />
+          <Image 
+            source={require("../../../assets/images/ui/pata.png")} 
+            style={[styles.paw, styles.paw2]} 
+            resizeMode="contain"
+          />
+        </View>
         
         <Image
           source={require('../../../assets/images/ui/caoegato.png')} 
@@ -126,28 +138,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 0,
-    paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEE',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#005A9C',
-    textAlign: 'center',
-    flex: 1,
-  },
-  container: {
-    padding: 20,
-    backgroundColor: '#FFFFFF',
-    paddingTop: 10,
-  },
+  
   iconHeaderContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -155,13 +146,43 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginTop: 10,
   },
-  tituloDePagina: {
+
+  container: {
+    padding: 20,
+    backgroundColor: '#FFFFFF',
+    paddingTop: 10,
+  },
+  titleContainer: {
+    position: 'relative', 
+    marginBottom: 20,
+    marginTop: 10,
+  },
+  tituloDePagina: { 
     fontSize: 26,
     fontWeight: "700",
     color: "#2D68A6",
-    width: "70%",
-    marginBottom: 20,
-    marginTop: 10,
+    width: "70%", 
+  },
+   paw: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    opacity: 0.5,
+  },
+  paw1: {
+    top: -30,
+    right: 50, 
+    transform: [{ rotate: '15deg' }],
+  },
+  paw2: {
+    top: 60, 
+    right: 20, 
+    transform: [{ rotate: '-20deg' }],
+  },
+  paw3: {
+    top: 100, 
+    right: 60, 
+    transform: [{ rotate: '30deg' }],
   },
   mainImage: {
     width: '100%',
@@ -171,8 +192,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   paragraph: {
-    fontSize: 18,
-    lineHeight: 28,
+    fontSize: 16,
+    lineHeight: 24,
     color: '#333',
     textAlign: 'left',
     marginBottom: 20,
@@ -180,13 +201,13 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 35,
+    marginBottom: 30,
   },
   button: {
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 15,
-    backgroundColor: '#74c5ffff',
+    backgroundColor: '#005A9C',
     borderRadius: 8,
     alignItems: 'center',
     marginHorizontal: 5,
@@ -194,7 +215,7 @@ const styles = StyleSheet.create({
   buttonOutline: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#5dbbffff',
+    borderColor: '#005A9C',
   },
   buttonText: {
     color: '#FFFFFF',
@@ -202,7 +223,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   buttonOutlineText: {
-    color: '#2ba8e2ff',
+    color: '#005A9C',
   },
   swiperContainer: {
     height: 320,

@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 
 SplashScreen.preventAutoHideAsync();
 
-// Esta é a sua lógica de navegação e autenticação
+//lógica de navegação e autenticação
 function RootLayoutNav() {
   const { user, isLoading } = useAuth();
   const segments = useSegments();
@@ -31,7 +31,7 @@ function RootLayoutNav() {
   }, [user, isLoading, segments]);
   
   if (isLoading) {
-    return null; // A SplashScreen continua visível
+    return null; 
   }
 
   return (
@@ -42,24 +42,12 @@ function RootLayoutNav() {
     >
 
       <Stack.Screen name="(tabs)" />
-      
-      {/* Telas de Adoção */}
       <Stack.Screen name="formulario-interesse" />
-      
-      {/* --- ESTA LINHA FOI REMOVIDA --- */}
-      {/* <Stack.Screen name="pets-disponiveis" /> */}
-      {/* --- FIM DA CORREÇÃO --- */}
-      
       <Stack.Screen name="pet/[id]" />
-
-      {/* Telas de Voluntariado */}
       <Stack.Screen name="formulario-voluntarios" />
-      
-      {/* Telas de Configuração (que movemos anteriormente) */}
       <Stack.Screen name="meus-dados" />
       <Stack.Screen name="seguranca" />
       <Stack.Screen name="notificacoes" />
-      
     </Stack>
   );
 }

@@ -1,4 +1,3 @@
-// app/(app)/pet/[id].tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
@@ -42,29 +41,23 @@ export default function PetDetalheScreen() {
       <Stack.Screen
         options={{
           title: pet ? pet.nome : 'Carregando...',
-          // --- CORREÇÃO AQUI ---
-          headerBackTitle: '', // Usa uma string vazia em vez de 'headerBackTitleVisible'
+        
+          headerBackTitle: '', 
           headerShown: true,
           headerStyle: { backgroundColor: '#005A9C' },
           headerTintColor: '#FFFFFF',
         }}
       />
-
-      {/* 1. Mostra o "loading" */}
       {loading && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#005A9C" />
         </View>
       )}
-
-      {/* 2. Mostra "Não encontrado" */}
       {!loading && !pet && (
         <View style={styles.loadingContainer}>
           <Text>Pet não encontrado.</Text>
         </View>
       )}
-
-      {/* 3. Mostra o conteúdo */}
       {!loading && pet && (
         <ScrollView style={styles.container}>
           <Image source={pet.imagem} style={styles.image} />
@@ -81,7 +74,6 @@ export default function PetDetalheScreen() {
   );
 }
 
-// --- ESTILOS ---
 const styles = StyleSheet.create({
   container: {
     flex: 1,
