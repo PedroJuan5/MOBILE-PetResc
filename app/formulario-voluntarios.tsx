@@ -1,7 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import {ActivityIndicator,Alert,SafeAreaView,ScrollView,StyleSheet, Text, TextInput,TouchableOpacity, View,} from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Modal, // Importa o Modal
+} from 'react-native';
 import MaskInput from 'react-native-mask-input';
 
 //Definição de Tipos 
@@ -84,7 +95,7 @@ const Step1 = ({ formData, updateFormData, updateUnmasked }: StepProps) => (
       value={formData.cpf}
       onChangeText={(masked, unmasked) => {
         updateFormData('cpf', masked);
-        updateUnmasked!('cpfUnmasked', unmasked); // '!' garante ao TS que a função existe
+        updateUnmasked!('cpfUnmasked', unmasked); 
       }}
       mask={[/\d/,/\d/,/\d/,'.',/\d/,/\d/,/\d/,'.',/\d/,/\d/,/\d/,'-',/\d/,/\d/]}
       keyboardType="numeric"
@@ -265,10 +276,10 @@ const Step5 = ({ formData, updateFormData }: StepProps) => (
   </>
 );
 
-//Finalizando
+//Finalizando (AGORA RENDERIZADO DENTRO DO MODAL)
 const Step6 = ({ formData, updateFormData }: StepProps) => (
   <>
-    <Text style={styles.stepTitle}>Finalizando formulário</Text>
+    <Text style={styles.modalTitle}>Finalizando formulário</Text>
     <CustomCheckbox
       label="Declaração de que se compromete a cuidar do animal com responsabilidade, respeitando as orientações da ONG."
       isSelected={formData.declaracaoCompromisso}
@@ -283,18 +294,17 @@ const Step6 = ({ formData, updateFormData }: StepProps) => (
   </>
 );
 
-//formulário Enviado
+//formulário Enviado (AGORA RENDERIZADO DENTRO DO MODAL)
 const Step7 = () => (
-  <View style={styles.successContainer}>
-    <Ionicons name="checkmark-circle-outline" size={80} color="#005A9C" />
-    <Text style={styles.successTitle}>Formulário enviado</Text>
-    <Text style={styles.successMessage}>
+  <>
+    <Text style={styles.modalTitle}>Formulário enviado</Text>
+    <Text style={styles.modalMessage}>
       Sua inscrição como Lar Temporário foi recebida com sucesso.
     </Text>
-    <Text style={styles.successMessage}>
+    <Text style={styles.modalMessage}>
       Em breve, nossa equipe entrará em contato para alinhar os próximos passos e apresentar o animal que poderá ficar sob seus cuidados.
     </Text>
-  </View>
+  </>
 );
 
 
@@ -334,6 +344,11 @@ export default function FormularioVoluntariosScreen() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<FormDataState>(initialState);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // --- MUDANÇA: Estados para o Modal ---
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState<'finalizando' | 'enviado'>('finalizando');
+
 
   const updateFormData = (key: keyof FormDataState, value: any, isCheckbox: boolean = false) => {
     setFormData(prev => {
@@ -353,10 +368,20 @@ export default function FormularioVoluntariosScreen() {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
+  // --- MUDANÇA: Lógica de Navegação e Modal ---
   const handleNext = () => {
-    if (step < 7) setStep(step + 1);
+    // Se estiver antes do passo 5, apenas avança
+    if (step < 5) {
+      setStep(step + 1);
+    } 
+    // Se estiver no passo 5 (o último da scrollview), abre o modal
+    else if (step === 5) {
+      setModalContent('finalizando'); // Define o conteúdo do modal para o Passo 6
+      setIsModalVisible(true);      // Abre o modal
+    }
   };
 
+  // Volta para o passo anterior (só funciona nos passos 2-5)
   const handleBack = () => {
     if (step > 1) setStep(step - 1);
   };
@@ -368,20 +393,28 @@ export default function FormularioVoluntariosScreen() {
     }
     if (!formData.nome || !formData.cpfUnmasked || !formData.email || !formData.telefoneUnmasked || !formData.cepUnmasked) {
       Alert.alert("Formulário incompleto", "Por favor, volte e preencha todos os campos obrigatórios (Passo 1 e 2).");
-      setStep(1);
+      setStep(1); // Manda o usuário de volta para o começo
+      setIsModalVisible(false); // Fecha o modal
       return;
     }
 
     setIsLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
-      setStep(7);
-      
+      // Sucesso! Muda o conteúdo do modal para o Passo 7
+      setModalContent('enviado');
     } catch (err) {
       Alert.alert("Erro", "Não foi possível enviar seu formulário. Tente novamente.");
+      setIsModalVisible(false);
     } finally {
       setIsLoading(false);
     }
+  };
+  
+  // Função para fechar o modal de sucesso e voltar para a tela anterior
+  const handleCloseSuccessModal = () => {
+    setIsModalVisible(false);
+    router.back();
   };
 
   const renderStep = () => {
@@ -392,8 +425,7 @@ export default function FormularioVoluntariosScreen() {
       case 3: return <Step3 {...props} />;
       case 4: return <Step4 {...props} />;
       case 5: return <Step5 {...props} />;
-      case 6: return <Step6 {...props} />;
-      case 7: return <Step7 />;
+      // Passos 6 e 7 foram movidos para o Modal
       default: return null;
     }
   };
@@ -402,56 +434,100 @@ export default function FormularioVoluntariosScreen() {
     <>
       <Stack.Screen
         options={{
-          title: 'Seja um lar temporário',
+          // --- MUDANÇA: Título removido da barra do topo ---
+          title: '', 
           headerShown: true,
-          headerTitleAlign: 'center',
-          headerTitleStyle: { fontSize: 16, fontWeight: 'bold', color: '#333' },
-          // @ts-ignore - Ignora o erro de tipo do editor para 'elevation' e 'shadowOpacity'
-          headerStyle: { backgroundColor: '#FFFFFF', elevation: 0, shadowOpacity: 0 },
+          // --- MUDANÇA: headerTransparent para a seta aparecer ---
+          // Faz o cabeçalho ficar flutuante e transparente
+          headerTransparent: true, 
           
+          // --- MUDANÇA: Lógica CORRIGIDA da seta "Voltar" ---
           // @ts-ignore - Ignora o erro de tipo do editor para 'headerLeft'
-          headerLeft: () =>
-            step > 1 && step < 7 ? (
-              <TouchableOpacity onPress={handleBack} style={{ paddingLeft: 20 }}>
-                <Ionicons name="arrow-back" size={24} color="#005A9C" />
-              </TouchableOpacity>
-            ) : (step === 7 ? () => null : undefined),
+          headerLeft: () => {
+            // Se o modal estiver aberto (Passos 6 ou 7), não mostre nada.
+            if (isModalVisible) {
+              return null;
+            }
+            // No Passo 1, a seta volta para a tela anterior (ex: Voluntários)
+            if (step === 1) {
+              return (
+                <TouchableOpacity onPress={() => router.back()} style={{ paddingLeft: 20 }}>
+                  <Ionicons name="arrow-back" size={24} color="#005A9C" />
+                </TouchableOpacity>
+              );
+            }
+            // Nos Passos 2-5, a seta volta um passo (handleBack)
+            if (step > 1 && step <= 5) {
+               return (
+                <TouchableOpacity onPress={handleBack} style={{ paddingLeft: 20 }}>
+                  <Ionicons name="arrow-back" size={24} color="#005A9C" />
+                </TouchableOpacity>
+              );
+            }
+            // Por padrão, não mostra nada
+            return null;
+          },
+            
+          // @ts-ignore - Ignora o erro de tipo do editor para 'headerBackTitleVisible'
           headerBackTitleVisible: false,
         }}
       />
       
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
+          
+          {/* --- MUDANÇA: Títulos movidos para DENTRO da ScrollView --- */}
+          <Text style={styles.mainTitle}>Seja um lar temporário</Text>
           <Text style={styles.subtitle}>Crie o conta suas seguindo suas necessidades</Text>
+          
           {renderStep()}
         </ScrollView>
         
-        {step < 6 && (
+        {/* O Footer da seta SÓ aparece ANTES do modal (Passos 1-5) */}
+        {step <= 5 && !isModalVisible && (
           <View style={styles.footer}>
             <TouchableOpacity style={styles.navButton} onPress={handleNext}>
               <Ionicons name="arrow-forward" size={28} color="white" />
             </TouchableOpacity>
           </View>
         )}
-        {step === 6 && (
-          <View style={styles.footer}>
-            <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} disabled={isLoading}>
-              {isLoading ? (
-                <ActivityIndicator color="#FFFFFF" />
-              ) : (
-                <Text style={styles.submitButtonText}>Próximo</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        )}
-        {step === 7 && (
-           <View style={styles.footer}>
-            <TouchableOpacity style={styles.submitButton} onPress={() => router.back()}>
-              <Text style={styles.submitButtonText}>OK</Text>
-            </TouchableOpacity>
-          </View>
-        )}
       </SafeAreaView>
+
+      {/* --- O MODAL POP-UP (Passos 6 e 7) --- */}
+      <Modal
+        visible={isModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalPopup}>
+            
+            {modalContent === 'finalizando' ? (
+              // Passo 6
+              <>
+                <Step6 formData={formData} updateFormData={updateFormData} />
+                <TouchableOpacity style={[styles.modalButton, isLoading && styles.buttonDisabled]} onPress={handleSubmit} disabled={isLoading}>
+                  {isLoading ? (
+                    <ActivityIndicator color="#1c5b8f" />
+                  ) : (
+                    <Text style={styles.modalButtonText}>Próximo</Text>
+                  )}
+                </TouchableOpacity>
+              </>
+            ) : (
+              // Passo 7
+              <>
+                <Step7 />
+                <TouchableOpacity style={styles.modalButton} onPress={handleCloseSuccessModal}>
+                  <Text style={styles.modalButtonText}>OK</Text>
+                </TouchableOpacity>
+              </>
+            )}
+
+          </View>
+        </View>
+      </Modal>
     </>
   );
 }
@@ -464,6 +540,17 @@ const styles = StyleSheet.create({
   scrollContainer: {
     padding: 24,
     paddingBottom: 100,
+    // --- MUDANÇA: Adiciona padding no topo para o cabeçalho transparente ---
+    paddingTop: 80, // Ajuste este valor se a seta e o título estiverem muito altos
+  },
+  
+  // --- MUDANÇA: Estilos para os novos títulos ---
+  mainTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#005A9C',
+    textAlign: 'center',
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
@@ -471,6 +558,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
+  // --- FIM DA MUDANÇA ---
+
   stepTitle: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -518,6 +607,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
     alignItems: 'flex-end',
+    // @ts-ignore
     elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
@@ -532,37 +622,57 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  submitButton: {
-    backgroundColor: '#005A9C',
-    height: 50,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-  },
-  submitButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  successContainer: {
+  
+  // --- (NOVOS ESTILOS PARA O MODAL) ---
+  modalOverlay: {
     flex: 1,
-    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
   },
-  successTitle: {
-    fontSize: 22,
+  modalPopup: {
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    padding: 24,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#005A9C',
-    marginTop: 20,
-    marginBottom: 15,
+    marginBottom: 24,
+    textAlign: 'center',
   },
-  successMessage: {
+  modalMessage: {
     fontSize: 16,
     color: '#333',
     textAlign: 'center',
     lineHeight: 24,
-    marginBottom: 10,
+    marginBottom: 20,
   },
+  modalButton: {
+    backgroundColor: '#94B9D8',
+    padding: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 20,
+    width: '100%',
+  },
+  modalButtonText: {
+    color: '#1c5b8f',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  buttonDisabled: {
+    opacity: 0.7,
+  },
+  
+  // Estilos antigos que não são mais usados (apenas para referência)
+  submitButton: {},
+  submitButtonText: {},
+  successContainer: {},
+  successTitle: {},
+  successMessage: {},
 });

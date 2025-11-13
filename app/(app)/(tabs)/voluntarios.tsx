@@ -71,7 +71,7 @@ export default function VoluntariosScreen() {
 
         <Text style={styles.sectionTitle}>O que é um Lar Temporário?</Text>
         <Text style={styles.paragraph}>
-       É um lar humano acolhedor que abriga temporariamente animais resgatados em situação de vulnerabilidade, oferecendo-lhes um ambiente seguro, carinho e cuidados até que encontrem um lar definitivo ou um cuidador permanente.
+        É um lar humano acolhedor que abriga temporariamente animais resgatados em situação de vulnerabilidade, oferecendo-lhes um ambiente seguro, carinho e cuidados até que encontrem um lar definitivo ou um cuidador permanente.
         </Text>
 
         <Image
@@ -79,7 +79,7 @@ export default function VoluntariosScreen() {
           style={styles.mainImage}
         />
         <Text style={styles.paragraph}>
-         Este gesto transforma vidas, permitindo que os animais recebam tratamento adequado, evitem o isolamento em abrigos e aprendam a confiar novamente, enquanto as famílias que acolhem se sentem gratificadas por fazer a diferença. 
+          Este gesto transforma vidas, permitindo que os animais recebam tratamento adequado, evitem o isolamento em abrigos e aprendam a confiar novamente, enquanto as famílias que acolhem se sentem gratificadas por fazer a diferença. 
         </Text>
         <View style={styles.swiperContainer}>
           <Swiper
@@ -111,8 +111,10 @@ export default function VoluntariosScreen() {
           </Swiper>
         </View>
 
+        {/* Título do FAQ (agora centralizado) */}
         <Text style={styles.faqHeader}>Perguntas frequentes:</Text>
 
+        {/* Cards do FAQ (com estilos corrigidos) */}
         {faqData.map((faq, index) => (
           <View key={index} style={styles.faqCard}>
             <Text style={styles.faqQuestion}>{faq.pergunta}</Text>
@@ -219,15 +221,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
+
+  // --- MUDANÇAS A PARTIR DAQUI ---
   faqHeader: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#005A9C',
     marginBottom: 15,
+    textAlign: 'center', // 1. TÍTULO CENTRALIZADO
   },
   faqCard: {
-    backgroundColor: '#F0F8FF',
-    padding: 20,
+    backgroundColor: '#E6F0FA', // 2. COR DE FUNDO (igual da imagem)
+    paddingVertical: 25,     // 3. MAIS ESPAÇO INTERNO
+    paddingHorizontal: 20,
     borderRadius: 10,
     marginBottom: 15,
   },
@@ -235,10 +241,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#005A9C',
+    textAlign: 'center', // 4. PERGUNTA CENTRALIZADA
+    marginBottom: 10,      // 5. ESPAÇO ENTRE PERGUNTA E RESPOSTA
   },
   faqAnswer: {
     fontSize: 15,
-    color: '#333',
-    marginTop: 10,
+    color: '#3A5C7A',     // 6. COR DO TEXTO (igual de outros parágrafos)
+    textAlign: 'center', // 7. RESPOSTA CENTRALIZADA
+    lineHeight: 22,      // 8. ESPAÇAMENTO ENTRE LINHAS
   },
 });
