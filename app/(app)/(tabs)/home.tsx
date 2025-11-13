@@ -1,11 +1,27 @@
-import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import {Image,ImageSourcePropType,ScrollView,StyleSheet,Text,TouchableOpacity,View,} from "react-native";
+import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, TouchableOpacity, View, Linking,  Alert } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import CustomHeaderLeft from '../../../components/elementosEsquerda';
+import { DenuncieModal } from '../../../components/denuncieModal';
 import CustomHeaderRight from '../../../components/elementosDireita';
-import { DenuncieModal } from '../../../components/DenuncieModal';
+import CustomHeaderLeft from '../../../components/elementosEsquerda';
+
+
+ //pega um endereço em string, formata para URL e tenta abrir no Maps
+const handleOpenMaps = async (endereco: string) => {
+  // Codifica o endereço para ser usado em uma URL
+  const encodedAddress = encodeURIComponent(endereco);
+  const url = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+
+  try {
+    // Tenta abrir a URL
+    await Linking.openURL(url);
+  } catch (err) {
+    //se falhar (ex: app do Maps não instalado), mostra um alerta
+    Alert.alert('Erro', 'Não foi possível abrir o aplicativo de mapas.');
+    console.error('Falha ao abrir o link do Maps:', err);
+  }
+};
 
 //tipos para TypeScript
 interface Animal {
@@ -93,7 +109,11 @@ const CartaoOng = ({ ong }: CartaoOngProps) => (
     <View style={styles.infoOng}>
       <Text style={styles.nomeOng}>{ong.nome}</Text>
       <Text style={styles.enderecoOng}>{ong.endereco}</Text>
-      <TouchableOpacity style={styles.botaoMaps}>
+      
+      <TouchableOpacity 
+        style={styles.botaoMaps}
+        onPress={() => handleOpenMaps(ong.endereco)} // Chama a função com o endereço da ONG
+      >
         <Text style={styles.textoBotaoMaps}>Abrir no MAPS</Text>
         <Ionicons
           name="location"
@@ -106,28 +126,44 @@ const CartaoOng = ({ ong }: CartaoOngProps) => (
   </View>
 );
 
+
 export default function HomeScreen() {
+
   const [modalVisible, setModalVisible] = useState(false);
   const handleDenunciePress = () => setModalVisible(true);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       
-      {/* --- 4. SEU NOVO HEADER CUSTOMIZADO --- */}
-      <View style={styles.headerContainer}>
-        <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
-        {/* Mantive o mesmo texto do seu título antigo */}
-        <Text style={styles.headerTitle}>Conheça seu novo melhor amigo!</Text>
-        <CustomHeaderRight />
-      </View>
-
-      {/* --- 5. SEU MODAL (renderizado mas invisível) --- */}
       <DenuncieModal visible={modalVisible} onClose={() => setModalVisible(false)} />
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           
-          {/* --- O CABEÇALHO ANTIGO FOI REMOVIDO DAQUI --- */}
+          <View style={styles.iconHeaderContainer}>
+            <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
+            <CustomHeaderRight />
+          </View>
+
+          <View style={styles.titleContainer}>
+            <Text style={styles.tituloDePagina}>Conheça seu novo melhor amigo!</Text>
+
+            <Image 
+              source={require("../../../assets/images/ui/pata.png")} 
+              style={[styles.paw, styles.paw1]} 
+              resizeMode="contain"
+            />
+            <Image 
+              source={require("../../../assets/images/ui/pata.png")} 
+              style={[styles.paw, styles.paw2]} 
+              resizeMode="contain"
+            />
+            <Image 
+              source={require("../../../assets/images/ui/pata.png")} 
+              style={[styles.paw, styles.paw3]} 
+              resizeMode="contain"
+            />
+          </View>        
 
           <Text style={styles.subTitulo}>Meus animais</Text>
           <ScrollView horizontal showsVerticalScrollIndicator={false}>
@@ -165,28 +201,46 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#FFFFFF" },
-  
-  headerContainer: {
+  container: { padding: 20, paddingTop: 10 }, 
+  iconHeaderContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 0, 
-    paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEE', 
+    marginBottom: 10,
+    marginTop: 10,
+  }, 
+  titleContainer: {
+    position: 'relative',
+    marginBottom: 20,
+    marginTop: 10,
   },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: '700', 
-    color: '#2D68A6', 
-    textAlign: 'center',
-    flex: 1, 
+  tituloDePagina: {
+    fontSize: 26,
+    fontWeight: "700",
+    color: "#2D68A6",
+    width: "70%",
   },
-
-  container: { padding: 20, paddingTop: 10 }, 
-
-
+  paw: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    opacity: 0.5,
+  },
+  paw1: {
+    top: -30,
+    right: 50, 
+    transform: [{ rotate: '15deg' }],
+  },
+  paw2: {
+    top: 60, 
+    right: 20, 
+    transform: [{ rotate: '-20deg' }],
+  },
+  paw3: {
+    top: 100, 
+    right: 60, 
+    transform: [{ rotate: '30deg' }],
+  },
   subTitulo: {
     fontSize: 18,
     fontWeight: "600",
@@ -194,7 +248,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 15,
   },
-
   cartaoAnimal: {
     width: 300,
     height: 120,
@@ -208,7 +261,6 @@ const styles = StyleSheet.create({
   infoAnimal: { flex: 1, padding: 10, justifyContent: "center" },
   nomeAnimal: { fontSize: 16, fontWeight: "700", color: "#2D68A6" },
   detalheAnimal: { fontSize: 13, color: "#3A5C7A", marginTop: 9},
-
   boxContribuicao: {
     flexDirection: "row",
     alignItems: "center",
@@ -216,7 +268,6 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   textoContribuicao: { flex: 1, marginRight: 10 },
-
   paragrafoContribuicao: {
     fontSize: 14,
     color: "#3A5C7A",
@@ -232,7 +283,6 @@ const styles = StyleSheet.create({
   },
   textoBotaoDoar: { color: "#2D68A6", fontWeight: "700" },
   imagemContribuicao: { width: 130, height: 180, resizeMode: "contain" },
-
   cartaoOng: {
     backgroundColor: "#E6F0FA",
     borderRadius: 15,

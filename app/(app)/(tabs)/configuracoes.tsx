@@ -6,15 +6,14 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 export default function ConfigScreen() {
   const router = useRouter();
   return (
+    
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <Ionicons name="chevron-back" size={24} color="#2D68A6" />
         <Text style={styles.headerTitle}>Configurações</Text>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Conta */}
         <Text style={styles.sectionTitle}>Conta</Text>
 
         <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/configperfil')}>
@@ -35,42 +34,38 @@ export default function ConfigScreen() {
           <Feather name="chevron-right" size={20} color="#2D68A6" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item}>
+        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/privacidade')}>
           <Ionicons name="shield-outline" size={22} color="#2D68A6" />
           <Text style={styles.itemText}>Privacidade</Text>
           <Feather name="chevron-right" size={20} color="#2D68A6" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item}>
+        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/seguranca')}>
           <Ionicons name="lock-closed-outline" size={22} color="#2D68A6" />
           <Text style={styles.itemText}>Segurança</Text>
           <Feather name="chevron-right" size={20} color="#2D68A6" />
         </TouchableOpacity>
 
-        {/* Ajuda */}
         <Text style={[styles.sectionTitle, { marginTop: 25 }]}>Ajuda</Text>
 
-        <TouchableOpacity style={styles.item}>
+        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/contateNos')}>
           <MaterialIcons name="support-agent" size={22} color="#2D68A6" />
           <Text style={styles.itemText}>Contate-nos</Text>
           <Feather name="chevron-right" size={20} color="#2D68A6" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item}>
+        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/faq')}>
           <Ionicons name="help-circle-outline" size={22} color="#2D68A6" />
           <Text style={styles.itemText}>FAQ</Text>
           <Feather name="chevron-right" size={20} color="#2D68A6" />
         </TouchableOpacity>
 
-        {/* Footer */}
         <View style={styles.footer}>
-          <TouchableOpacity>
-            <Text style={styles.deleteText}>Deletar conta</Text>
-          </TouchableOpacity>
           <TouchableOpacity style={styles.logout}>
             <Feather name="log-out" size={20} color="#2D68A6" />
             <Text style={styles.logoutText}>Saída</Text>
           </TouchableOpacity>
+
         </View>
       </ScrollView>
     </View>
@@ -116,12 +111,10 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   footer: {
-    marginTop: 40,
-    flexDirection: 'row',
+    marginTop: 10,
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderTopWidth: 0.5,
-    borderTopColor: '#ddd',
     paddingTop: 15,
   },
   deleteText: {

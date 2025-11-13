@@ -1,94 +1,99 @@
-import React, { useState } from 'react';
 import { Feather, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
+import React, { useState } from 'react';
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Swiper from 'react-native-swiper';
-import { DenuncieModal } from '../../../components/DenuncieModal';
+import { DenuncieModal } from '../../../components/denuncieModal';
 import CustomHeaderRight from '../../../components/elementosDireita';
 import CustomHeaderLeft from '../../../components/elementosEsquerda';
 
+const voluntarioSlides = [
+  {
+    key: 'interesse',
+    title: 'Formulário de interesse',
+    description:
+      'Faça o formulário de inscrição que disponibilizamos aqui que a ONG entrará em contato com você em até 48h.',
+    iconName: 'clipboard-list',
+    iconLib: FontAwesome5,
+  },
+  {
+    key: 'avaliacao',
+    title: 'Avaliação de formulário',
+    description:
+      'A ONG irá fazer a análise do cadastro e perfil do voluntário. Preenchendo os requisitos, você recebe a aprovação por telefone/email.',
+    iconName: 'chart-line',
+    iconLib: FontAwesome5,
+  },
+  {
+    key: 'aprovado',
+    title: 'Formulário aprovado',
+    description:
+      'Caso seja aprovado espere o contato e a aprovação. Com tudo certo, você busca o pet no dia combinado com a ONG.',
+    iconName: 'user-check',
+    iconLib: FontAwesome5,
+  },
+];
 
+const faqData = [
+  {
+    pergunta: 'Por quanto tempo devo cuidar do animal?',
+    resposta: 'O período varia conforme a necessidade do animal, geralmente de algumas semanas a meses.',
+  },
+  {
+    pergunta: 'Preciso ter experiência com animais?',
+    resposta: 'Não. Fornecemos orientação e acompanhamento completo durante toda a estadia.',
+  },
+  {
+    pergunta: 'Há custos envolvidos?',
+    resposta: 'Algumas despesas podem ser cobertas pelo programa, mas cada lar deve fornecer alimentação e cuidados básicos.',
+  },
+];
 
 export default function VoluntariosScreen() {
   const router = useRouter();
-
-  // --- LÓGICA DO MODAL DE DENÚNCIA ---
   const [modalVisible, setModalVisible] = useState(false);
   const handleDenunciePress = () => setModalVisible(true);
-  // --- FIM DA LÓGICA DO MODAL ---
-
-  // Navega para o NOVO formulário de voluntários
   const handleFormPress = () => {
-    // Este é o novo formulário que você precisa criar
     router.push('/formulario-voluntarios');
   };
 
-  const voluntarioSlides = [
-    {
-      key: 'interesse',
-      title: 'Formulário de interesse',
-      description:
-        'Faça o formulário de inscrição que disponibilizamos aqui que a ONG entrará em contato com você em até 48h.',
-      iconName: 'clipboard-list',
-      iconLib: FontAwesome5,
-    },
-    {
-      key: 'avaliacao',
-      title: 'Avaliação de formulário',
-      description:
-        'A ONG irá fazer a análise do cadastro e perfil do voluntário. Preenchendo os requisitos, você recebe a aprovação por telefone/email.',
-      iconName: 'chart-line', 
-      iconLib: FontAwesome5,
-    },
-    {
-      key: 'aprovado',
-      title: 'Formulário aprovado',
-      description:
-        'Caso seja aprovado espere o contato e a aprovação. Com tudo certo, você busca o pet no dia combinado com a ONG.',
-      iconName: 'user-check', 
-      iconLib: FontAwesome5,
-    },
-  ];
-
   return (
-    <SafeAreaView style={styles.safeArea}>
-      {/* --- SEU HEADER CUSTOMIZADO --- */}
-      <View style={styles.headerContainer}>
-        <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
-        <Text style={styles.headerTitle}>Veja a diferença que você pode fazer!</Text>
-        <CustomHeaderRight />
-      </View>
-
-      {/* --- SEU MODAL (renderizado mas invisível) --- */}
+    <SafeAreaView style={styles.containerSafe}>
       <DenuncieModal visible={modalVisible} onClose={() => setModalVisible(false)} />
 
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* --- O que é Lar Temporário --- */}
-        <Text style={styles.sectionTitle}>O que é um Lar Temporário?</Text>
-        <Text style={styles.paragraph}>
-          É um lar humano acolhedor que abriga temporariamente animais resgatados em situação de
-          vulnerabilidade... (etc)
+      <ScrollView contentContainerStyle={styles.contentWrapper}>
+        <View style={styles.headerRow}>
+          <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
+          <CustomHeaderRight />
+        </View>
+
+        <View style={styles.headerTitleWrapper}>
+          <Text style={styles.headerTitle}>O que é um Lar Temporário?</Text>
+
+          <Image
+            source={require('../../../assets/images/ui/pata.png')}
+            style={[styles.decorativePaw, styles.decorativePawTopRight]}
+            resizeMode="contain"
+          />
+        </View>
+
+        <Text style={styles.bodyText}>
+          É um lar humano acolhedor que abriga temporariamente animais resgatados em situação de vulnerabilidade, oferecendo-lhes um ambiente seguro, carinho e cuidados até que encontrem um lar definitivo ou um cuidador permanente.
         </Text>
 
-        {/* --- Imagem Principal --- */}
-        <Image
-          source={require('../../../assets/images/ui/gatoVoluntario.png')}
-          style={styles.mainImage}
-        />
+        <Image source={require('../../../assets/images/ui/gatoVoluntario.png')} style={styles.heroImage} />
 
-        {/* --- Texto Explicativo --- */}
-        <Text style={styles.paragraph}>
-          Este gesto transforma vidas, permitindo que os animais recebam tratamento adequado... (etc)
+        <Text style={styles.bodyText}>
+          Este gesto transforma vidas, permitindo que os animais recebam tratamento adequado, evitem o isolamento em abrigos e aprendam a confiar novamente, enquanto as famílias que acolhem se sentem gratificadas por fazer a diferença.
         </Text>
 
-        {/* --- Carrossel de VOLUNTÁRIO --- */}
-        <View style={styles.swiperContainer}>
+        <View style={styles.carouselWrapper}>
           <Swiper
-            style={styles.swiper}
+            style={styles.carousel}
             showsButtons={true}
             showsPagination={false}
             loop={false}
-            buttonWrapperStyle={styles.swiperButtonWrapper}
+            buttonWrapperStyle={styles.carouselControls}
             nextButton={<Feather name="chevron-right" size={30} color="#005A9C" />}
             prevButton={<Feather name="chevron-left" size={30} color="#005A9C" />}
           >
@@ -97,63 +102,85 @@ export default function VoluntariosScreen() {
               return (
                 <TouchableOpacity
                   key={slide.key}
-                  style={styles.slide}
-                  onPress={slide.key === 'interesse' ? handleFormPress : () => {}}
+                  style={styles.featureCard}
+                  onPress={slide.key === 'interesse' ? handleFormPress : undefined}
                   activeOpacity={slide.key === 'interesse' ? 0.8 : 1.0}
                 >
-                  <View style={styles.slideIconContainer}>
-                    <IconComponent name={slide.iconName as any} size={50} color="#FFFFFF" />
+                  <View style={styles.featureIconWrapper}>
+                    <IconComponent name={slide.iconName} size={50} color="#FFFFFF" />
                   </View>
-                  <Text style={styles.slideTitle}>{slide.title}</Text>
-                  <Text style={styles.slideDescription}>{slide.description}</Text>
+                  <Text style={styles.featureTitle}>{slide.title}</Text>
+                  <Text style={styles.featureText}>{slide.description}</Text>
                 </TouchableOpacity>
               );
             })}
           </Swiper>
         </View>
 
-        {/* --- Perguntas Frequentes --- */}
-        <Text style={styles.faqHeader}>Perguntas frequentes:</Text>
-        {/* ... (Seus <View style={styles.faqCard}> ... ) ... */}
+        <Text style={styles.faqTitle}>Perguntas frequentes:</Text>
+
+        {faqData.map((faq, index) => (
+          <View key={index} style={styles.faqItem}>
+            <Text style={styles.faqQuestionText}>{faq.pergunta}</Text>
+            <Text style={styles.faqAnswerText}>{faq.resposta}</Text>
+          </View>
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  containerSafe: {
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  headerContainer: {
+  headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 0, 
-    paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
+    marginBottom: 10,
+    marginTop: 10,
   },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#005A9C',
-    textAlign: 'center', 
-    flex: 1, 
-  },
-  container: {
+  contentWrapper: {
     padding: 20,
     backgroundColor: '#FFFFFF',
-    paddingTop: 10, 
+    paddingTop: 10,
   },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#005A9C',
-    marginLeft: 40,
+  headerTitleWrapper: {
+    position: 'relative',
     marginTop: 20,
     marginBottom: 5,
+    marginLeft: 40,
   },
-  paragraph: {
+  headerTitle: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    color: '#005A9C',
+    width: '95%',
+  },
+  decorativePaw: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    opacity: 0.5,
+  },
+  decorativePawTopRight: {
+    top: -30,
+    right: 50,
+    transform: [{ rotate: '15deg' }],
+  },
+  decorativePawMidRight: {
+    top: 60,
+    right: 20,
+    transform: [{ rotate: '-20deg' }],
+  },
+  decorativePawBottomRight: {
+    top: 100,
+    right: 60,
+    transform: [{ rotate: '30deg' }],
+  },
+  bodyText: {
     fontSize: 17,
     lineHeight: 32,
     color: '#333',
@@ -161,26 +188,24 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     marginLeft: 20,
   },
-  mainImage: {
+  heroImage: {
     width: '100%',
     height: 300,
     resizeMode: 'cover',
     borderRadius: 10,
     marginBottom: 20,
   },
-  // Carrossel
-  swiperContainer: {
+  carouselWrapper: {
     height: 320,
     marginTop: 10,
     marginBottom: 30,
   },
-  swiperContent: {
+  carouselContent: {
     alignItems: 'center',
     paddingHorizontal: 20,
   },
-  swiper: {
-  },
-  swiperButtonWrapper: {
+  carousel: {},
+  carouselControls: {
     paddingHorizontal: 0,
     width: '100%',
     position: 'absolute',
@@ -190,7 +215,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
-  slide: {
+  featureCard: {
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
@@ -201,7 +226,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginHorizontal: 40,
   },
-  slideIconContainer: {
+  featureIconWrapper: {
     width: 100,
     height: 100,
     borderRadius: 50,
@@ -210,40 +235,44 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 15,
   },
-  slideTitle: {
+  featureTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#005A9C',
     textAlign: 'center',
     marginBottom: 10,
   },
-  slideDescription: {
+  featureText: {
     fontSize: 14,
     color: '#333',
     textAlign: 'center',
     lineHeight: 20,
   },
-  // FAQ
-  faqHeader: {
+  faqTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#005A9C',
     marginBottom: 15,
+    textAlign: 'center',
   },
-  faqCard: {
-    backgroundColor: '#F0F8FF',
-    padding: 20,
+  faqItem: {
+    backgroundColor: '#E6F0FA',
+    paddingVertical: 25,
+    paddingHorizontal: 20,
     borderRadius: 10,
     marginBottom: 15,
   },
-  faqQuestion: {
+  faqQuestionText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#005A9C',
+    textAlign: 'center',
+    marginBottom: 10,
   },
-  faqAnswer: {
+  faqAnswerText: {
     fontSize: 15,
-    color: '#333',
-    marginTop: 10,
+    color: '#3A5C7A',
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });

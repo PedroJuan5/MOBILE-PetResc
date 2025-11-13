@@ -1,150 +1,189 @@
-import React, { useState } from "react";
-import { AntDesign } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert,} from "react-native";
-import { useAuth } from "../../context/AuthContext";
-
+import { Ionicons } from '@expo/vector-icons'; // Trocado de AntDesign para Ionicons
+import { Stack, useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView, // Adicionado
+  Platform, // Adicionado
+  SafeAreaView,
+  ScrollView, // Adicionado
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { useAuth } from '../../context/AuthContext';
 
 export default function TelaLogin() {
   const router = useRouter();
-  const { signIn } = useAuth(); 
+  const { signIn } = useAuth();
 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [carregando, setCarregando] = useState(false);
+  
+  // --- MUDANÇA: Adicionado estado para o "olho" da senha ---
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const entrar = async () => {
     if (!email.trim() || !senha) {
       Alert.alert("Atenção", "Por favor, preencha email e senha");
       return;
     }
-
     if (typeof signIn !== "function") {
       Alert.alert("Erro", "Serviço de autenticação indisponível");
       return;
     }
-
     setCarregando(true);
-
     try {
+      // Sua lógica de login (está ótima)
       await signIn({ email: email, password: senha });
-
-      router.replace('/home');
-      
-
+      console.log("Login bem sucedido, navegando para home...");
+      router.replace('/(app)/(tabs)/home');
     } catch (err: any) {
-     console.warn("signIn falhou:", err.message);
-     Alert.alert("Erro no Login", err.message);
-
+      console.warn("signIn falhou:", err?.message || err);
+      Alert.alert("Erro no Login", err?.message || "Erro desconhecido");
     } finally {
       setCarregando(false);
     }
   };
+
   return (
-    <SafeAreaView style={styles.container}>
-      {/*botao de voltar */}
-      <TouchableOpacity
-        style={styles.botaoVoltar}
-        onPress={() => router.back()}
-        accessibilityLabel="Voltar"
-      >
-        {/*AntDesign usa "arrowleft"; fazemos cast para evitar erro de tipagem temporário */}
-        <AntDesign name={"arrowleft" as any} size={24} color="#1c5b8f" />
-      </TouchableOpacity>
-
-      <View style={styles.conteudo}>
-        <Text style={styles.titulo}>Bem-vindo de volta</Text>
-        <Text style={styles.subtitulo}>Entre com seu email e senha</Text>
-
-        {/*campo de email */}
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#cac9c9ff"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={email}
-          onChangeText={setEmail}
-          editable={!carregando}
-        />
-
-        {/*campo de senha */}
-        <TextInput
-          style={styles.input}
-          placeholder="Senha"
-          placeholderTextColor="#cac9c9ff"
-          secureTextEntry
-          value={senha}
-          onChangeText={setSenha}
-          editable={!carregando}
-        />
-
-        {/*divisor com "Ou" */}
-        <View style={styles.divisor}>
-          <View style={styles.linha} />
-          <Text style={styles.ou}>Ou</Text>
-          <View style={styles.linha} />
-        </View>
+    <>
+      {/* --- MUDANÇA: Adicionado o cabeçalho do Stack (como na imagem) --- */}
+      <Stack.Screen
+        options={{
+          title: '', // A imagem não tem título
+          headerShown: true,
+          headerBackTitle: '', // Esconde o texto "Voltar" no iOS
+          headerShadowVisible: false,
+          headerTransparent: true, // Deixa o cabeçalho flutuar
+        }}
+      />
       
-        <View style={styles.sociais}>
-          <TouchableOpacity
-            style={styles.botaoSocial}
-            accessibilityLabel="Entrar com Google"
-            onPress={() => Alert.alert("Google", "Login social não implementado")}
-            disabled={carregando}
-          >
-            <Text>Google</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.botaoSocial}
-            accessibilityLabel="Entrar com Apple"
-            onPress={() => Alert.alert("Apple", "Login social não implementado")}
-            disabled={carregando}
-          >
-            <Text>Apple</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Rodape com ação principal e link para cadastro */}
-      <View style={styles.rodape}>
-        <TouchableOpacity
-          style={[styles.botaoEntrar, carregando && { opacity: 0.6 }]}
-          onPress={entrar}
-          disabled={carregando}
+      <SafeAreaView style={styles.container}>
+        {/* --- MUDANÇA: Adicionado KeyboardAvoidingView e ScrollView --- */}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
         >
-          <Text style={styles.textoBotao}>{carregando ? "Entrando..." : "Entrar"}</Text>
-        </TouchableOpacity>
+          <ScrollView 
+            contentContainerStyle={styles.scrollContainer} 
+            keyboardShouldPersistTaps="handled"
+          >
+            {/* --- MUDANÇA: Removido o botão de voltar customizado --- */}
+            {/* <TouchableOpacity style={styles.botaoVoltar} ... /> */}
 
-        <Text style={styles.textoCadastro}>
-          Sem conta?{" "}
-          <Text style={styles.linkCadastro} onPress={() => router.push('/signup')}>
-            Criar conta
-          </Text>
-        </Text>
-      </View>
-    </SafeAreaView>
+            <Text style={styles.titulo}>Bem-vindo de volta</Text>
+            {/* --- MUDANÇA: Texto do subtítulo atualizado --- */}
+            <Text style={styles.subtitulo}>Faça login para continuar</Text>
+
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="user@email.com" // Placeholder da imagem
+              placeholderTextColor="#FFFFFF"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+              editable={!carregando}
+              maxLength={100}
+            />
+
+            {/* --- MUDANÇA: Campo de senha com ícone de "olho" --- */}
+            <Text style={styles.label}>Senha</Text>
+            <View style={styles.passwordContainer}>
+              <TextInput
+                style={styles.passwordInput}
+                placeholder="Digite sua senha"
+                placeholderTextColor="#FFFFFF"
+                secureTextEntry={!isPasswordVisible} // Controlado pelo estado
+                value={senha}
+                onChangeText={setSenha}
+                editable={!carregando}
+                maxLength={50}
+              />
+              <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+                <Ionicons 
+                  name={isPasswordVisible ? 'eye-off-outline' : 'eye-outline'} 
+                  size={24} 
+                  color="#FFFFFF" 
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* --- MUDANÇA: Adicionado o link "Esqueci a senha" --- */}
+            <TouchableOpacity 
+              style={styles.forgotPasswordButton}
+              onPress={() => router.push('/esqueci-senha')}
+            >
+              <Text style={styles.forgotPasswordText}>Esqueci a senha</Text>
+            </TouchableOpacity>
+
+            <View style={styles.divisor}>
+              <View style={styles.linha} />
+              <Text style={styles.ou}>OU</Text>
+              <View style={styles.linha} />
+            </View>
+
+            <View style={styles.sociais}>
+              {/* --- MUDANÇA: Ícones de Logo --- */}
+              <TouchableOpacity style={styles.botaoSocial} onPress={() => console.log('Login Google')}>
+                <Ionicons name="logo-google" size={24} color="#005A9C" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botaoSocial} onPress={() => console.log('Login Apple')}>
+                <Ionicons name="logo-apple" size={24} color="#005A9C" />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={[styles.botaoEntrar, carregando && { opacity: 0.7 }]}
+              onPress={entrar} // Simplificado
+              disabled={carregando}
+              accessibilityLabel="Login" // Atualizado
+            >
+              {carregando ? (
+                <ActivityIndicator color="#1c5b8f" />
+              ) : (
+                <Text style={styles.textoBotao}>Login</Text> // Atualizado
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                console.log("Ir para signup");
+                router.push('/(auth)/signup');
+              }}
+            >
+              <Text style={styles.textoCadastro}>
+                Não tem conta? <Text style={styles.linkCadastro}>Cadastre-se</Text>
+              </Text>
+            </TouchableOpacity>
+            
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
   },
-  botaoVoltar: {
-    marginLeft: 20,
-    marginTop: 20,
-    alignSelf: "flex-start",
+  // --- MUDANÇA: 'scrollContainer' substitui 'conteudo' e 'rodape' ---
+  scrollContainer: {
+    flexGrow: 1, // Garante que o container cresça
+    paddingHorizontal: 24,
+    paddingTop: 100, // Espaço para o header transparente
+    paddingBottom: 30, // Espaço no final
+    justifyContent: 'center', // Centraliza o conteúdo se a tela for grande
   },
-
-  conteudo: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 15,
-  },
+  // --- MUDANÇA: Removido 'botaoVoltar' ---
   titulo: {
     color: "#1c5b8f",
     fontSize: 28,
@@ -153,25 +192,54 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   subtitulo: {
-    color: "#1c5b8f",
-    fontSize: 14,
-    marginBottom: 40,
+    color: "#666", // Cor da imagem
+    fontSize: 16, // Tamanho da imagem
+    marginBottom: 30, // Reduzido
     textAlign: "center",
   },
-
+  // --- MUDANÇA: Adicionado 'label' ---
+  label: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 8,
+    marginTop: 10,
+  },
   input: {
-    backgroundColor: "#1c5b8f",
+    backgroundColor: "#1c5b8f", // Seu estilo de input (correto)
     borderRadius: 8,
     padding: 15,
-    marginBottom: 20,
+    marginBottom: 10, // Reduzido
     fontSize: 16,
     color: "#fff",
   },
-
+  // --- MUDANÇA: Estilos para o input de senha com "olho" ---
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1c5b8f',
+    borderRadius: 8,
+    paddingHorizontal: 15, // Padding horizontal
+  },
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 15, // Padding vertical
+    fontSize: 16,
+    color: '#fff',
+  },
+  // --- MUDANÇA: Estilo para "Esqueci a senha" ---
+  forgotPasswordButton: {
+    alignSelf: 'flex-end',
+    marginTop: 12,
+  },
+  forgotPasswordText: {
+    color: '#1c5b8f',
+    fontSize: 14,
+    fontWeight: '600',
+  },
   divisor: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 20,
+    marginVertical: 30, // Aumentado
   },
   linha: {
     flex: 1,
@@ -182,35 +250,24 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     color: "#aaa",
     fontSize: 14,
+    fontWeight: '600', // Como na imagem
   },
-
   sociais: {
     flexDirection: "row",
     justifyContent: "center",
     gap: 20,
-    marginBottom: 20,
+    marginBottom: 30, // Aumentado
   },
   botaoSocial: {
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
+    // --- MUDANÇA: Botões sociais redondos como na imagem ---
+    backgroundColor: '#F0F8FF', // Fundo azul claro
     borderRadius: 30,
-    width: 100,
-    height: 48,
+    width: 60,
+    height: 60,
     justifyContent: "center",
     alignItems: "center",
   },
-
-  rodape: {
-    backgroundColor: "#ffffff",
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
-    padding: 30,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-  },
+  
   botaoEntrar: {
     backgroundColor: "#94B9D8",
     padding: 15,

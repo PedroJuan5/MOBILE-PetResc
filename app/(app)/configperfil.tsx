@@ -15,7 +15,6 @@ export default function AccountScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Header com botão voltar */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -30,7 +29,6 @@ export default function AccountScreen() {
         <View style={{ width: 26 }} />
       </View>
 
-      {/* Capa e avatar */}
       <View style={styles.coverContainer}>
         <View style={styles.cover}>
           <TouchableOpacity style={styles.editIconCover}>
@@ -49,7 +47,6 @@ export default function AccountScreen() {
 
       <Text style={styles.userName}>{name}</Text>
 
-      {/* Campos de entrada */}
       <View style={styles.form}>
         <Text style={styles.label}>Nome</Text>
         <TextInput
@@ -75,8 +72,7 @@ export default function AccountScreen() {
           placeholder="username@gmail.com"
         />
       </View>
-
-      {/* Botão de salvar */}
+      
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
         <Text style={styles.saveText}>Salvar alterações</Text>
       </TouchableOpacity>

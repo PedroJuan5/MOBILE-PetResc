@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
+
 // Define os "tipos" das propriedades que o modal vai receber
 interface DenuncieModalProps {
   visible: boolean;
