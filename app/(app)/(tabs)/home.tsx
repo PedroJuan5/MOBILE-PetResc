@@ -1,25 +1,23 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-// <<< MUDANÇA 1/3: Importar Linking e Alert >>>
-import {  Image,  ImageSourcePropType,  ScrollView,  StyleSheet,  Text,  TouchableOpacity,  View, Linking,  Alert  } from "react-native";
+import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, TouchableOpacity, View, Linking,  Alert } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DenuncieModal } from '../../../components/denuncieModal';
 import CustomHeaderRight from '../../../components/elementosDireita';
 import CustomHeaderLeft from '../../../components/elementosEsquerda';
 
-/*
- Pega um endereço em string, formata para URL e tenta abrir no Maps
- */
+
+ //pega um endereço em string, formata para URL e tenta abrir no Maps
 const handleOpenMaps = async (endereco: string) => {
-  // Codifica o endereço para ser usado em uma URL (troca espaços por %20)
+  // Codifica o endereço para ser usado em uma URL
   const encodedAddress = encodeURIComponent(endereco);
   const url = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
 
   try {
-    //tenta abrir a URL
+    // Tenta abrir a URL
     await Linking.openURL(url);
   } catch (err) {
-    // Se falhar (ex: app do Maps não instalado), mostra um alerta
+    //se falhar (ex: app do Maps não instalado), mostra um alerta
     Alert.alert('Erro', 'Não foi possível abrir o aplicativo de mapas.');
     console.error('Falha ao abrir o link do Maps:', err);
   }
@@ -105,7 +103,6 @@ const CartaoAnimal = ({ animal }: CartaoAnimalProps) => (
   </View>
 );
 
-// <<< MUDANÇA 3/3: Adicionar o onPress ao botão >>>
 const CartaoOng = ({ ong }: CartaoOngProps) => (
   <View style={styles.cartaoOng}>
     <Image source={ong.imagem} style={styles.imagemOng} />
@@ -113,7 +110,6 @@ const CartaoOng = ({ ong }: CartaoOngProps) => (
       <Text style={styles.nomeOng}>{ong.nome}</Text>
       <Text style={styles.enderecoOng}>{ong.endereco}</Text>
       
-      {/* Adicionamos a propriedade 'onPress' ao botão */}
       <TouchableOpacity 
         style={styles.botaoMaps}
         onPress={() => handleOpenMaps(ong.endereco)} // Chama a função com o endereço da ONG
@@ -129,10 +125,10 @@ const CartaoOng = ({ ong }: CartaoOngProps) => (
     </View>
   </View>
 );
-// --- FIM DA MUDANÇA ---
 
 
 export default function HomeScreen() {
+
   const [modalVisible, setModalVisible] = useState(false);
   const handleDenunciePress = () => setModalVisible(true);
 
@@ -149,7 +145,25 @@ export default function HomeScreen() {
             <CustomHeaderRight />
           </View>
 
-          <Text style={styles.tituloDePagina}>Conheça seu novo melhor amigo!</Text>
+          <View style={styles.titleContainer}>
+            <Text style={styles.tituloDePagina}>Conheça seu novo melhor amigo!</Text>
+
+            <Image 
+              source={require("../../../assets/images/ui/pata.png")} 
+              style={[styles.paw, styles.paw1]} 
+              resizeMode="contain"
+            />
+            <Image 
+              source={require("../../../assets/images/ui/pata.png")} 
+              style={[styles.paw, styles.paw2]} 
+              resizeMode="contain"
+            />
+            <Image 
+              source={require("../../../assets/images/ui/pata.png")} 
+              style={[styles.paw, styles.paw3]} 
+              resizeMode="contain"
+            />
+          </View>        
 
           <Text style={styles.subTitulo}>Meus animais</Text>
           <ScrollView horizontal showsVerticalScrollIndicator={false}>
@@ -194,14 +208,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
     marginTop: 10,
+  }, 
+  titleContainer: {
+    position: 'relative',
+    marginBottom: 20,
+    marginTop: 10,
   },
   tituloDePagina: {
     fontSize: 26,
     fontWeight: "700",
     color: "#2D68A6",
     width: "70%",
-    marginBottom: 20,
-    marginTop: 10,
+  },
+  paw: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    opacity: 0.5,
+  },
+  paw1: {
+    top: -30,
+    right: 50, 
+    transform: [{ rotate: '15deg' }],
+  },
+  paw2: {
+    top: 60, 
+    right: 20, 
+    transform: [{ rotate: '-20deg' }],
+  },
+  paw3: {
+    top: 100, 
+    right: 60, 
+    transform: [{ rotate: '30deg' }],
   },
   subTitulo: {
     fontSize: 18,

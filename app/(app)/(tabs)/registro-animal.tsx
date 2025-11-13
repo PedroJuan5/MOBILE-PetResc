@@ -1,6 +1,6 @@
-import React, { useLayoutEffect, useState } from "react";
-import {Image,Modal,SafeAreaView,ScrollView,StyleSheet,Text,TextInput,TouchableOpacity,View,Alert,} from "react-native";
-import { useNavigation, useRouter } from "expo-router";
+import React, { useState } from "react"; 
+import { Image, Modal,SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert,} from "react-native";
+import { useNavigation, useRouter, Stack } from "expo-router"; 
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
@@ -30,7 +30,7 @@ export default function RegistroPet() {
   const [etapa, setEtapa] = useState(1);
   const [dados, setDados] = useState<DadosPet>({});
   const [modalSucesso, setModalSucesso] = useState(false);
-  const navigation = useNavigation();
+  const navigation = useNavigation(); // Mantido para o 'useLayoutEffect' customizado
   const router = useRouter();
   const totalEtapas = 4;
 
@@ -84,18 +84,6 @@ export default function RegistroPet() {
     console.log("Enviar para API:", dados);
     setModalSucesso(true);
   };
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerTitle: "Criar registro Pet",
-      headerLeft: () =>
-        etapa > 1 ? (
-          <TouchableOpacity onPress={voltar} style={{ marginLeft: 15 }} accessibilityLabel="Voltar etapa">
-            <Ionicons name="arrow-back" size={24} color="white" />
-          </TouchableOpacity>
-        ) : null,
-    });
-  }, [navigation, etapa]);
 
   const renderEtapa = () => {
     switch (etapa) {
@@ -175,44 +163,79 @@ export default function RegistroPet() {
   };
 
   return (
-    <SafeAreaView style={styles.areaSegura}>
-      <ScrollView style={styles.wrapper}>
-        <Text style={styles.subtitulo}>Crie o perfil do pet passo a passo</Text>
-        {renderEtapa()}
-      </ScrollView>
+    <>
+      {/*Garante que o cabeçalho nativo está desligado*/}
+      <Stack.Screen options={{ headerShown: false }} />
+    
+      <SafeAreaView style={styles.areaSegura}>
+        <ScrollView style={styles.wrapper}>
+          
+          <View style={styles.headerContainer}>
+            {etapa > 1 ? (
+              <TouchableOpacity onPress={voltar} style={styles.backButton} accessibilityLabel="Voltar etapa">
+                <Ionicons name="arrow-back" size={24} color="white" />
+              </TouchableOpacity>
+            ) : (
+         
+              <View style={styles.backButton} /> 
+            )}
 
-      <View style={styles.rodape}>
-        <IndicadorEtapas etapaAtual={etapa} total={totalEtapas} />
-        <TouchableOpacity
-          style={styles.botaoAcao}
-          onPress={etapa === totalEtapas ? finalizar : handleAvancar}
-          accessibilityLabel={etapa === totalEtapas ? "Finalizar registro" : "Próxima etapa"}>
-          <Text style={styles.textoBotao}>{etapa === totalEtapas ? "Finalizar" : "Prosseguir"}</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Modal visible={modalSucesso} transparent animationType="fade">
-        <View style={styles.fundoModal}>
-          <View style={styles.cardModal}>
-            <Text style={styles.tituloModal}>Registrado com sucesso</Text>
-            <Text style={styles.subModal}>O pet foi cadastrado no sistema.</Text>
-            <TouchableOpacity style={styles.botaoModal} onPress={() => { setModalSucesso(false); router.push("/home"); }} accessibilityLabel="Confirmar">
-              <Text style={styles.textoBotaoModal}>OK</Text>
-            </TouchableOpacity>
+            <Text style={styles.titulo}>Criar registro Pet</Text>
+            
+            {/* Espaço vazio para manter o título centralizado */}
+            <View style={styles.backButton} /> 
           </View>
+          
+          <Text style={styles.subtitulo}>Crie o perfil do pet passo a passo</Text>
+          {renderEtapa()}
+        </ScrollView>
+
+        <View style={styles.rodape}>
+          <IndicadorEtapas etapaAtual={etapa} total={totalEtapas} />
+          <TouchableOpacity
+            style={styles.botaoAcao}
+            onPress={etapa === totalEtapas ? finalizar : handleAvancar}
+            accessibilityLabel={etapa === totalEtapas ? "Finalizar registro" : "Próxima etapa"}>
+            <Text style={styles.textoBotao}>{etapa === totalEtapas ? "Finalizar" : "Prosseguir"}</Text>
+          </TouchableOpacity>
         </View>
-      </Modal>
-    </SafeAreaView>
+
+        <Modal visible={modalSucesso} transparent animationType="fade">
+          <View style={styles.fundoModal}>
+            <View style={styles.cardModal}>
+              <Text style={styles.tituloModal}>Registrado com sucesso</Text>
+              <Text style={styles.subModal}>O pet foi cadastrado no sistema.</Text>
+              <TouchableOpacity style={styles.botaoModal} onPress={() => { setModalSucesso(false); router.push("/(app)/(tabs)/home"); }} accessibilityLabel="Confirmar">
+                <Text style={styles.textoBotaoModal}>OK</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </SafeAreaView>
+    </>
   );
 }
 
-// Estilos padronizados e organizados
 const styles = StyleSheet.create({
-  // Estrutura Principal
   areaSegura: { flex: 1, backgroundColor: "#2D68A6" },
   wrapper: { flex: 1, padding: 22 },
-  subtitulo: { fontSize: 16, color: "#ffffff", marginBottom: 18 },
-
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  backButton: {
+    width: 24, 
+    height: 24,
+  },
+  titulo: {
+    fontSize: 24, 
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+  subtitulo: { fontSize: 16, color: "#ffffff", marginBottom: 18, textAlign: 'center' }, // Centralizado
   // Formulário
   rotulo: { fontSize: 16, fontWeight: "700", color: "#ffffff", marginTop: 12, marginBottom: 8 },
   ajuda: { fontSize: 12, color: "#BFE1F7", marginBottom: 10 },

@@ -344,8 +344,6 @@ export default function FormularioVoluntariosScreen() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<FormDataState>(initialState);
   const [isLoading, setIsLoading] = useState(false);
-  
-  // --- MUDANÇA: Estados para o Modal ---
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<'finalizando' | 'enviado'>('finalizando');
 
@@ -368,20 +366,16 @@ export default function FormularioVoluntariosScreen() {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
-  // --- MUDANÇA: Lógica de Navegação e Modal ---
   const handleNext = () => {
-    // Se estiver antes do passo 5, apenas avança
     if (step < 5) {
       setStep(step + 1);
     } 
-    // Se estiver no passo 5 (o último da scrollview), abre o modal
     else if (step === 5) {
-      setModalContent('finalizando'); // Define o conteúdo do modal para o Passo 6
-      setIsModalVisible(true);      // Abre o modal
+      setModalContent('finalizando');
+      setIsModalVisible(true);
     }
   };
 
-  // Volta para o passo anterior (só funciona nos passos 2-5)
   const handleBack = () => {
     if (step > 1) setStep(step - 1);
   };
@@ -393,15 +387,14 @@ export default function FormularioVoluntariosScreen() {
     }
     if (!formData.nome || !formData.cpfUnmasked || !formData.email || !formData.telefoneUnmasked || !formData.cepUnmasked) {
       Alert.alert("Formulário incompleto", "Por favor, volte e preencha todos os campos obrigatórios (Passo 1 e 2).");
-      setStep(1); // Manda o usuário de volta para o começo
-      setIsModalVisible(false); // Fecha o modal
+      setStep(1);
+      setIsModalVisible(false);
       return;
     }
 
     setIsLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
-      // Sucesso! Muda o conteúdo do modal para o Passo 7
       setModalContent('enviado');
     } catch (err) {
       Alert.alert("Erro", "Não foi possível enviar seu formulário. Tente novamente.");
@@ -411,7 +404,6 @@ export default function FormularioVoluntariosScreen() {
     }
   };
   
-  // Função para fechar o modal de sucesso e voltar para a tela anterior
   const handleCloseSuccessModal = () => {
     setIsModalVisible(false);
     router.back();
@@ -425,58 +417,41 @@ export default function FormularioVoluntariosScreen() {
       case 3: return <Step3 {...props} />;
       case 4: return <Step4 {...props} />;
       case 5: return <Step5 {...props} />;
-      // Passos 6 e 7 foram movidos para o Modal
       default: return null;
     }
   };
 
   return (
     <>
+      {/* --- MUDANÇA: O CABEÇALHO AGORA ESTÁ DESLIGADO --- */}
       <Stack.Screen
         options={{
-          // --- MUDANÇA: Título removido da barra do topo ---
-          title: '', 
-          headerShown: true,
-          // --- MUDANÇA: headerTransparent para a seta aparecer ---
-          // Faz o cabeçalho ficar flutuante e transparente
-          headerTransparent: true, 
-          
-          // --- MUDANÇA: Lógica CORRIGIDA da seta "Voltar" ---
-          // @ts-ignore - Ignora o erro de tipo do editor para 'headerLeft'
-          headerLeft: () => {
-            // Se o modal estiver aberto (Passos 6 ou 7), não mostre nada.
-            if (isModalVisible) {
-              return null;
-            }
-            // No Passo 1, a seta volta para a tela anterior (ex: Voluntários)
-            if (step === 1) {
-              return (
-                <TouchableOpacity onPress={() => router.back()} style={{ paddingLeft: 20 }}>
-                  <Ionicons name="arrow-back" size={24} color="#005A9C" />
-                </TouchableOpacity>
-              );
-            }
-            // Nos Passos 2-5, a seta volta um passo (handleBack)
-            if (step > 1 && step <= 5) {
-               return (
-                <TouchableOpacity onPress={handleBack} style={{ paddingLeft: 20 }}>
-                  <Ionicons name="arrow-back" size={24} color="#005A9C" />
-                </TouchableOpacity>
-              );
-            }
-            // Por padrão, não mostra nada
-            return null;
-          },
-            
-          // @ts-ignore - Ignora o erro de tipo do editor para 'headerBackTitleVisible'
-          headerBackTitleVisible: false,
+          headerShown: false, // Desliga completamente o cabeçalho nativo
         }}
       />
       
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           
-          {/* --- MUDANÇA: Títulos movidos para DENTRO da ScrollView --- */}
+          {/* --- MUDANÇA: A SETA E TÍTULOS AGORA ESTÃO AQUI DENTRO --- */}
+          {/* Se o modal NÃO estiver visível, mostre a seta */}
+          {!isModalVisible && (
+            <View style={styles.headerContainer}>
+              {/* No Passo 1, a seta volta para a tela anterior */}
+              {step === 1 && (
+                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                  <Ionicons name="arrow-back" size={24} color="#005A9C" />
+                </TouchableOpacity>
+              )}
+              {/* Nos Passos 2-5, a seta volta um passo */}
+              {step > 1 && step <= 5 && (
+                 <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+                  <Ionicons name="arrow-back" size={24} color="#005A9C" />
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+
           <Text style={styles.mainTitle}>Seja um lar temporário</Text>
           <Text style={styles.subtitle}>Crie o conta suas seguindo suas necessidades</Text>
           
@@ -540,11 +515,23 @@ const styles = StyleSheet.create({
   scrollContainer: {
     padding: 24,
     paddingBottom: 100,
-    // --- MUDANÇA: Adiciona padding no topo para o cabeçalho transparente ---
-    paddingTop: 80, // Ajuste este valor se a seta e o título estiverem muito altos
+    // --- MUDANÇA: Padding no topo removido ---
+    // paddingTop: 80, (removido)
   },
+
+  // --- MUDANÇA: Novos estilos para a seta "dentro" da página ---
+  headerContainer: {
+    width: '100%',
+    height: 30, // Altura para o botão de voltar
+    justifyContent: 'center',
+    alignItems: 'flex-start', // Alinha a seta à esquerda
+    marginBottom: 10, // Espaço antes do título
+  },
+  backButton: {
+    // padding: 5, // Aumenta a área de toque se necessário
+  },
+  // --- FIM DA MUDANÇA ---
   
-  // --- MUDANÇA: Estilos para os novos títulos ---
   mainTitle: {
     fontSize: 28,
     fontWeight: 'bold',
@@ -558,8 +545,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
-  // --- FIM DA MUDANÇA ---
-
   stepTitle: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -668,7 +653,6 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     opacity: 0.7,
   },
-  
   // Estilos antigos que não são mais usados (apenas para referência)
   submitButton: {},
   submitButtonText: {},
