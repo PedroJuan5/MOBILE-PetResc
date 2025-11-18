@@ -1,31 +1,58 @@
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useState } from "react";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { DenuncieModal } from "../../components/denuncieModal";
 
 const HomeScreen = () => {
+  const [denuncieVisible, setDenuncieVisible] = useState(false);
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={true}
+    >
       {/* Topo */}
       <View style={styles.header}>
         <View style={styles.icons}>
-          <Ionicons name="information-circle-outline" size={22} color="#0d549b" />
+          <TouchableOpacity
+            onPress={() => setDenuncieVisible(true)}
+            accessibilityRole="button"
+            accessibilityLabel="Denunciar"
+          >
+            <Ionicons
+              name="information-circle-outline"
+              size={22}
+              color="#0d549b"
+            />
+          </TouchableOpacity>
           <Ionicons name="notifications-outline" size={22} color="#0d549b" />
         </View>
 
-        <Text style={styles.title}>
-          Conheça seu novo{"\n"}melhor amigo!
-        </Text>
-
-        <TouchableOpacity style={styles.addButton}>
-          <Text style={styles.addButtonText}>Cadastrar animal</Text>
-        </TouchableOpacity>
+        <View>
+          <Text style={styles.title}>Conheça seu novo melhor amigo!</Text>
+        </View>
       </View>
+
+      <DenuncieModal
+        visible={denuncieVisible}
+        onClose={() => setDenuncieVisible(false)}
+      />
 
       {/* Pedidos de adoção */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Pedidos de Adoção</Text>
         <View style={styles.subSection}>
-          <Text style={styles.subSectionTitle}>Pedidos de adoção pendentes: 5</Text>
+          <Text style={styles.subSectionTitle}>
+            Pedidos de adoção pendentes: 5
+          </Text>
 
           {/* Card 1 */}
           <View style={styles.card}>
@@ -35,7 +62,9 @@ const HomeScreen = () => {
             />
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>Não possui nome</Text>
-              <Text style={styles.cardSubtitle}>Sem raça definida (SRD) | AD</Text>
+              <Text style={styles.cardSubtitle}>
+                Sem raça definida (SRD) | AD
+              </Text>
               <Text style={styles.cardStatus}>Status: Em tratamento</Text>
             </View>
           </View>
@@ -48,7 +77,9 @@ const HomeScreen = () => {
             />
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>Amendoim</Text>
-              <Text style={styles.cardSubtitle}>Sem raça definida (SRD) | FI</Text>
+              <Text style={styles.cardSubtitle}>
+                Sem raça definida (SRD) | FI
+              </Text>
               <Text style={styles.cardStatus}>Status:</Text>
             </View>
           </View>
@@ -63,7 +94,9 @@ const HomeScreen = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Animais em Lares Temporários</Text>
         <View style={styles.subSection}>
-          <Text style={styles.subSectionTitle}>Animais em lares temporários ativos: 6</Text>
+          <Text style={styles.subSectionTitle}>
+            Animais em lares temporários ativos: 6
+          </Text>
 
           {/* Card 1 */}
           <View style={styles.card}>
@@ -73,7 +106,9 @@ const HomeScreen = () => {
             />
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>Não possui nome</Text>
-              <Text style={styles.cardSubtitle}>Sem raça definida (SRD) | AD</Text>
+              <Text style={styles.cardSubtitle}>
+                Sem raça definida (SRD) | AD
+              </Text>
               <Text style={styles.cardStatus}>Status: Em tratamento</Text>
             </View>
           </View>
@@ -86,7 +121,39 @@ const HomeScreen = () => {
             />
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>Amendoim</Text>
-              <Text style={styles.cardSubtitle}>Sem raça definida (SRD) | FI</Text>
+              <Text style={styles.cardSubtitle}>
+                Sem raça definida (SRD) | FI
+              </Text>
+              <Text style={styles.cardStatus}>Status:</Text>
+            </View>
+          </View>
+
+          {/* Card 3 */}
+          <View style={styles.card}>
+            <Image
+              source={{ uri: "https://placekitten.com/201/201" }}
+              style={styles.image}
+            />
+            <View style={styles.cardContent}>
+              <Text style={styles.cardTitle}>Amendoim</Text>
+              <Text style={styles.cardSubtitle}>
+                Sem raça definida (SRD) | FI
+              </Text>
+              <Text style={styles.cardStatus}>Status:</Text>
+            </View>
+          </View>
+
+          {/* Card 4 */}
+          <View style={styles.card}>
+            <Image
+              source={{ uri: "https://placekitten.com/201/201" }}
+              style={styles.image}
+            />
+            <View style={styles.cardContent}>
+              <Text style={styles.cardTitle}>Amendoim</Text>
+              <Text style={styles.cardSubtitle}>
+                Sem raça definida (SRD) | FI
+              </Text>
               <Text style={styles.cardStatus}>Status:</Text>
             </View>
           </View>
@@ -104,14 +171,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f7fb",
+  },
+  scrollContent: {
     paddingHorizontal: 16,
     paddingTop: 40,
+    paddingBottom: 40,
   },
   header: {
     alignItems: "center",
     marginBottom: 10,
-    fontFamily: "more-sugar",
-    
   },
   icons: {
     flexDirection: "row",
@@ -120,13 +188,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   title: {
-    color: "#0d549b",
-    fontSize: 20,
-    textAlign: "center",
+    marginBottom: 20,
+    marginTop: 10,
+    fontSize: 26,
     fontWeight: "700",
-    marginBottom: 10,
-    lineHeight: 26,
-    fontFamily: "moresugar",
+    color: "#2D68A6",
+    width: "75%",
   },
   addButton: {
     backgroundColor: "#2b95ffff",
@@ -141,34 +208,34 @@ const styles = StyleSheet.create({
   },
   section: {
     marginTop: 20,
-    backgroundColor: "#d6e4f7",
+    backgroundColor: "#eeeeeeff",
     borderRadius: 10,
     padding: 10,
   },
   sectionTitle: {
-    backgroundColor: "#a7c4ee",
+    backgroundColor: "#9ac6f5ff",
     textAlign: "center",
-    color: "#0d549b",
+    color: "#18395aff",
     fontWeight: "700",
     fontSize: 15,
     borderRadius: 6,
     paddingVertical: 6,
   },
   subSection: {
-    backgroundColor: "#e9f1fc",
+    backgroundColor: "#eeeeeeff",
     borderRadius: 8,
     padding: 10,
     marginTop: 10,
   },
   subSectionTitle: {
-    color: "#0d549b",
+    color: "#18395aff",
     fontSize: 14,
     fontWeight: "600",
     marginBottom: 10,
   },
   card: {
     flexDirection: "row",
-    backgroundColor: "#d6e4f7",
+    backgroundColor: "#9ac6f5ff",
     borderRadius: 8,
     padding: 8,
     marginBottom: 10,
@@ -184,7 +251,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontWeight: "600",
-    color: "#0d549b",
+    color: "#18395aff",
     fontSize: 14,
   },
   cardSubtitle: {
@@ -192,7 +259,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   cardStatus: {
-    color: "#0d549b",
+    color: "#000000ff",
     fontSize: 12,
     marginTop: 4,
   },
