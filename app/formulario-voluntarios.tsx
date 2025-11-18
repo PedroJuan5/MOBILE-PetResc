@@ -453,7 +453,7 @@ export default function FormularioVoluntariosScreen() {
           )}
 
           <Text style={styles.mainTitle}>Seja um lar temporário</Text>
-          <Text style={styles.subtitle}>Crie o conta suas seguindo suas necessidades</Text>
+          <Text style={styles.subtitle}>Crie o conta suas seguindo suas necessidadees</Text>
           
           {renderStep()}
         </ScrollView>
