@@ -1,9 +1,20 @@
 import React, { useState, useLayoutEffect, useMemo } from "react";
-import { SafeAreaView, View,Text,  FlatList,  TouchableOpacity, ImageSourcePropType, Image,  Dimensions,} from "react-native";
+import {
+  SafeAreaView,
+  View,
+  Text,
+  StyleSheet, // A importação correta é aqui, dentro das chaves
+  FlatList,
+  TouchableOpacity,
+  ImageSourcePropType,
+  Image,
+  Dimensions,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRouter } from "expo-router";
 import { FiltrosModal } from "../../../components/adocao/FiltrosModal";
 
+// Definição do objeto Pet
 interface Pet {
   id: string;
   nome: string;
@@ -13,9 +24,10 @@ interface Pet {
   idade: string;
   tamanho: string;
   imagem: ImageSourcePropType;
-  status: 'disponivel' | 'adotado' | 'perdido'; // Exemplo
+  status: 'disponivel' | 'adotado' | 'perdido';
 }
 
+// Definição dos Filtros
 interface Filtros {
   nome?: string;
   isGato?: boolean;
@@ -27,10 +39,11 @@ interface Filtros {
   idade?: string;
 }
 
+// Cálculos de dimensão para o grid
 const { width } = Dimensions.get('window');
 const cardWidth = (width - 20 * 3) / 2; 
 
-/* Dados de exemplo */
+// Dados Mockados (Exemplo)
 const PETS_COMPLETOS: Pet[] = [
   { id: "1", nome: "Branquinho", raca: "SRD", genero: "Macho", especie: "Gato", idade: "Adulto", tamanho: "Pequeno", imagem: require("../../../assets/images/pets/branquinho.png"), status: 'disponivel' },
   { id: "2", nome: "Shanti",     raca: "SRD", genero: "Fêmea", especie: "Cachorro", idade: "Filhote", tamanho: "Pequeno", imagem: require("../../../assets/images/pets/shanti.png"), status: 'disponivel' },
@@ -66,11 +79,11 @@ export default function TelaAdotar() {
     });
   }, [filtrosAplicados]);
 
-  // Modificado para o novo título e botão de filtro/menu
+  // Configuração do Cabeçalho
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerTitle: "Nossos pets", // Título como no design
-      headerTitleStyle: { color: '#2D68A6', fontWeight: 'bold' }, // Cor do título
+      headerTitle: "Nossos pets",
+      headerTitleStyle: { color: '#2D68A6', fontWeight: 'bold' },
       headerLeft: () => (
         <TouchableOpacity style={{ marginLeft: 15 }} accessibilityLabel="Informações">
           <Ionicons name="information-circle-outline" size={28} color="#2D68A6" />
@@ -81,7 +94,7 @@ export default function TelaAdotar() {
           <Ionicons name="notifications-outline" size={28} color="#2D68A6" />
         </TouchableOpacity>
       ),
-      headerShown: true, // Certifica que o cabeçalho nativo está visível
+      headerShown: true, 
     });
   }, [navigation]);
 
@@ -98,9 +111,10 @@ export default function TelaAdotar() {
       />
 
       <View style={styles.container}>
+        {/* Subcabeçalho com botão de filtro */}
         <View style={styles.subCabecalho}>
-          <Text style={styles.tituloSecundario}>Animais em destaque</Text> {/* Título "Animais em destaque" */}
-          <TouchableOpacity accessibilityLabel="Trocar ordem" onPress={() => setFiltroVisivel(true)}> {/* Botão para abrir os filtros */}
+          <Text style={styles.tituloSecundario}>Animais em destaque</Text>
+          <TouchableOpacity accessibilityLabel="Abrir filtros" onPress={() => setFiltroVisivel(true)}>
             <Ionicons name="swap-horizontal" size={24} color="#2D68A6" />
           </TouchableOpacity>
         </View>
@@ -112,13 +126,15 @@ export default function TelaAdotar() {
               style={styles.petCard} 
               onPress={() => handlePetPress(item.id)}
             >
+              {/* Imagem de fundo */}
               <Image source={item.imagem} style={styles.petCardImage} />
               
-              {/* Overlay com as informações e a bolinha */}
+              {/* Overlay com informações */}
               <View style={styles.petCardOverlay}>
                 <Text style={styles.petCardNome}>{item.nome}</Text>
                 <View style={styles.petCardStatus}>
                   <Text style={styles.petCardDetalhe}>{item.raca} {item.genero === 'Macho' ? 'M' : 'F'}.</Text>
+                  {/* Bolinha de status */}
                   <View style={[
                       styles.statusCircle,
                       item.status === 'disponivel' && styles.statusDisponivel,
@@ -137,13 +153,15 @@ export default function TelaAdotar() {
           ListEmptyComponent={<Text style={styles.textoVazio}>Nenhum animal encontrado.</Text>}
         />
       </View>
-      {/* Elementos de fundo no canto inferior direito e superior esquerdo */}
+
+      {/* Formas de fundo (azul claro) */}
       <View style={styles.fundoInferiorDireito} />
       <View style={styles.fundoSuperiorEsquerdo} />
     </SafeAreaView>
   );
 }
 
+// --- ESTILOS ---
 const styles = StyleSheet.create({
   areaSegura: {
     flex: 1,
@@ -174,11 +192,12 @@ const styles = StyleSheet.create({
   row: {
     justifyContent: 'space-between',
     marginBottom: 10,
-    paddingHorizontal: 5, 
+    paddingHorizontal: 5,
   },
 
+  // --- Estilo do Card (Design Imagem 1) ---
   petCard: {
-    width: cardWidth, 
+    width: cardWidth,
     height: cardWidth * 1.2,
     borderRadius: 12,
     overflow: 'hidden',
@@ -187,7 +206,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 3.84,
-    backgroundColor: '#fff', 
+    backgroundColor: '#fff',
     marginHorizontal: 5,
     marginBottom: 10,
   },
@@ -195,14 +214,14 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
-    position: 'absolute', 
+    position: 'absolute', // Imagem absoluta no fundo
   },
   petCardOverlay: {
-    position: 'absolute',
+    position: 'absolute', // Overlay absoluto na frente
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.75)', 
+    backgroundColor: 'rgba(255, 255, 255, 0.85)', // Fundo branco transparente
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
     paddingVertical: 8,
@@ -229,14 +248,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   statusDisponivel: {
-    backgroundColor: '#34C759', 
+    backgroundColor: '#34C759', // Verde
   },
   statusAdotado: {
-    backgroundColor: '#FF9500', 
+    backgroundColor: '#FF9500', // Laranja
   },
   statusPerdido: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: '#FF3B30', // Vermelho
   },
+
+  // --- Elementos Decorativos de Fundo ---
   fundoInferiorDireito: {
     position: 'absolute',
     bottom: -150,
@@ -244,18 +265,19 @@ const styles = StyleSheet.create({
     width: 300,
     height: 300,
     borderRadius: 150,
-    backgroundColor: '#BFE1F7', 
-    opacity: 0.7, 
+    backgroundColor: '#BFE1F7',
+    opacity: 0.7,
+    zIndex: -1,
   },
   fundoSuperiorEsquerdo: {
     position: 'absolute',
-    top: -100, 
+    top: -100,
     left: -100,
     width: 200,
     height: 200,
     borderRadius: 100,
     backgroundColor: '#BFE1F7',
-    opacity: 0.5, 
-    zIndex: -1, 
+    opacity: 0.5,
+    zIndex: -1,
   },
 });

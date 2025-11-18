@@ -2,7 +2,6 @@ import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRouter } from 'expo-router';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Modal, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
 import { DenuncieModal } from '@/components/denuncieModal';
 import { useAuth } from '../../context/AuthContext';
 
@@ -31,13 +30,13 @@ export default function PublicIndex() {
   const [signupModalVisible, setSignupModalVisible] = useState(false);
   const navigation = useNavigation();
   const router = useRouter();
-  const { session, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && session) {
+    if (!isLoading && user) { // Troca 'session' por 'user'
       router.replace('/home');
     }
-  }, [session, isLoading]);
+  }, [user, isLoading]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -58,7 +57,7 @@ export default function PublicIndex() {
   }, [navigation]);
   
   // Enquanto verifica o login, ou se já está redirecionando, não mostra nada.
-  if (isLoading || session) {
+  if (isLoading || user) {
     return null;
   }
 
@@ -108,11 +107,14 @@ export default function PublicIndex() {
           </View>
         </TouchableOpacity>
       </Modal>
+      
+      {/* Elementos de fundo decorativos (patinhas) REMOVIDOS daqui */}
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           <View style={styles.headerTitle}>
             <Text style={styles.title}>Conheça seu novo melhor amigo!</Text>
+            {/* Ícone de pata no cabeçalho mantido */}
             <View style={styles.paws}><FontAwesome5 name="paw" size={18} color="#BFE1F7" /></View>
           </View>
 

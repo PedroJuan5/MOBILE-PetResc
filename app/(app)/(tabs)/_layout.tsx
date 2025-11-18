@@ -7,9 +7,10 @@ export default function TabLayout() {
     <Tabs
       initialRouteName="home"
       screenOptions={{
+        headerShown: false, 
         headerTitleAlign: "center",
         tabBarActiveTintColor: "#2D68A6", 
-        tabBarInactiveTintColor: "#3A5C7A",
+        tabBarInactiveTintColor: "#3A5C7A", 
         tabBarStyle: {
           paddingBottom: 5, 
           height: 60, 
@@ -44,8 +45,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <Ionicons name="heart-outline" size={size} color={color} />,
         }}
       />
-      
-      {/* --- MUDANÇA: Nova aba de Perfil --- */}
       <Tabs.Screen
         name="perfil"
         options={{
@@ -53,8 +52,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
         }}
       />
-      
-      {/* A tela de registro continua na barra */}
       <Tabs.Screen
         name="registro-animal"
         options={{
@@ -63,7 +60,7 @@ export default function TabLayout() {
         }}
       />
 
-      {/* Telas ocultas da barra de navegação, mas que precisam estar aqui */}
+      {/* Telas ocultas */}
       <Tabs.Screen
         name="pets-disponiveis"
         options={{
