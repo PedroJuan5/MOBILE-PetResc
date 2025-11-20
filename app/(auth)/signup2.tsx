@@ -1,4 +1,4 @@
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import React, { useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from "react-native";
@@ -11,8 +11,13 @@ export default function CadastroScreen2() {
 
   const [telefone, setTelefone] = useState('');
   const [telefoneUnmasked, setTelefoneUnmasked] = useState('');
+  
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); 
+
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
+
   const [isLoading, setIsLoading] = useState(false);
 
   const handleFinalizeCadastro = async () => {
@@ -21,8 +26,8 @@ export default function CadastroScreen2() {
       return;
     }
     if (telefoneUnmasked.length < 10 || telefoneUnmasked.length > 11) {
-       Alert.alert("Erro", "O telefone deve ter 10 ou 11 dígitos (com DDD).");
-       return;
+      Alert.alert("Erro", "O telefone deve ter 10 ou 11 dígitos (com DDD).");
+      return;
     }
     if (password.length < 6) {
       Alert.alert("Erro", "A senha deve ter pelo menos 6 caracteres.");
@@ -61,63 +66,90 @@ export default function CadastroScreen2() {
       }
       Alert.alert("Erro no Cadastro", errorMessage);
       setIsLoading(false);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => { console.log('Voltar do signup2'); router.back(); }}>
+      {/* Botão de voltar fixo no topo */}
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <AntDesign name="arrow-left" size={24} color="#1c5b8f" />
       </TouchableOpacity>
-      <Text style={styles.title}>Cadastre-se</Text>
-      <Text style={styles.subtitle}>Crie sua conta e ajude a transformar vidas.</Text>
+      
+      {/* Conteúdo centralizado */}
+      <View style={styles.contentCenter}>
+        <Text style={styles.title}>Cadastre-se</Text>
+        <Text style={styles.subtitle}>Crie sua conta e ajude a transformar vidas.</Text>
 
-      <MaskInput
-        style={styles.input}
-        placeholder="Telefone"
-        placeholderTextColor="#cac9c9ff"
-        value={telefone}
-        onChangeText={(masked, unmasked) => {
-          setTelefone(masked);
-          setTelefoneUnmasked(unmasked);
-        }}
-        mask={['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-        keyboardType="phone-pad"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Senha (mínimo 6 caracteres)" 
-        placeholderTextColor="#cac9c9ff"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        maxLength={50} 
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Confirmar Senha"
-        placeholderTextColor="#cac9c9ff"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-        maxLength={50} 
-      />
+        <MaskInput
+          style={styles.input}
+          placeholder="Telefone"
+          placeholderTextColor="#cac9c9ff"
+          value={telefone}
+          onChangeText={(masked, unmasked) => {
+            setTelefone(masked);
+            setTelefoneUnmasked(unmasked);
+          }}
+          mask={['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+          keyboardType="phone-pad"
+        />
 
-      <View style={styles.bottomCard}>
-        <TouchableOpacity
-          style={[styles.nextButton, isLoading && { opacity: 0.7 }]}
-          onPress={() => { console.log('Finalizar cadastro'); handleFinalizeCadastro(); }}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator color="#1c5b8f" />
-          ) : (
-            <Text style={styles.nextButtonText}>Finalizar cadastro</Text>
-          )}
-        </TouchableOpacity>
-        <Text style={styles.loginText}>
-          Já tem conta? <Text style={styles.loginLink} onPress={() => { console.log('Ir para login'); router.replace('/(auth)/login'); }}>Login</Text>
-        </Text>
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Senha (mínimo 6 caracteres)" 
+            placeholderTextColor="#cac9c9ff"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+            maxLength={50} 
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Ionicons 
+              name={showPassword ? "eye-off-outline" : "eye-outline"} 
+              size={24} 
+              color="#cac9c9ff" 
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Confirmar Senha"
+            placeholderTextColor="#cac9c9ff"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry={!showConfirmPassword}
+            maxLength={50} 
+          />
+          <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+            <Ionicons 
+              name={showConfirmPassword ? "eye-off-outline" : "eye-outline"} 
+              size={24} 
+              color="#cac9c9ff" 
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.bottomCard}>
+          <TouchableOpacity
+            style={[styles.nextButton, isLoading && { opacity: 0.7 }]}
+            onPress={() => handleFinalizeCadastro()}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#1c5b8f" />
+            ) : (
+              <Text style={styles.nextButtonText}>Finalizar cadastro</Text>
+            )}
+          </TouchableOpacity>
+          <Text style={styles.loginText}>
+            Já tem conta? <Text style={styles.loginLink} onPress={() => router.replace('/(auth)/login')}>Login</Text>
+          </Text>
+        </View>
       </View>
     </View>
   );
@@ -127,12 +159,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ffffffff',
-    paddingTop: 15,
-    color: '#1c5b8f',
   },
   backButton: {
-    marginLeft: 20,
-    marginBottom: 10,
+    position: 'absolute', 
+    top: 60,              
+    left: 20,             
+    zIndex: 10,           
+    padding: 10,         
+  },
+  contentCenter: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 0,    
   },
   title: {
     color: '#1c5b8f',
@@ -147,7 +185,7 @@ const styles = StyleSheet.create({
   subtitle: {
     color: '#1c5b8f',
     fontSize: 14,
-    marginBottom: 50,
+    marginBottom: 30,
     backgroundColor: '#ffffffff',
     padding: 10,
     borderRadius: 8,
@@ -157,10 +195,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#1c5b8f',
     borderRadius: 8,
     padding: 15,
-    marginBottom: 35,
+    marginBottom: 15,
     fontSize: 16,
     marginHorizontal: 20,
     color: "#ffffff",
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1c5b8f',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    marginBottom: 15,
+    marginHorizontal: 20,
+  },
+  passwordInput: {
+    flex: 1,
+    color: "#ffffff",
+    fontSize: 16,
+    paddingVertical: 15,
   },
   bottomCard: {
     backgroundColor: '#ffffffff',
@@ -168,7 +221,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 25,
     padding: 20,
     justifyContent: 'flex-start',
-    marginTop: 'auto',
   },
   nextButton: {
     backgroundColor: '#94B9D8',
