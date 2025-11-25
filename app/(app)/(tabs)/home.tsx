@@ -158,11 +158,6 @@ export default function HomeScreen() {
               style={[styles.paw, styles.paw2]} 
               resizeMode="contain"
             />
-            <Image 
-              source={require("../../../assets/images/ui/pata.png")} 
-              style={[styles.paw, styles.paw3]} 
-              resizeMode="contain"
-            />
           </View>        
 
           <Text style={styles.subTitulo}>Meus animais</Text>

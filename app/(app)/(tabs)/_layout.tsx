@@ -9,12 +9,12 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false, 
         headerTitleAlign: "center",
-        tabBarActiveTintColor: "#2D68A6",
-        tabBarInactiveTintColor: "#3A5C7A",
-        headerStyle: {
-          backgroundColor: '#2D68A6',
-        },
-        headerTintColor: '#fff',
+        tabBarActiveTintColor: "#2D68A6", 
+        tabBarInactiveTintColor: "#3A5C7A", 
+        tabBarStyle: {
+          paddingBottom: 5, 
+          height: 60, 
+        }
       }}
     >
       <Tabs.Screen
@@ -46,23 +46,25 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="perfil"
+        options={{
+          title: "Perfil",
+          tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="registro-animal"
         options={{
           title: "Registro",
           tabBarIcon: ({ color, size }) => <Ionicons name="add-circle-outline" size={size} color={color} />,
         }}
       />
+
+      {/* Telas ocultas */}
       <Tabs.Screen
         name="pets-disponiveis"
         options={{
           href: null, 
-        }}
-        />
-          <Tabs.Screen
-        name="configuracoes"
-        options={{
-          title: "Configurações",
-          tabBarIcon: ({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />,
         }}
       />
     </Tabs>

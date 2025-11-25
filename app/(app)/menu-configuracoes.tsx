@@ -5,11 +5,22 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 
 export default function ConfigScreen() {
   const router = useRouter();
+  const handleGoBackToProfile = () => {
+    router.push('/perfil'); 
+  };
+
   return (
     
     <View style={styles.container}>
       <View style={styles.header}>
-        <Ionicons name="chevron-back" size={24} color="#2D68A6" />
+        {/* BOTÃO DE VOLTAR CONFIGURADO PARA IR PARA /PERFIL */}
+        <TouchableOpacity 
+          onPress={handleGoBackToProfile} 
+          style={styles.backButtonContainer} 
+          hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+        >
+          <Ionicons name="chevron-back" size={24} color="#2D68A6" />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>Configurações</Text>
       </View>
 
@@ -22,7 +33,7 @@ export default function ConfigScreen() {
           <Feather name="chevron-right" size={20} color="#2D68A6" />
         </TouchableOpacity>
 
-  <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/endereco')}>
+        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/endereco')}>
           <Ionicons name="home-outline" size={22} color="#2D68A6" />
           <Text style={styles.itemText}>Endereço</Text>
           <Feather name="chevron-right" size={20} color="#2D68A6" />
@@ -65,7 +76,6 @@ export default function ConfigScreen() {
             <Feather name="log-out" size={20} color="#2D68A6" />
             <Text style={styles.logoutText}>Saída</Text>
           </TouchableOpacity>
-
         </View>
       </ScrollView>
     </View>
@@ -83,6 +93,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 25,
+  },
+  backButtonContainer: { 
+    paddingRight: 10,
+    paddingVertical: 10,
   },
   headerTitle: {
     fontSize: 22,

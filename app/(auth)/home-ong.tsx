@@ -1,275 +1,233 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from 'expo-router';
 import React, { useState } from "react";
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { DenuncieModal } from "../../components/denuncieModal";
 
-const HomeScreen = () => {
-  const [denuncieVisible, setDenuncieVisible] = useState(false);
-
-  return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.scrollContent}
-      showsVerticalScrollIndicator={true}
-    >
-      {/* Topo */}
-      <View style={styles.header}>
-        <View style={styles.icons}>
-          <TouchableOpacity
-            onPress={() => setDenuncieVisible(true)}
-            accessibilityRole="button"
-            accessibilityLabel="Denunciar"
-          >
-            <Ionicons
-              name="information-circle-outline"
-              size={22}
-              color="#0d549b"
-            />
-          </TouchableOpacity>
-          <Ionicons name="notifications-outline" size={22} color="#0d549b" />
-        </View>
-
-        <View>
-          <Text style={styles.title}>Conheça seu novo melhor amigo!</Text>
-        </View>
-      </View>
-
-      <DenuncieModal
-        visible={denuncieVisible}
-        onClose={() => setDenuncieVisible(false)}
+export default function HomeScreen(): React.ReactElement {
+  const [denuncieVisible, setDenuncieVisible] = useState<boolean>(false);
+  const router = useRouter();
+  const animalCard = (name: string, race: string, status?: string): React.ReactElement => (
+    <View style={styles.animalCard}>
+      <Image
+        source={require("../../assets/images/pets/branquinho.png")}
+        style={styles.petImage}
       />
 
-      {/* Pedidos de adoção */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Pedidos de Adoção</Text>
-        <View style={styles.subSection}>
-          <Text style={styles.subSectionTitle}>
-            Pedidos de adoção pendentes: 5
-          </Text>
-
-          {/* Card 1 */}
-          <View style={styles.card}>
-            <Image
-              source={{ uri: "https://place-puppy.com/200x200" }}
-              style={styles.image}
-            />
-            <View style={styles.cardContent}>
-              <Text style={styles.cardTitle}>Não possui nome</Text>
-              <Text style={styles.cardSubtitle}>
-                Sem raça definida (SRD) | AD
-              </Text>
-              <Text style={styles.cardStatus}>Status: Em tratamento</Text>
-            </View>
-          </View>
-
-          {/* Card 2 */}
-          <View style={styles.card}>
-            <Image
-              source={{ uri: "https://placekitten.com/200x200" }}
-              style={styles.image}
-            />
-            <View style={styles.cardContent}>
-              <Text style={styles.cardTitle}>Amendoim</Text>
-              <Text style={styles.cardSubtitle}>
-                Sem raça definida (SRD) | FI
-              </Text>
-              <Text style={styles.cardStatus}>Status:</Text>
-            </View>
-          </View>
-
-          <TouchableOpacity>
-            <Text style={styles.linkText}>Ver mais</Text>
-          </TouchableOpacity>
-        </View>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.animalName}>{name}</Text>
+        <Text style={styles.animalRace}>{race}</Text>
+        <Text style={styles.animalStatus}>
+          Status: <Text style={{ fontWeight: "600" }}>{status}</Text>
+        </Text>
       </View>
-
-      {/* Animais em lares temporários */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Animais em Lares Temporários</Text>
-        <View style={styles.subSection}>
-          <Text style={styles.subSectionTitle}>
-            Animais em lares temporários ativos: 6
-          </Text>
-
-          {/* Card 1 */}
-          <View style={styles.card}>
-            <Image
-              source={{ uri: "https://place-puppy.com/201x201" }}
-              style={styles.image}
-            />
-            <View style={styles.cardContent}>
-              <Text style={styles.cardTitle}>Não possui nome</Text>
-              <Text style={styles.cardSubtitle}>
-                Sem raça definida (SRD) | AD
-              </Text>
-              <Text style={styles.cardStatus}>Status: Em tratamento</Text>
-            </View>
-          </View>
-
-          {/* Card 2 */}
-          <View style={styles.card}>
-            <Image
-              source={{ uri: "https://placekitten.com/201/201" }}
-              style={styles.image}
-            />
-            <View style={styles.cardContent}>
-              <Text style={styles.cardTitle}>Amendoim</Text>
-              <Text style={styles.cardSubtitle}>
-                Sem raça definida (SRD) | FI
-              </Text>
-              <Text style={styles.cardStatus}>Status:</Text>
-            </View>
-          </View>
-
-          {/* Card 3 */}
-          <View style={styles.card}>
-            <Image
-              source={{ uri: "https://placekitten.com/201/201" }}
-              style={styles.image}
-            />
-            <View style={styles.cardContent}>
-              <Text style={styles.cardTitle}>Amendoim</Text>
-              <Text style={styles.cardSubtitle}>
-                Sem raça definida (SRD) | FI
-              </Text>
-              <Text style={styles.cardStatus}>Status:</Text>
-            </View>
-          </View>
-
-          {/* Card 4 */}
-          <View style={styles.card}>
-            <Image
-              source={{ uri: "https://placekitten.com/201/201" }}
-              style={styles.image}
-            />
-            <View style={styles.cardContent}>
-              <Text style={styles.cardTitle}>Amendoim</Text>
-              <Text style={styles.cardSubtitle}>
-                Sem raça definida (SRD) | FI
-              </Text>
-              <Text style={styles.cardStatus}>Status:</Text>
-            </View>
-          </View>
-
-          <TouchableOpacity>
-            <Text style={styles.linkText}>Ver mais</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ScrollView>
+    </View>
   );
-};
+
+  return (
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 130 }}>
+
+        {/* TOP HEADER */}
+        <View style={styles.headerContainer}>
+              <View style={styles.headerIcons}>
+                <TouchableOpacity onPress={() => setDenuncieVisible(true)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                  <Ionicons name="alert-circle-outline" size={26} color="#D9534F" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push('/notificacoes')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                  <Ionicons name="notifications-outline" size={26} color="#2D68A6" />
+                </TouchableOpacity>
+              </View>
+
+          <Text style={styles.pageTitle}>Conheça seu novo{"\n"}melhor amigo!</Text>
+
+          <TouchableOpacity style={styles.btnCadastrar}>
+            <Text style={styles.btnCadastrarText}>Cadastrar animal</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* SECTION COMPONENT */}
+        <Section title="Pedidos de Adoção" subtitle="Pedidos de adoção pendentes: 5">
+          {animalCard("Não possui nome", "Sem raça definida (SRD)   AD", "Em tratamento")}
+          {animalCard("Amendoim", "Sem raça definida (SRD)   FL", "")}
+
+          <TouchableOpacity style={styles.verMaisBtn}>
+            <Text style={styles.verMaisText}>Ver mais</Text>
+          </TouchableOpacity>
+        </Section>
+
+        <Section title="Animais em Lares Temporários" subtitle="Animais em lares temporários ativos: 6">
+          {animalCard("Não possui nome", "Sem raça definida (SRD)   AD", "Em tratamento")}
+          {animalCard("Amendoim", "Sem raça definida (SRD)   FL", "")}
+
+          <TouchableOpacity style={styles.verMaisBtn}>
+            <Text style={styles.verMaisText}>Ver mais</Text>
+          </TouchableOpacity>
+        </Section>
+
+        <Section title="Animais registrados recen..." subtitle="Animais aguardando vaga: 8">
+          {animalCard("Não possui nome", "Sem raça definida (SRD)   AD", "Em tratamento")}
+          {animalCard("Amendoim", "Sem raça definida (SRD)   FL", "")}
+
+          <TouchableOpacity style={styles.verMaisBtn}>
+            <Text style={styles.verMaisText}>Ver mais</Text>
+          </TouchableOpacity>
+        </Section>
+
+        {/* REPEAT SECTION AS IN IMAGE */}
+        <Section title="Animais registrados recen..." subtitle="Animais aguardando vaga: 8">
+          {animalCard("Não possui nome", "Sem raça definida (SRD)   AD", "Em tratamento")}
+          {animalCard("Amendoim", "Sem raça definida (SRD)   FL", "")}
+
+          <TouchableOpacity style={styles.verMaisBtn}>
+            <Text style={styles.verMaisText}>Ver mais</Text>
+          </TouchableOpacity>
+        </Section>
+
+        {/* MINHAS CAMPANHAS */}
+        <View style={styles.campanhasContainer}>
+          <Text style={styles.campanhasTitle}>Minhas campanhas</Text>
+
+          <Text style={styles.campanhasText}>
+            Crie novas campanhas para arrecadar doações e ajudar a transformar a vida de mais animais.{"\n"}
+            Aqui você também encontra todas as suas campanhas anteriores, com relatórios e histórico de contribuições.
+          </Text>
+
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Image source={require("../../assets/images/ui/gatoHome.png")} style={styles.campanhaCat} />
+            <TouchableOpacity style={styles.newCampanhaBtn}>
+              <Text style={styles.newCampanhaText}>Nova campanha</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity style={styles.oldCampanhaBtn}>
+            <Text style={styles.oldCampanhaText}>Campanhas anteriores</Text>
+          </TouchableOpacity>
+        </View>
+
+      </ScrollView>
+
+      {/* FOOTER MENU */}
+      <View style={styles.bottomNav}>
+        <Ionicons name="home-outline" size={28} color="#2D68A6" />
+        <Ionicons name="paw-outline" size={28} color="#2D68A6" />
+        <Ionicons name="gift-outline" size={28} color="#2D68A6" />
+        <Ionicons name="heart-outline" size={28} color="#2D68A6" />
+        <Ionicons name="add-circle-outline" size={32} color="#2D68A6" />
+      </View>
+      {/* Denuncie Modal */}
+      <DenuncieModal visible={denuncieVisible} onClose={() => setDenuncieVisible(false)} />
+    </View>
+  );
+}
+
+function Section({ title, subtitle, children }: { title: string; subtitle?: string; children?: React.ReactNode }): React.ReactElement {
+  return (
+    <View style={styles.section}>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+      </View>
+
+      <Text style={styles.sectionSubtitle}>{subtitle}</Text>
+
+      <View style={styles.sectionContent}>{children}</View>
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f7fb",
-  },
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingTop: 40,
-    paddingBottom: 40,
-  },
-  header: {
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  icons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    marginBottom: 8,
-  },
-  title: {
-    marginBottom: 20,
-    marginTop: 10,
-    fontSize: 26,
+  container: { flex: 1, backgroundColor: "#F0F2F5" },
+
+  headerContainer: { paddingTop: 40, paddingHorizontal: 20, paddingBottom: 15 },
+  headerIcons: { flexDirection: "row", justifyContent: "space-between" },
+  pageTitle: {
+    fontSize: 24,
     fontWeight: "700",
     color: "#2D68A6",
-    width: "75%",
-  },
-  addButton: {
-    backgroundColor: "#2b95ffff",
-    paddingVertical: 10,
-    paddingHorizontal: 22,
-    borderRadius: 10,
-  },
-  addButtonText: {
-    color: "#ffffffff",
-    fontWeight: "600",
-    fontSize: 15,
-  },
-  section: {
-    marginTop: 20,
-    backgroundColor: "#eeeeeeff",
-    borderRadius: 10,
-    padding: 10,
-  },
-  sectionTitle: {
-    backgroundColor: "#9ac6f5ff",
-    textAlign: "center",
-    color: "#18395aff",
-    fontWeight: "700",
-    fontSize: 15,
-    borderRadius: 6,
-    paddingVertical: 6,
-  },
-  subSection: {
-    backgroundColor: "#eeeeeeff",
-    borderRadius: 8,
-    padding: 10,
     marginTop: 10,
+    marginBottom: 15,
   },
-  subSectionTitle: {
-    color: "#18395aff",
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 10,
+  btnCadastrar: {
+    backgroundColor: "#5DA9F6",
+    paddingVertical: 10,
+    borderRadius: 20,
+    alignItems: "center",
+    width: 150,
   },
-  card: {
-    flexDirection: "row",
-    backgroundColor: "#9ac6f5ff",
-    borderRadius: 8,
+  btnCadastrarText: { color: "#fff", fontWeight: "700" },
+
+  section: { marginTop: 10, paddingHorizontal: 15 },
+  sectionHeader: {
+    backgroundColor: "#BFD6F5",
     padding: 8,
-    marginBottom: 10,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
   },
-  image: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    marginRight: 10,
-  },
-  cardContent: {
-    flex: 1,
-  },
-  cardTitle: {
-    fontWeight: "600",
-    color: "#18395aff",
+  sectionTitle: { fontSize: 16, fontWeight: "700", color: "#2D68A6" },
+  sectionSubtitle: {
+    backgroundColor: "#DCE9FA",
+    padding: 8,
     fontSize: 14,
+    fontWeight: "600",
+    color: "#2D68A6",
   },
-  cardSubtitle: {
-    color: "#555",
-    fontSize: 12,
+  sectionContent: {
+    backgroundColor: "#fff",
+    padding: 10,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
   },
-  cardStatus: {
-    color: "#000000ff",
-    fontSize: 12,
-    marginTop: 4,
+
+  animalCard: {
+    backgroundColor: "#E7F1FC",
+    borderRadius: 12,
+    padding: 10,
+    marginBottom: 10,
+    flexDirection: "row",
+    gap: 10,
   },
-  linkText: {
-    color: "#0d549b",
-    textAlign: "right",
-    fontSize: 13,
-    fontWeight: "500",
-    marginTop: 4,
+  petImage: { width: 80, height: 80, borderRadius: 12 },
+  animalName: { fontSize: 16, fontWeight: "700" },
+  animalRace: { fontSize: 13, marginTop: 2 },
+  animalStatus: { marginTop: 5, fontSize: 13 },
+
+  verMaisBtn: { alignSelf: "flex-end", marginTop: 5 },
+  verMaisText: { color: "#2D68A6", fontWeight: "600" },
+
+  campanhasContainer: {
+    marginTop: 20,
+    paddingHorizontal: 15,
+    paddingBottom: 20,
+  },
+  campanhasTitle: { fontSize: 18, fontWeight: "700", color: "#2D68A6" },
+  campanhasText: { marginTop: 8, color: "#444" },
+  campanhaCat: { width: 110, height: 110, marginRight: 10 },
+  newCampanhaBtn: {
+    backgroundColor: "#BFD6F5",
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+  },
+  newCampanhaText: { color: "#2D68A6", fontWeight: "700" },
+  oldCampanhaBtn: {
+    marginTop: 10,
+    backgroundColor: "#DCE9FA",
+    padding: 8,
+    borderRadius: 20,
+    alignSelf: "flex-start",
+  },
+  oldCampanhaText: { color: "#2D68A6", fontWeight: "700" },
+
+  bottomNav: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    height: 65,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderColor: "#ddd",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
   },
 });
-
-export default HomeScreen;
