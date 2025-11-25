@@ -1,18 +1,9 @@
 import React, { useState, useLayoutEffect, useMemo } from "react";
-import {
-  SafeAreaView,
-  View,
-  Text,
-  StyleSheet, // A importação correta é aqui, dentro das chaves
-  FlatList,
-  TouchableOpacity,
-  ImageSourcePropType,
-  Image,
-  Dimensions,
-} from "react-native";
+import {SafeAreaView,View, Text, StyleSheet, FlatList, TouchableOpacity, ImageSourcePropType, Image, Dimensions,} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRouter } from "expo-router";
 import { FiltrosModal } from "../../../components/adocao/FiltrosModal";
+import { DenuncieModal } from "../../../components/denuncieModal";
 
 // Definição do objeto Pet
 interface Pet {
@@ -27,7 +18,6 @@ interface Pet {
   status: 'disponivel' | 'adotado' | 'perdido';
 }
 
-// Definição dos Filtros
 interface Filtros {
   nome?: string;
   isGato?: boolean;
@@ -39,11 +29,9 @@ interface Filtros {
   idade?: string;
 }
 
-// Cálculos de dimensão para o grid
 const { width } = Dimensions.get('window');
 const cardWidth = (width - 20 * 3) / 2; 
 
-// Dados Mockados (Exemplo)
 const PETS_COMPLETOS: Pet[] = [
   { id: "1", nome: "Branquinho", raca: "SRD", genero: "Macho", especie: "Gato", idade: "Adulto", tamanho: "Pequeno", imagem: require("../../../assets/images/pets/branquinho.png"), status: 'disponivel' },
   { id: "2", nome: "Shanti",     raca: "SRD", genero: "Fêmea", especie: "Cachorro", idade: "Filhote", tamanho: "Pequeno", imagem: require("../../../assets/images/pets/shanti.png"), status: 'disponivel' },
@@ -55,7 +43,9 @@ const PETS_COMPLETOS: Pet[] = [
 
 export default function TelaAdotar() {
   const [filtroVisivel, setFiltroVisivel] = useState(false);
+  const [denunciaVisivel, setDenunciaVisivel] = useState(false); // Estado para o modal de denúncia
   const [filtrosAplicados, setFiltrosAplicados] = useState<Filtros>({});
+  
   const navigation = useNavigation();
   const router = useRouter();
 
@@ -79,22 +69,9 @@ export default function TelaAdotar() {
     });
   }, [filtrosAplicados]);
 
-  // Configuração do Cabeçalho
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerTitle: "Nossos pets",
-      headerTitleStyle: { color: '#2D68A6', fontWeight: 'bold' },
-      headerLeft: () => (
-        <TouchableOpacity style={{ marginLeft: 15 }} accessibilityLabel="Informações">
-          <Ionicons name="information-circle-outline" size={28} color="#2D68A6" />
-        </TouchableOpacity>
-      ),
-      headerRight: () => (
-        <TouchableOpacity style={{ marginRight: 15 }} accessibilityLabel="Notificações">
-          <Ionicons name="notifications-outline" size={28} color="#2D68A6" />
-        </TouchableOpacity>
-      ),
-      headerShown: true, 
+      headerShown: false,
     });
   }, [navigation]);
 
@@ -109,14 +86,38 @@ export default function TelaAdotar() {
         onClose={() => setFiltroVisivel(false)}
         onApplyFilters={aplicarFiltros}
       />
+      
+      <DenuncieModal 
+        visible={denunciaVisivel} 
+        onClose={() => setDenunciaVisivel(false)} 
+      />
 
       <View style={styles.container}>
-        {/* Subcabeçalho com botão de filtro */}
-        <View style={styles.subCabecalho}>
-          <Text style={styles.tituloSecundario}>Animais em destaque</Text>
-          <TouchableOpacity accessibilityLabel="Abrir filtros" onPress={() => setFiltroVisivel(true)}>
-            <Ionicons name="swap-horizontal" size={24} color="#2D68A6" />
+        
+        <View style={styles.customHeader}>
+          {/* Esquerda: Denúncia */}
+          <TouchableOpacity onPress={() => setDenunciaVisivel(true)}>
+            <Ionicons name="alert-circle-outline" size={28} color="#2D68A6" />
           </TouchableOpacity>
+
+          {/* Centro: Título da Página */}
+          <Text style={styles.headerTitle}>Nossos pets</Text>
+
+          {/* Direita: Notificação */}
+          <TouchableOpacity onPress={() => router.push('/notificacoes')}>
+            <Ionicons name="notifications-outline" size={28} color="#2D68A6" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.subCabecalho}>
+          {/* MUDANÇA: Menu Hambúrguer na esquerda */}
+          <TouchableOpacity accessibilityLabel="Abrir filtros" onPress={() => setFiltroVisivel(true)}>
+            <Ionicons name="menu" size={28} color="#2D68A6" />
+          </TouchableOpacity>
+
+          <Text style={styles.tituloSecundario}>Animais em destaque</Text>
+          
+          <View style={{ width: 28 }} /> 
         </View>
 
         <FlatList
@@ -126,15 +127,12 @@ export default function TelaAdotar() {
               style={styles.petCard} 
               onPress={() => handlePetPress(item.id)}
             >
-              {/* Imagem de fundo */}
               <Image source={item.imagem} style={styles.petCardImage} />
               
-              {/* Overlay com informações */}
               <View style={styles.petCardOverlay}>
                 <Text style={styles.petCardNome}>{item.nome}</Text>
                 <View style={styles.petCardStatus}>
                   <Text style={styles.petCardDetalhe}>{item.raca} {item.genero === 'Macho' ? 'M' : 'F'}.</Text>
-                  {/* Bolinha de status */}
                   <View style={[
                       styles.statusCircle,
                       item.status === 'disponivel' && styles.statusDisponivel,
@@ -154,14 +152,13 @@ export default function TelaAdotar() {
         />
       </View>
 
-      {/* Formas de fundo (azul claro) */}
+      {/* Formas de fundo */}
       <View style={styles.fundoInferiorDireito} />
       <View style={styles.fundoSuperiorEsquerdo} />
     </SafeAreaView>
   );
 }
 
-// --- ESTILOS ---
 const styles = StyleSheet.create({
   areaSegura: {
     flex: 1,
@@ -171,19 +168,33 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 10,
   },
+  customHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 50, 
+    paddingBottom: 10,
+    paddingHorizontal: 10,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#2D68A6',
+  },
   subCabecalho: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 10,
     marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 15,
   },
   tituloSecundario: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 18,
+    fontWeight: "600",
     color: "#3A5C7A",
   },
+
   textoVazio: {
     textAlign: "center",
     marginTop: 50,
@@ -194,8 +205,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 5,
   },
-
-  // --- Estilo do Card (Design Imagem 1) ---
   petCard: {
     width: cardWidth,
     height: cardWidth * 1.2,
@@ -214,14 +223,14 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
-    position: 'absolute', // Imagem absoluta no fundo
+    position: 'absolute', 
   },
   petCardOverlay: {
-    position: 'absolute', // Overlay absoluto na frente
+    position: 'absolute', 
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.85)', // Fundo branco transparente
+    backgroundColor: 'rgba(255, 255, 255, 0.85)', 
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
     paddingVertical: 8,
@@ -248,16 +257,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   statusDisponivel: {
-    backgroundColor: '#34C759', // Verde
+    backgroundColor: '#34C759', 
   },
   statusAdotado: {
-    backgroundColor: '#FF9500', // Laranja
+    backgroundColor: '#FF9500', 
   },
   statusPerdido: {
-    backgroundColor: '#FF3B30', // Vermelho
+    backgroundColor: '#FF3B30', 
   },
-
-  // --- Elementos Decorativos de Fundo ---
   fundoInferiorDireito: {
     position: 'absolute',
     bottom: -150,
