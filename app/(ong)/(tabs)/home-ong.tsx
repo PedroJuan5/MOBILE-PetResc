@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from 'expo-router';
 import React, { useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { DenuncieModal } from "../../components/denuncieModal";
+import { DenuncieModal } from "../../../components/denuncieModal";
 
 export default function HomeScreen(): React.ReactElement {
   const [denuncieVisible, setDenuncieVisible] = useState<boolean>(false);
@@ -10,7 +10,7 @@ export default function HomeScreen(): React.ReactElement {
   const animalCard = (name: string, race: string, status?: string): React.ReactElement => (
     <View style={styles.animalCard}>
       <Image
-        source={require("../../assets/images/pets/branquinho.png")}
+        source={require("../../../assets/images/pets/branquinho.png")}
         style={styles.petImage}
       />
 
@@ -94,7 +94,7 @@ export default function HomeScreen(): React.ReactElement {
           </Text>
 
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Image source={require("../../assets/images/ui/gatoHome.png")} style={styles.campanhaCat} />
+            <Image source={require("../../../assets/images/ui/gatoHome.png")} style={styles.campanhaCat} />
             <TouchableOpacity style={styles.newCampanhaBtn}>
               <Text style={styles.newCampanhaText}>Nova campanha</Text>
             </TouchableOpacity>
