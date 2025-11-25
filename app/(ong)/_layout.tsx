@@ -1,14 +1,8 @@
 import React from 'react';
-import { Stack } from 'expo-router';
+import { Slot } from 'expo-router';
 
-export default function OngGroupLayout() {
-  return (
-    <Stack screenOptions={{ headerShown: false }}>
-      {/* Isso é uma Stack (Pilha). 
-         Ela é invisível e serve apenas para carregar a pasta (tabs).
-         A barra de navegação virá apenas de dentro da pasta (tabs).
-      */}
-      <Stack.Screen name="(tabs)" />
-    </Stack>
-  );
+export default function OngLayout() {
+  // Slot é um buraco invisível. Ele não desenha barras, 
+  // só deixa passar o que vem da pasta (tabs).
+  return <Slot />;
 }
