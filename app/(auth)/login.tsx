@@ -27,29 +27,21 @@ export default function TelaLogin() {
   // --- MUDANÇA: Adicionado estado para o "olho" da senha ---
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const entrar = async () => {
-    if (!email.trim() || !senha) {
-      Alert.alert("Atenção", "Por favor, preencha email e senha");
-      return;
-    }
-    if (typeof signIn !== "function") {
-      Alert.alert("Erro", "Serviço de autenticação indisponível");
-      return;
-    }
-    setCarregando(true);
-    try {
-      // Sua lógica de login (está ótima)
-      await signIn({ email: email, password: senha });
-      console.log("Login bem sucedido, navegando para home...");
-      router.replace('/(app)/(tabs)/home');
-    } catch (err: any) {
-      console.warn("signIn falhou:", err?.message || err);
-      Alert.alert("Erro no Login", err?.message || "Erro desconhecido");
-    } finally {
-      setCarregando(false);
-    }
-  };
-
+ const entrar = async () => {
+  if (!email.trim() || !senha) {
+    Alert.alert("Atenção", "Por favor, preencha email e senha");
+    return;
+  }
+  setCarregando(true);
+  try {
+    await signIn({ email, password: senha });
+    router.replace("/(app)/(tabs)/home");
+  } catch (err: any) {
+    Alert.alert("Erro no Login", err.message || "Erro desconhecido");
+  } finally {
+    setCarregando(false);
+  }
+};
   return (
     <>
       {/* --- MUDANÇA: Adicionado o cabeçalho do Stack (como na imagem) --- */}

@@ -12,26 +12,30 @@ export default function CadastroScreen() {
   const [cpfUnmasked, setCpfUnmasked] = useState('');
   const [email, setEmail] = useState('');
 
-  const handleNext = () => {
-    if (!nome.trim() || !email.trim() || !cpf.trim()) {
-      Alert.alert("Erro", "Nome, CPF e Email são obrigatórios.");
-      return;
-    }
-    if (cpfUnmasked.length !== 11) {
-      Alert.alert("Erro", "O CPF deve ter 11 dígitos.");
-      return;
-    }
+ 
+const handleNext = () => {
+  if (!nome.trim() || !email.trim() || !cpf.trim()) {
+    Alert.alert("Erro", "Nome, CPF e Email são obrigatórios.");
+    return;
+  }
+  if (cpfUnmasked.length !== 11) {
+    Alert.alert("Erro", "O CPF deve ter 11 dígitos.");
+    return;
+  }
 
-    console.log("Prosseguir cadastro 1 -> signup2", { nome, cpf: cpfUnmasked, email });
-    router.push({
-      pathname: '/(auth)/signup2',
-      params: { nome, cpf: cpfUnmasked, email }
-    });
-  };
+  router.push({
+    pathname: '/(auth)/signup2',
+    params: { 
+      nome: nome.trim(), 
+      cpf: cpfUnmasked, 
+      email: email.trim() 
+    }
+  });
+};
 
-  const goToLogin = () => {
-    router.push('/(auth)/login');
-  };
+const goToLogin = () => {
+  router.push('/(auth)/login');
+};
 
   return (
     <View style={styles.container}>

@@ -35,42 +35,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function loadUserFromStorage() {
-      const token = await AsyncStorage.getItem('@PetResc:token');
-      const storedUser = await AsyncStorage.getItem('@PetResc:user');
+  async function loadUserFromStorage() {
+    const token = await AsyncStorage.getItem('@PetResc:token');
+    const storedUser = await AsyncStorage.getItem('@PetResc:user');
 
-      if (token && storedUser) {
-        setUser(JSON.parse(storedUser));
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      }
-      setIsLoading(false);
-    }
-    loadUserFromStorage();
-  }, []);
-
-  const signIn = async ({ email, password }: SignInCredentials) => {
-    try {
-      const response = await api.post('./auth/login', {
-      email,
-        password,
-      });
-
-      const { token, usuario } = response.data;
-
-      await AsyncStorage.setItem('@PetResc:token', token);
-      await AsyncStorage.setItem('@PetResc:user', JSON.stringify(usuario));
-
+    if (token && storedUser) {
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-      setUser(usuario);
-
-    } catch (error: any) {
-      if (error instanceof AxiosError && error.response) {
-        throw new Error(error.response.data.error || 'Erro ao fazer login');
+      try {
+        const response = await api.get('/api/auth/me');
+        setUser(response.data);
+      } catch {
+        await AsyncStorage.removeItem('@PetResc:token');
+        await AsyncStorage.removeItem('@PetResc:user');
       }
-      throw new Error('Não foi possível se conectar ao servidor.');
     }
-  };
+    setIsLoading(false);
+  }
+  loadUserFromStorage();
+}, []);
+
+ const signIn = async ({ email, password }: SignInCredentials) => {
+  try {
+    const response = await api.post('/api/auth/login', { email, password });
+
+    const { token, usuario } = response.data;
+
+    await AsyncStorage.setItem('@PetResc:token', token);
+    await AsyncStorage.setItem('@PetResc:user', JSON.stringify(usuario));
+
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    setUser(usuario);
+
+  } catch (error: any) {
+    if (error instanceof AxiosError && error.response) {
+      throw new Error(error.response.data.error || 'Erro ao fazer login');
+    }
+    throw new Error('Não foi possível se conectar ao servidor.');
+  }
+};
 
   const signOut = async () => {
     await AsyncStorage.removeItem('@PetResc:token');
