@@ -5,69 +5,70 @@ import { Ionicons } from '@expo/vector-icons';
 export default function OngTabLayout() {
   return (
     <Tabs
-      // AQUI: Aponta para o seu arquivo home-ong
-      initialRouteName="home-ong" 
+      initialRouteName="home-ong"
       screenOptions={{
-        headerShown: false,
-        tabBarShowLabel: false,
-        tabBarActiveTintColor: "#2D68A6",
-        tabBarInactiveTintColor: "#8FA7B8",
+        headerShown: false, 
+        headerTitleAlign: "center",
+        // Cores idênticas ao layout de usuário que você mandou
+        tabBarActiveTintColor: "#2D68A6", 
+        tabBarInactiveTintColor: "#3A5C7A", 
         tabBarStyle: {
-          height: 60,
-          backgroundColor: '#fff',
-          borderTopWidth: 1,
-          borderTopColor: '#f0f0f0',
-          paddingBottom: 5,
+          paddingBottom: 5, 
+          height: 60, // Altura padrão para caber ícone + texto
         }
       }}
     >
-      {/* 1. Casinha (Arquivo: home-ong.tsx) */}
+      {/* 1. Início (Casinha) */}
       <Tabs.Screen
-        name="home-ong" // Tem que ser igual ao nome do seu arquivo
+        name="home-ong"
         options={{
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="home-outline" size={28} color={color} />
-          ),
+          title: 'Início',
+          tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
         }}
       />
 
-      {/* 2. Patinha (Arquivo: pets.tsx) */}
+      {/* 2. Pets (Patinha) */}
       <Tabs.Screen
         name="pets"
         options={{
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="paw-outline" size={28} color={color} />
-          ),
+          title: 'Pets',
+          tabBarIcon: ({ color, size }) => <Ionicons name="paw-outline" size={size} color={color} />,
         }}
       />
 
-      {/* 3. Presente (Arquivo: doacoes.tsx) */}
+      {/* 3. Doações (Presente) */}
       <Tabs.Screen
         name="doacoes"
         options={{
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="gift-outline" size={28} color={color} />
-          ),
+          title: "Doações",
+          tabBarIcon: ({ color, size }) => <Ionicons name="gift-outline" size={size} color={color} />,
         }}
       />
 
-      {/* 4. Coração (Arquivo: solicitacoes.tsx) */}
+      {/* 4. Solicitações (Coração) */}
       <Tabs.Screen
         name="solicitacoes"
         options={{
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="heart-outline" size={28} color={color} />
-          ),
+          title: "Interesse",
+          tabBarIcon: ({ color, size }) => <Ionicons name="heart-outline" size={size} color={color} />,
         }}
       />
 
-      {/* 5. Mais (Arquivo: perfil.tsx) */}
+      {/* 5. Registro (Sinal de Mais) */}
+      <Tabs.Screen
+        name="registroAnimal-ong"
+        options={{
+          title: "Registro",
+          tabBarIcon: ({ color, size }) => <Ionicons name="add-circle-outline" size={30} color={color} />, // Ícone levemente maior
+        }}
+      />
+
+      {/* 6. Perfil (Bonequinho) */}
       <Tabs.Screen
         name="perfil"
         options={{
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="add-circle-outline" size={32} color={color} />
-          ),
+          title: "Perfil",
+          tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
         }}
       />
     </Tabs>
