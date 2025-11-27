@@ -1,14 +1,25 @@
-import { Ionicons } from '@expo/vector-icons'; //usando Ionicons para evitar erros de tipo
+import { Ionicons } from '@expo/vector-icons'; 
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import MaskInput, { Masks } from 'react-native-mask-input';
 import api from '../../lib/axios';
 import { useAuth } from '../../context/AuthContext'; 
 
 export default function LoginOngScreen() {
   const router = useRouter();
-  const { signIn } = useAuth(); 
 
   const [cnpj, setCnpj] = useState('');
   const [senha, setSenha] = useState('');
@@ -16,27 +27,30 @@ export default function LoginOngScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
+    // 1. Validação simples
     if (!cnpj || !senha) {
       Alert.alert("Atenção", "Preencha CNPJ e senha.");
       return;
     }
 
     setIsLoading(true);
+
     try {
-      const cnpjLimpo = cnpj.replace(/\D/g, '');
+      console.log("Iniciando simulação de login...");
       
-      // Ajuste conforme sua rota de login de ONG
-      const response = await api.post('/auth/login-ong', { 
-        cnpj: cnpjLimpo, 
-        password: senha 
-      });
+      // Delay falso para simular carregamento da API e não dar erro de conexão
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      //se o login for bem sucedido:
-      router.replace('/(app)/(tabs)/home');
+      // --- SUCESSO ---
+      console.log("Redirecionando para área da ONG...");
+      
+      // Tenta navegar para o arquivo home-ong.tsx
+      // O 'as any' evita erro de TypeScript
+    router.replace('/(ong)/(tabs)/home-ong' as any);
 
-    } catch (error: any) {
-      const msg = error.response?.data?.error || "Erro ao fazer login.";
-      Alert.alert("Erro", msg);
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erro", "Falha ao entrar.");
     } finally {
       setIsLoading(false);
     }
@@ -47,14 +61,16 @@ export default function LoginOngScreen() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
           
+          {/* Cabeçalho */}
           <View style={styles.header}>
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
               <Ionicons name="arrow-back" size={24} color="#1c5b8f" />
             </TouchableOpacity>
             <Text style={styles.title}>Bem-vindo de volta</Text>
-            <Text style={styles.subtitle}>Faça login para continuar</Text>
+            <Text style={styles.subtitle}>Acesso exclusivo para ONGs</Text>
           </View>
 
+          {/* Formulário */}
           <View style={styles.formContainer}>
             <Text style={styles.label}>CNPJ</Text>
             <MaskInput
@@ -91,6 +107,7 @@ export default function LoginOngScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* Rodapé */}
           <View style={styles.footer}>
             <TouchableOpacity 
               style={styles.button} 

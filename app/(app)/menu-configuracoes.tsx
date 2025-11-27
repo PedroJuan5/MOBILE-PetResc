@@ -1,91 +1,108 @@
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, SafeAreaView } from 'react-native';
+import { useAuth } from '../../context/AuthContext'; 
 
 export default function ConfigScreen() {
   const router = useRouter();
+  const { signOut } = useAuth(); 
+  
+  // --- CORREÇÃO DO GO BACK ---
   const handleGoBackToProfile = () => {
-    router.push('/perfil'); 
+    // Força a navegação para a rota da aba de perfil.
+    // O 'as any' evita o erro de TypeScript se o caminho não for reconhecido na hora.
+    router.push('/(tabs)/perfil' as any); 
+  };
+
+  // --- BOTÃO DE SAÍDA ---
+  const handleLogout = () => {
+    signOut(); // Limpa sessão
+    router.replace('/'); // Vai para o início
   };
 
   return (
-    
-    <View style={styles.container}>
-      <View style={styles.header}>
-        {/* BOTÃO DE VOLTAR CONFIGURADO PARA IR PARA /PERFIL */}
-        <TouchableOpacity 
-          onPress={handleGoBackToProfile} 
-          style={styles.backButtonContainer} 
-          hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
-        >
-          <Ionicons name="chevron-back" size={24} color="#2D68A6" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Configurações</Text>
-      </View>
-
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <Text style={styles.sectionTitle}>Conta</Text>
-
-        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/configperfil')}>
-          <Ionicons name="person-outline" size={22} color="#2D68A6" />
-          <Text style={styles.itemText}>Conta</Text>
-          <Feather name="chevron-right" size={20} color="#2D68A6" />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/endereco')}>
-          <Ionicons name="home-outline" size={22} color="#2D68A6" />
-          <Text style={styles.itemText}>Endereço</Text>
-          <Feather name="chevron-right" size={20} color="#2D68A6" />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/notificacoes')}>
-          <Ionicons name="notifications-outline" size={22} color="#2D68A6" />
-          <Text style={styles.itemText}>Notificação</Text>
-          <Feather name="chevron-right" size={20} color="#2D68A6" />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/privacidade')}>
-          <Ionicons name="shield-outline" size={22} color="#2D68A6" />
-          <Text style={styles.itemText}>Privacidade</Text>
-          <Feather name="chevron-right" size={20} color="#2D68A6" />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/seguranca')}>
-          <Ionicons name="lock-closed-outline" size={22} color="#2D68A6" />
-          <Text style={styles.itemText}>Segurança</Text>
-          <Feather name="chevron-right" size={20} color="#2D68A6" />
-        </TouchableOpacity>
-
-        <Text style={[styles.sectionTitle, { marginTop: 25 }]}>Ajuda</Text>
-
-        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/contateNos')}>
-          <MaterialIcons name="support-agent" size={22} color="#2D68A6" />
-          <Text style={styles.itemText}>Contate-nos</Text>
-          <Feather name="chevron-right" size={20} color="#2D68A6" />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/faq')}>
-          <Ionicons name="help-circle-outline" size={22} color="#2D68A6" />
-          <Text style={styles.itemText}>FAQ</Text>
-          <Feather name="chevron-right" size={20} color="#2D68A6" />
-        </TouchableOpacity>
-
-        <View style={styles.footer}>
-          <TouchableOpacity style={styles.logout}>
-            <Feather name="log-out" size={20} color="#2D68A6" />
-            <Text style={styles.logoutText}>Saída</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        
+        <View style={styles.header}>
+          {/* Botão de Voltar */}
+          <TouchableOpacity 
+            onPress={handleGoBackToProfile} 
+            style={styles.backButtonContainer} 
+            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+          >
+            <Ionicons name="chevron-back" size={24} color="#2D68A6" />
           </TouchableOpacity>
+          <Text style={styles.headerTitle}>Configurações</Text>
         </View>
-      </ScrollView>
-    </View>
+
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+          <Text style={styles.sectionTitle}>Conta</Text>
+
+          <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/configperfil')}>
+            <Ionicons name="person-outline" size={22} color="#2D68A6" />
+            <Text style={styles.itemText}>Conta</Text>
+            <Feather name="chevron-right" size={20} color="#2D68A6" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/endereco')}>
+            <Ionicons name="home-outline" size={22} color="#2D68A6" />
+            <Text style={styles.itemText}>Endereço</Text>
+            <Feather name="chevron-right" size={20} color="#2D68A6" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/notificacoes')}>
+            <Ionicons name="notifications-outline" size={22} color="#2D68A6" />
+            <Text style={styles.itemText}>Notificação</Text>
+            <Feather name="chevron-right" size={20} color="#2D68A6" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/privacidade')}>
+            <Ionicons name="shield-outline" size={22} color="#2D68A6" />
+            <Text style={styles.itemText}>Privacidade</Text>
+            <Feather name="chevron-right" size={20} color="#2D68A6" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/seguranca')}>
+            <Ionicons name="lock-closed-outline" size={22} color="#2D68A6" />
+            <Text style={styles.itemText}>Segurança</Text>
+            <Feather name="chevron-right" size={20} color="#2D68A6" />
+          </TouchableOpacity>
+
+          <Text style={[styles.sectionTitle, { marginTop: 25 }]}>Ajuda</Text>
+
+          <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/contateNos')}>
+            <MaterialIcons name="support-agent" size={22} color="#2D68A6" />
+            <Text style={styles.itemText}>Contate-nos</Text>
+            <Feather name="chevron-right" size={20} color="#2D68A6" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/faq')}>
+            <Ionicons name="help-circle-outline" size={22} color="#2D68A6" />
+            <Text style={styles.itemText}>FAQ</Text>
+            <Feather name="chevron-right" size={20} color="#2D68A6" />
+          </TouchableOpacity>
+
+          <View style={styles.footer}>
+            <TouchableOpacity style={styles.logout} onPress={handleLogout}>
+              <Feather name="log-out" size={20} color="#2D68A6" />
+              <Text style={styles.logoutText}>Saída</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  container: {
+    flex: 1,
     paddingHorizontal: 20,
     paddingTop: 50,
   },
@@ -103,6 +120,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#2D68A6',
     marginLeft: 10,
+  },
+  scrollContent: {
+    paddingBottom: 40,
   },
   sectionTitle: {
     fontSize: 16,
@@ -130,10 +150,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingTop: 15,
-  },
-  deleteText: {
-    color: '#EB5757',
-    fontWeight: '500',
   },
   logout: {
     flexDirection: 'row',
