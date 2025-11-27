@@ -7,6 +7,14 @@ import { DenuncieModal } from '../../../components/denuncieModal';
 import CustomHeaderRight from '../../../components/elementosDireita';
 import CustomHeaderLeft from '../../../components/elementosEsquerda';
 
+// --- CORREÇÃO DO ERRO "setImmediate is not defined" ---
+// O react-native-swiper tenta usar essa função que não existe mais nativamente.
+// Estamos criando ela manualmente aqui.
+if (!global.setImmediate) {
+  global.setImmediate = ((callback: (...args: any[]) => void) => setTimeout(callback, 0)) as any;
+}
+// ------------------------------------------------------
+
 const voluntarioSlides = [
   {
     key: 'interesse',
@@ -170,16 +178,6 @@ const styles = StyleSheet.create({
     right: 50,
     transform: [{ rotate: '15deg' }],
   },
-  decorativePawMidRight: {
-    top: 60,
-    right: 20,
-    transform: [{ rotate: '-20deg' }],
-  },
-  decorativePawBottomRight: {
-    top: 100,
-    right: 60,
-    transform: [{ rotate: '30deg' }],
-  },
   bodyText: {
     fontSize: 17,
     lineHeight: 32,
@@ -200,11 +198,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 30,
   },
-  carouselContent: {
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  carousel: {},
   carouselControls: {
     paddingHorizontal: 0,
     width: '100%',
@@ -215,6 +208,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
+  carousel: {},
   featureCard: {
     flex: 1,
     justifyContent: 'flex-start',

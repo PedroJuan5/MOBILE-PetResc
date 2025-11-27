@@ -11,7 +11,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Modal, // Importa o Modal
+  Modal,
+  Keyboard,
 } from 'react-native';
 import MaskInput from 'react-native-mask-input';
 
@@ -49,6 +50,8 @@ type StepProps = {
   formData: FormDataState;
   updateFormData: (key: keyof FormDataState, value: any, isCheckbox?: boolean) => void;
   updateUnmasked?: (key: keyof FormDataState, value: string) => void;
+  isLoadingCep?: boolean;
+  onFetchCep?: (cep: string) => void;
 };
 
 // Componente para Múltipla Escolha (Quadrado)
@@ -137,22 +140,36 @@ const Step1 = ({ formData, updateFormData, updateUnmasked }: StepProps) => (
   </>
 );
 
-//endereço
-const Step2 = ({ formData, updateFormData, updateUnmasked }: StepProps) => (
+//Endereço
+const Step2 = ({ formData, updateFormData, updateUnmasked, isLoadingCep, onFetchCep }: StepProps) => (
   <>
     <Text style={styles.stepTitle}>Endereço</Text>
+    
     <Text style={styles.label}>CEP</Text>
-    <MaskInput
-      style={styles.input}
-      placeholder="00000-000"
-      value={formData.cep}
-      onChangeText={(masked, unmasked) => {
-        updateFormData('cep', masked);
-        updateUnmasked!('cepUnmasked', unmasked);
-      }}
-      mask={[/\d/,/\d/,/\d/,/\d/,/\d/,'-',/\d/,/\d/,/\d/]}
-      keyboardType="numeric"
-    />
+    <View style={styles.cepContainer}>
+      <MaskInput
+        style={[styles.input, { flex: 1, marginBottom: 0 }]} 
+        placeholder="00000-000"
+        value={formData.cep}
+        onChangeText={(masked, unmasked) => {
+          updateFormData('cep', masked);
+          updateUnmasked!('cepUnmasked', unmasked);
+          
+          if (unmasked.length === 8 && onFetchCep) {
+            onFetchCep(unmasked);
+          }
+        }}
+        mask={[/\d/,/\d/,/\d/,/\d/,/\d/,'-',/\d/,/\d/,/\d/]}
+        keyboardType="numeric"
+      />
+      {isLoadingCep && (
+        <View style={styles.loadingIcon}>
+            <ActivityIndicator size="small" color="#005A9C" />
+        </View>
+      )}
+    </View>
+    <View style={{ marginBottom: 20 }} /> 
+
     <Text style={styles.label}>Rua/Avenida e Bairro</Text>
     <TextInput
       style={styles.input}
@@ -189,7 +206,7 @@ const Step2 = ({ formData, updateFormData, updateUnmasked }: StepProps) => (
   </>
 );
 
-//sobre o espaço disponível
+// --- CORREÇÃO AQUI NO STEP 3 ---
 const Step3 = ({ formData, updateFormData }: StepProps) => (
   <>
     <Text style={styles.stepTitle}>Sobre o espaço disponível</Text>
@@ -212,7 +229,10 @@ const Step3 = ({ formData, updateFormData }: StepProps) => (
     <Text style={styles.label}>Quais portes aceita?</Text>
     <View style={styles.optionRow}>
       <CustomCheckbox label="Pequeno" isSelected={formData.portesAceitos.includes('Pequeno')} onSelect={() => updateFormData('portesAceitos', 'Pequeno', true)} />
-      <CustomCheckbox label="Médio" isSelected={formData.portesAceitos.includes('Médio')} onSelect={() => updateFormData('portesAceitos', 'Média', true)} />
+      
+      {/* CORREÇÃO: Mudado de 'Média' para 'Médio' para bater com o filtro includes('Médio') */}
+      <CustomCheckbox label="Médio" isSelected={formData.portesAceitos.includes('Médio')} onSelect={() => updateFormData('portesAceitos', 'Médio', true)} />
+      
       <CustomCheckbox label="Grande" isSelected={formData.portesAceitos.includes('Grande')} onSelect={() => updateFormData('portesAceitos', 'Grande', true)} />
     </View>
 
@@ -224,8 +244,9 @@ const Step3 = ({ formData, updateFormData }: StepProps) => (
     </View>
   </>
 );
+// --------------------------------
 
-//experiência com animais
+//Experiência com animais
 const Step4 = ({ formData, updateFormData }: StepProps) => (
   <>
     <Text style={styles.stepTitle}>Experiência com animais</Text>
@@ -249,7 +270,7 @@ const Step4 = ({ formData, updateFormData }: StepProps) => (
   </>
 );
 
-//recursos e condições
+//Recursos e condições
 const Step5 = ({ formData, updateFormData }: StepProps) => (
   <>
     <Text style={styles.stepTitle}>Recursos e condições</Text>
@@ -276,7 +297,7 @@ const Step5 = ({ formData, updateFormData }: StepProps) => (
   </>
 );
 
-//Finalizando (AGORA RENDERIZADO DENTRO DO MODAL)
+//Finalizando
 const Step6 = ({ formData, updateFormData }: StepProps) => (
   <>
     <Text style={styles.modalTitle}>Finalizando formulário</Text>
@@ -294,7 +315,7 @@ const Step6 = ({ formData, updateFormData }: StepProps) => (
   </>
 );
 
-//formulário Enviado (AGORA RENDERIZADO DENTRO DO MODAL)
+//Formulário Enviado
 const Step7 = () => (
   <>
     <Text style={styles.modalTitle}>Formulário enviado</Text>
@@ -308,7 +329,7 @@ const Step7 = () => (
 );
 
 
-//Dados Iniciais do Formulário 
+//Dados Iniciais
 const initialState: FormDataState = {
   nome: '',
   cpf: '',
@@ -338,7 +359,7 @@ const initialState: FormDataState = {
   aceiteObrigatorio: false,
 };
 
-//Componente Principal do Formulário 
+//Componente Principal
 export default function FormularioVoluntariosScreen() {
   const router = useRouter();
   const [step, setStep] = useState(1);
@@ -346,6 +367,7 @@ export default function FormularioVoluntariosScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<'finalizando' | 'enviado'>('finalizando');
+  const [isLoadingCep, setIsLoadingCep] = useState(false);
 
 
   const updateFormData = (key: keyof FormDataState, value: any, isCheckbox: boolean = false) => {
@@ -364,6 +386,33 @@ export default function FormularioVoluntariosScreen() {
 
   const updateUnmasked = (key: keyof FormDataState, value: string) => {
     setFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const fetchAddress = async (cep: string) => {
+      setIsLoadingCep(true);
+      Keyboard.dismiss(); 
+      
+      try {
+          const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+          const data = await response.json();
+
+          if (data.erro) {
+              Alert.alert('Erro', 'CEP não encontrado.');
+              setIsLoadingCep(false);
+              return;
+          }
+
+          setFormData(prev => ({
+              ...prev,
+              ruaBairro: `${data.logradouro} - ${data.bairro}`, 
+              cidadeEstado: `${data.localidade} - ${data.uf}`
+          }));
+
+      } catch (error) {
+          Alert.alert('Erro', 'Falha ao buscar endereço. Verifique sua conexão.');
+      } finally {
+          setIsLoadingCep(false);
+      }
   };
 
   const handleNext = () => {
@@ -410,7 +459,14 @@ export default function FormularioVoluntariosScreen() {
   };
 
   const renderStep = () => {
-    const props: StepProps = { formData, updateFormData, updateUnmasked };
+    const props: StepProps = { 
+        formData, 
+        updateFormData, 
+        updateUnmasked,
+        isLoadingCep,
+        onFetchCep: fetchAddress 
+    };
+
     switch (step) {
       case 1: return <Step1 {...props} />;
       case 2: return <Step2 {...props} />;
@@ -423,27 +479,18 @@ export default function FormularioVoluntariosScreen() {
 
   return (
     <>
-      {/* --- MUDANÇA: O CABEÇALHO AGORA ESTÁ DESLIGADO --- */}
-      <Stack.Screen
-        options={{
-          headerShown: false, // Desliga completamente o cabeçalho nativo
-        }}
-      />
+      <Stack.Screen options={{ headerShown: false }} />
       
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           
-          {/* --- MUDANÇA: A SETA E TÍTULOS AGORA ESTÃO AQUI DENTRO --- */}
-          {/* Se o modal NÃO estiver visível, mostre a seta */}
           {!isModalVisible && (
             <View style={styles.headerContainer}>
-              {/* No Passo 1, a seta volta para a tela anterior */}
               {step === 1 && (
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                   <Ionicons name="arrow-back" size={24} color="#005A9C" />
                 </TouchableOpacity>
               )}
-              {/* Nos Passos 2-5, a seta volta um passo */}
               {step > 1 && step <= 5 && (
                  <TouchableOpacity onPress={handleBack} style={styles.backButton}>
                   <Ionicons name="arrow-back" size={24} color="#005A9C" />
@@ -458,7 +505,6 @@ export default function FormularioVoluntariosScreen() {
           {renderStep()}
         </ScrollView>
         
-        {/* O Footer da seta SÓ aparece ANTES do modal (Passos 1-5) */}
         {step <= 5 && !isModalVisible && (
           <View style={styles.footer}>
             <TouchableOpacity style={styles.navButton} onPress={handleNext}>
@@ -468,7 +514,6 @@ export default function FormularioVoluntariosScreen() {
         )}
       </SafeAreaView>
 
-      {/* --- O MODAL POP-UP (Passos 6 e 7) --- */}
       <Modal
         visible={isModalVisible}
         transparent={true}
@@ -479,7 +524,6 @@ export default function FormularioVoluntariosScreen() {
           <View style={styles.modalPopup}>
             
             {modalContent === 'finalizando' ? (
-              // Passo 6
               <>
                 <Step6 formData={formData} updateFormData={updateFormData} />
                 <TouchableOpacity style={[styles.modalButton, isLoading && styles.buttonDisabled]} onPress={handleSubmit} disabled={isLoading}>
@@ -491,7 +535,6 @@ export default function FormularioVoluntariosScreen() {
                 </TouchableOpacity>
               </>
             ) : (
-              // Passo 7
               <>
                 <Step7 />
                 <TouchableOpacity style={styles.modalButton} onPress={handleCloseSuccessModal}>
@@ -515,23 +558,15 @@ const styles = StyleSheet.create({
   scrollContainer: {
     padding: 24,
     paddingBottom: 100,
-    // --- MUDANÇA: Padding no topo removido ---
-    // paddingTop: 80, (removido)
   },
-
-  // --- MUDANÇA: Novos estilos para a seta "dentro" da página ---
   headerContainer: {
     width: '100%',
-    height: 30, // Altura para o botão de voltar
+    height: 30, 
     justifyContent: 'center',
-    alignItems: 'flex-start', // Alinha a seta à esquerda
-    marginBottom: 10, // Espaço antes do título
+    alignItems: 'flex-start', 
+    marginBottom: 10, 
   },
-  backButton: {
-    // padding: 5, // Aumenta a área de toque se necessário
-  },
-  // --- FIM DA MUDANÇA ---
-  
+  backButton: {},
   mainTitle: {
     fontSize: 28,
     fontWeight: 'bold',
@@ -564,6 +599,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20,
     color: '#333',
+  },
+  cepContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+    marginBottom: 20,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 8,
+  },
+  loadingIcon: {
+    position: 'absolute',
+    right: 15,
   },
   optionRow: {
     flexDirection: 'row',
@@ -607,8 +654,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
-  // --- (NOVOS ESTILOS PARA O MODAL) ---
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
@@ -653,10 +698,4 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     opacity: 0.7,
   },
-  // Estilos antigos que não são mais usados (apenas para referência)
-  submitButton: {},
-  submitButtonText: {},
-  successContainer: {},
-  successTitle: {},
-  successMessage: {},
 });

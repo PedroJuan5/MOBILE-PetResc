@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import {View,Text, StyleSheet,ScrollView, TextInput,TouchableOpacity,Alert} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert, ActivityIndicator, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -29,7 +29,8 @@ interface FormData {
 
 export default function FormularioInteresseScreen() {
   const router = useRouter();
-  const [step, setStep] = useState(1); 
+  const [step, setStep] = useState(1);
+  const [loadingCep, setLoadingCep] = useState(false); // Estado para carregar o CEP
 
   const [formData, setFormData] = useState<FormData>({
     termsAccepted: false,
@@ -57,14 +58,49 @@ export default function FormularioInteresseScreen() {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
+  // --- NOVA FUNÇÃO: BUSCAR CEP ---
+  const buscarCep = async (cepDigitado: string) => {
+    // Remove caracteres não numéricos
+    const cepLimpo = cepDigitado.replace(/\D/g, '');
+
+    if (cepLimpo.length !== 8) return;
+
+    setLoadingCep(true);
+    Keyboard.dismiss(); // Esconde o teclado enquanto busca
+
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+      const data = await response.json();
+
+      if (data.erro) {
+        Alert.alert('Erro', 'CEP não encontrado. Verifique o número digitado.');
+        setLoadingCep(false);
+        return;
+      }
+
+      // Preenche os dados automaticamente
+      setFormData((prev) => ({
+        ...prev,
+        rua: data.logradouro || '', // ViaCEP retorna 'logradouro'
+        cidadeEstado: `${data.localidade} - ${data.uf}`, // Junta Cidade e Estado
+        // Se quiser preencher bairro, teria que ter um campo no formData para isso
+      }));
+
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível buscar o endereço. Preencha manualmente.');
+    } finally {
+      setLoadingCep(false);
+    }
+  };
+
   //logica da Barra de Progresso
   const { currentProgressStep, totalProgressSteps } = useMemo(() => {
-    let total = 10; // Caminho padrão (1-8 + 9 + 10)
+    let total = 10;
     let current = step;
 
     if (formData.viuPetInteresse === 'sim') {
       total = 9;
-      if (step === 11) current = 9; 
+      if (step === 11) current = 9;
     } else if (formData.viuPetInteresse === 'nao') {
       total = 10;
       if (step === 9) current = 9;
@@ -74,14 +110,15 @@ export default function FormularioInteresseScreen() {
     }
     return { currentProgressStep: current, totalProgressSteps: total };
   }, [step, formData.viuPetInteresse]);
- 
+
 
   //função para lidar com o botao "Voltar"
   const handleBack = () => {
     if (step === 1) {
-      router.back(); 
+      router.back();
     } else if (step === 11 || step === 9) {
-      setStep(8); 
+      // Lógica de retorno baseada na ramificação
+      setStep(8);
     } else {
       setStep(step - 1);
     }
@@ -131,13 +168,13 @@ export default function FormularioInteresseScreen() {
         return;
       }
       if (formData.viuPetInteresse === 'sim') {
-        setStep(11); 
+        setStep(11);
       } else {
         setStep(9);
       }
-      return; 
+      return;
     }
-    
+
     // validação do caminho "Não sei qual pet"
     if (step === 9 && !formData.tipoPetInteresse) {
       Alert.alert('Atenção', 'Por favor, selecione o tipo de pet.');
@@ -148,7 +185,7 @@ export default function FormularioInteresseScreen() {
         Alert.alert('Atenção', 'Por favor, selecione a preferência de sexo.');
         return;
       }
-      
+
       submitForm();
       return;
     }
@@ -174,7 +211,7 @@ export default function FormularioInteresseScreen() {
       'Formulário Enviado!',
       'Seu formulário de interesse foi enviado com sucesso. A ONG entrará em contato em breve.',
     );
-    router.back(); //volta para a tela de voluntários
+    router.back(); 
   };
 
 
@@ -233,9 +270,8 @@ export default function FormularioInteresseScreen() {
       />
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-      
 
-  
+
         {step === 1 && (
           <View style={styles.stepContainer}>
             <Text style={styles.stepTitle}>Formulário de interesse em adoção</Text>
@@ -250,7 +286,7 @@ export default function FormularioInteresseScreen() {
           </View>
         )}
 
-       
+
         {step === 2 && (
           <View style={styles.stepContainer}>
             <Text style={styles.stepTitle}>Antes de começar</Text>
@@ -321,41 +357,67 @@ export default function FormularioInteresseScreen() {
         {step === 4 && (
           <View style={styles.stepContainer}>
             <Text style={styles.stepTitle}>Endereço</Text>
+            
             <Text style={styles.inputLabel}>CEP</Text>
+            <View style={{position: 'relative', justifyContent: 'center'}}>
+                <MaskInput
+                style={styles.input}
+                value={formData.cep}
+                onChangeText={(masked, unmasked) => {
+                    updateFormData('cep', masked);
+                    // Se digitou os 8 números, busca o CEP
+                    if (unmasked.length === 8) {
+                        buscarCep(unmasked);
+                    }
+                }}
+                mask={[/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/]}
+                placeholder="00000-000"
+                keyboardType="numeric"
+                />
+                {loadingCep && (
+                    <ActivityIndicator 
+                        size="small" 
+                        color="#005A9C" 
+                        style={{position: 'absolute', right: 15}} 
+                    />
+                )}
+            </View>
 
-            <MaskInput
-              style={styles.input}
-              value={formData.cep}
-              onChangeText={(masked) => updateFormData('cep', masked)}
-              mask={[/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/]}
-              placeholder="00000-000"
-              keyboardType="numeric"
-            />
             <Text style={styles.inputLabel}>Rua/Avenida e Bairro</Text>
             <TextInput
               style={styles.input}
               value={formData.rua}
               onChangeText={(val) => updateFormData('rua', val)}
+              placeholder="Preenchido automaticamente"
             />
-            <Text style={styles.inputLabel}>Número</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.numero}
-              onChangeText={(val) => updateFormData('numero', val)}
-              keyboardType="numeric"
-            />
-            <Text style={styles.inputLabel}>Complemento (Opcional)</Text>
-            <TextInput
-              style={styles.input}
-              value={formData.complemento}
-              onChangeText={(val) => updateFormData('complemento', val)}
-            />
+            
+            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <View style={{width: '35%'}}>
+                    <Text style={styles.inputLabel}>Número</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={formData.numero}
+                        onChangeText={(val) => updateFormData('numero', val)}
+                        keyboardType="numeric"
+                    />
+                </View>
+                <View style={{width: '60%'}}>
+                    <Text style={styles.inputLabel}>Complemento</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={formData.complemento}
+                        onChangeText={(val) => updateFormData('complemento', val)}
+                        placeholder="Ex: Ap 101"
+                    />
+                </View>
+            </View>
+
             <Text style={styles.inputLabel}>Cidade e Estado</Text>
             <TextInput
               style={styles.input}
               value={formData.cidadeEstado}
               onChangeText={(val) => updateFormData('cidadeEstado', val)}
-              placeholder="Ex: São Paulo, SP"
+              placeholder="Ex: São Paulo - SP"
             />
           </View>
         )}
@@ -478,6 +540,14 @@ export default function FormularioInteresseScreen() {
         )}
       </ScrollView>
 
+      {/* --- BOTÃO DE VOLTAR FLUTUANTE (No canto inferior esquerdo) --- */}
+      {step > 1 && (
+        <TouchableOpacity style={styles.backFloatingButton} onPress={handleBack}>
+          <Feather name="chevron-left" size={32} color="#005A9C" />
+        </TouchableOpacity>
+      )}
+
+      {/* --- BOTÃO DE PRÓXIMO (No canto inferior direito) --- */}
       <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
         <Feather
           name={
@@ -500,7 +570,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     padding: 25,
-    paddingBottom: 100, 
+    paddingBottom: 100,
   },
   headerButton: {
     padding: 10,
@@ -543,7 +613,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#333',
     marginLeft: 10,
-    flex: 1, 
+    flex: 1,
   },
   // Inputs
   inputLabel: {
@@ -607,4 +677,21 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3,
   },
+  // --- Estilo do Botão Voltar Flutuante ---
+  backFloatingButton: {
+    position: 'absolute',
+    bottom: 30,
+    left: 30, // Fica à esquerda
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#E0E0E0', // Cor mais clara para diferenciar do botão de avançar
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+  }
 });
