@@ -2,7 +2,7 @@ import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import React, { useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from "react-native";
-import api, { AxiosError } from '@/lib/axios';
+import api, { AxiosError } from '../../lib/axios';
 import MaskInput from "react-native-mask-input";
 
 export default function CadastroScreen2() {
@@ -50,8 +50,7 @@ export default function CadastroScreen2() {
         role: 'PUBLICO',
       };
 
-      await api.post('/auth/register', userData);
-      
+       await api.post('/api/auth/register', userData);      
       console.log("CADASTRO REALIZADO COM SUCESSO!");
       Alert.alert("Sucesso", "Cadastro realizado! Por favor, faça o login."); 
       router.replace('/(auth)/login');

@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import MaskInput, { Masks } from 'react-native-mask-input';
-import api from '@/lib/axios';
+import api from '../../lib/axios';
 import { useAuth } from '../../context/AuthContext'; 
 
 export default function LoginOngScreen() {
