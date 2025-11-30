@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, Feather } from '@expo/vector-icons'; // Adicionei o Feather aqui
 
 export default function TabLayout() {
   return (
@@ -45,13 +45,17 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <Ionicons name="heart-outline" size={size} color={color} />,
         }}
       />
+      
+      {/* --- AQUI ESTAVA O PROBLEMA --- */}
       <Tabs.Screen
         name="perfil"
         options={{
           title: "Perfil",
-          tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
+          // Troquei para o Feather 'user', que é o bonequinho padrão mais seguro
+          tabBarIcon: ({ color, size }) => <Feather name="user" size={size} color={color} />,
         }}
       />
+
       <Tabs.Screen
         name="registro-animal"
         options={{
@@ -66,6 +70,13 @@ export default function TabLayout() {
         options={{
           href: null, 
         }}
+      />
+      <Tabs.Screen 
+        name="perdidos-achados" 
+        options={{ 
+          href: null,
+          headerShown: false 
+        }} 
       />
     </Tabs>
   );

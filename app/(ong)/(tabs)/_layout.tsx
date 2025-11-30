@@ -71,6 +71,13 @@ export default function OngTabLayout() {
           tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
         }}
       />
+      <Tabs.Screen 
+        name="perdidos-achados-ong" 
+        options={{ 
+          href: null, //Oculta o botão, mas mantém a navegação
+          headerShown: false 
+        }} 
+      />
     </Tabs>
   );
 }

@@ -32,7 +32,7 @@ interface FilterModalProps {
   onClose: () => void;
 }
 
-// --- DADOS MOCKADOS ---
+// --- DADOS ---
 const ANIMAIS_ONG: Animal[] = [
   { id: '1', nome: 'Branquinho', imagem: require('../../../assets/images/pets/branquinho.png'), raca: 'Sem raça definida (SRD)', status: 'AD.' },
   { id: '2', nome: 'Frajola', imagem: require('../../../assets/images/ui/gatoHome.png'), raca: 'Sem raça definida (SRD)', status: 'FI.' },
@@ -42,19 +42,14 @@ const ANIMAIS_ONG: Animal[] = [
   { id: '6', nome: 'Caramelo', imagem: require('../../../assets/images/pets/caramelo.png'), raca: 'Sem raça definida (SRD)', status: 'FI.' },
 ];
 
-// --- CARD DO ANIMAL (COM NAVEGAÇÃO) ---
+// --- CARD DO ANIMAL ---
 const AnimalGridCard = ({ item }: { item: Animal }) => {
-  const router = useRouter(); // Hook para navegação
-
+  const router = useRouter(); 
   return (
     <TouchableOpacity 
       style={styles.cardContainer} 
       activeOpacity={0.9}
-      // Ao clicar, vai para a tela de detalhes enviando o ID do animal
-      onPress={() => router.push({
-        pathname: '/(ong)/detalhes-pet',
-        params: { id: item.id }
-      } as any)}
+   onPress={() => router.push({ pathname: '/(ong)/detalhes-pet-ong', params: { id: item.id } } as any)}
     >
       <Image source={item.imagem} style={styles.cardImage} resizeMode="cover" />
       <View style={styles.cardInfo}>
@@ -80,13 +75,37 @@ const FilterModal = ({ visible, onClose }: FilterModalProps) => {
     const [isTodos, setIsTodos] = useState(false);
     const [isMacho, setIsMacho] = useState(false);
     const [isFemea, setIsFemea] = useState(false);
-    
+
+    // Novos Estados para Porte, Raça e Idade
     const [porteSelecionado, setPorteSelecionado] = useState<string>('');
     const [idadeSelecionada, setIdadeSelecionada] = useState<string>('');
-    const [racaText, setRacaText] = useState('');
+    const [racaDigitada, setRacaDigitada] = useState('');
 
-    const togglePorte = (valor: string) => setPorteSelecionado(prev => prev === valor ? '' : valor);
-    const toggleIdade = (valor: string) => setIdadeSelecionada(prev => prev === valor ? '' : valor);
+    const toggleSelection = (currentValue: string, newValue: string, setter: (val: string) => void) => {
+        setter(currentValue === newValue ? '' : newValue);
+    };
+
+    const SwitchRow = ({ label, value, onValueChange }: any) => (
+        <View style={styles.switchRow}>
+            <Switch 
+                trackColor={{ false: "#A0B4CC", true: "#5C8BB8" }} 
+                thumbColor={value ? "#2D68A6" : "#f4f3f4"} 
+                onValueChange={onValueChange} 
+                value={value} 
+                style={{ transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }] }} 
+            />
+            <Text style={styles.switchLabel}>{label}</Text>
+        </View>
+    );
+
+    const FilterChip = ({ label, selected, onPress }: any) => (
+        <TouchableOpacity 
+            style={[styles.chip, selected && styles.chipSelected]} 
+            onPress={onPress}
+        >
+            <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{label}</Text>
+        </TouchableOpacity>
+    );
 
     return (
       <Modal
@@ -96,7 +115,6 @@ const FilterModal = ({ visible, onClose }: FilterModalProps) => {
         onRequestClose={onClose}
       >
         <View style={styles.modalOverlay}>
-          {/* BARRA LATERAL BRANCA */}
           <View style={styles.filterSidebar}>
             
             <View style={styles.filterHeader}>
@@ -105,76 +123,79 @@ const FilterModal = ({ visible, onClose }: FilterModalProps) => {
             
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{paddingBottom: 40}}>
                 
+                {/* Nome ou ID */}
                 <Text style={styles.filterLabel}>Nome ou id</Text>
                 <TextInput style={styles.filterInput} />
 
                 {/* Espécie */}
                 <Text style={styles.filterLabel}>Espécie</Text>
                 <View style={styles.switchContainer}>
-                    <View style={styles.switchRow}>
-                        <Switch trackColor={{ false: "#D1D5DB", true: "#2D68A6" }} thumbColor={"#fff"} onValueChange={setIsGato} value={isGato} />
-                        <Text style={styles.switchLabel}>Gato</Text>
-                    </View>
-                    <View style={styles.switchRow}>
-                        <Switch trackColor={{ false: "#D1D5DB", true: "#2D68A6" }} thumbColor={"#fff"} onValueChange={setIsCaes} value={isCaes} />
-                        <Text style={styles.switchLabel}>Cães</Text>
-                    </View>
-                    <View style={styles.switchRow}>
-                        <Switch trackColor={{ false: "#D1D5DB", true: "#2D68A6" }} thumbColor={"#fff"} onValueChange={setIsTodos} value={isTodos} />
-                        <Text style={styles.switchLabel}>Todos</Text>
-                    </View>
+                    <SwitchRow label="Gato" value={isGato} onValueChange={setIsGato} />
+                    <SwitchRow label="Cães" value={isCaes} onValueChange={setIsCaes} />
+                    <SwitchRow label="Todos" value={isTodos} onValueChange={setIsTodos} />
                 </View>
 
                 {/* Gênero */}
                 <Text style={styles.filterLabel}>Gênero</Text>
                 <View style={styles.switchContainer}>
-                    <View style={styles.switchRow}>
-                        <Switch trackColor={{ false: "#D1D5DB", true: "#2D68A6" }} thumbColor={"#fff"} onValueChange={setIsMacho} value={isMacho} />
-                        <Text style={styles.switchLabel}>Macho</Text>
-                    </View>
-                    <View style={styles.switchRow}>
-                        <Switch trackColor={{ false: "#D1D5DB", true: "#2D68A6" }} thumbColor={"#fff"} onValueChange={setIsFemea} value={isFemea} />
-                        <Text style={styles.switchLabel}>Fêmea</Text>
-                    </View>
+                    <SwitchRow label="Macho" value={isMacho} onValueChange={setIsMacho} />
+                    <SwitchRow label="Fêmea" value={isFemea} onValueChange={setIsFemea} />
                 </View>
 
                 {/* Porte */}
                 <Text style={styles.filterLabel}>Porte</Text>
-                <View style={styles.optionsContainer}>
-                    {['Pequeno', 'Médio', 'Grande'].map(opcao => (
-                        <TouchableOpacity key={opcao} style={[styles.optionBtn, porteSelecionado === opcao && styles.optionBtnSelected]} onPress={() => togglePorte(opcao)}>
-                            <Text style={[styles.optionText, porteSelecionado === opcao && styles.optionTextSelected]}>{opcao}</Text>
-                        </TouchableOpacity>
+                <View style={styles.chipsContainer}>
+                    {['Pequeno', 'Médio', 'Grande'].map((porte) => (
+                        <FilterChip 
+                            key={porte} 
+                            label={porte} 
+                            selected={porteSelecionado === porte} 
+                            onPress={() => toggleSelection(porteSelecionado, porte, setPorteSelecionado)} 
+                        />
                     ))}
                 </View>
 
                 {/* Raça */}
                 <Text style={styles.filterLabel}>Raça</Text>
-                <TextInput style={styles.filterInput} placeholder="Digite a raça" value={racaText} onChangeText={setRacaText} />
+                <TextInput 
+                    style={styles.filterInput} 
+                    placeholder="Digite a raça (ex: Poodle)" 
+                    value={racaDigitada}
+                    onChangeText={setRacaDigitada}
+                />
 
                 {/* Idade */}
                 <Text style={styles.filterLabel}>Idade</Text>
-                <View style={styles.optionsContainer}>
-                    {['Filhote', 'Adulto', 'Idoso'].map(opcao => (
-                        <TouchableOpacity key={opcao} style={[styles.optionBtn, idadeSelecionada === opcao && styles.optionBtnSelected]} onPress={() => toggleIdade(opcao)}>
-                            <Text style={[styles.optionText, idadeSelecionada === opcao && styles.optionTextSelected]}>{opcao}</Text>
-                        </TouchableOpacity>
+                <View style={styles.chipsContainer}>
+                    {['Filhote', 'Adulto', 'Idoso'].map((idade) => (
+                        <FilterChip 
+                            key={idade} 
+                            label={idade} 
+                            selected={idadeSelecionada === idade} 
+                            onPress={() => toggleSelection(idadeSelecionada, idade, setIdadeSelecionada)} 
+                        />
                     ))}
                 </View>
 
-                {/* LINK PERDIDOS E ACHADOS */}
-                <TouchableOpacity 
-                    style={styles.lostFoundButton}
-                    onPress={() => {
-                        onClose(); 
-                        router.push('/(ong)/perdidos-achados' as any); 
-                    }}
-                >
-                    <Text style={styles.lostFoundText}>PERDIDOS E ACHADOS</Text>
+                {/* BOTÃO APLICAR FILTROS */}
+                <TouchableOpacity style={styles.applyButton} onPress={onClose}>
+                    <Text style={styles.applyButtonText}>APLICAR FILTROS</Text>
                 </TouchableOpacity>
+
+                {/* LINK PERDIDOS E ACHADOS (ROTA CORRIGIDA) */}
+             <TouchableOpacity 
+    style={styles.lostFoundButton}
+    onPress={() => {
+        onClose(); 
+        router.push('/(ong)/(tabs)/perdidos-achados-ong' as any); 
+    }}
+>
+    <Text style={styles.lostFoundText}>PERDIDOS E ACHADOS</Text>
+</TouchableOpacity>
 
             </ScrollView>
           </View>
+          
           <TouchableOpacity style={styles.modalCloserArea} onPress={onClose} activeOpacity={1} />
         </View>
       </Modal>
@@ -188,31 +209,24 @@ export default function PetsOngScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      
-      {/* ELEMENTO DECORATIVO DE FUNDO */}
       <View style={styles.bgShapeRight} />
 
       <View style={styles.container}>
         
-        {/* CABEÇALHO */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => setFilterVisible(true)}>
             <Ionicons name="menu-outline" size={32} color="#2D68A6" />
           </TouchableOpacity>
-          
           <Text style={styles.headerTitle}>Animais da ONG</Text>
-          
           <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes' as any)}>
             <Ionicons name="notifications-outline" size={28} color="#2D68A6" />
           </TouchableOpacity>
         </View>
 
-        {/* SUB-CABEÇALHO */}
         <View style={styles.subHeaderContainer}>
             <Text style={styles.subHeaderTitle}>Disponíveis para Adoção</Text>
         </View>
 
-        {/* GRADE DE PETS */}
         <FlatList
           data={ANIMAIS_ONG}
           keyExtractor={(item) => item.id}
@@ -223,7 +237,6 @@ export default function PetsOngScreen() {
           contentContainerStyle={styles.listContent}
         />
 
-        {/* MODAL DE FILTRO */}
         <FilterModal visible={filterVisible} onClose={() => setFilterVisible(false)} />
 
       </View>
@@ -232,62 +245,22 @@ export default function PetsOngScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { 
-    flex: 1, 
-    backgroundColor: "#fff", 
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-  },
+  safeArea: { flex: 1, backgroundColor: "#fff", paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
   container: { flex: 1 },
 
-  // Fundo Decorativo
   bgShapeRight: {
-    position: 'absolute',
-    top: 150,
-    right: -50,
-    width: 300,
-    height: 550,
-    backgroundColor: '#94B9D8',
-    borderTopLeftRadius: 200,
-    borderBottomLeftRadius: 200,
-    opacity: 0.6,
-    zIndex: -1,
+    position: 'absolute', top: 150, right: -50, width: 300, height: 550,
+    backgroundColor: '#94B9D8', borderTopLeftRadius: 200, borderBottomLeftRadius: 200, opacity: 0.6, zIndex: -1,
   },
 
-  // Header
-  header: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    paddingHorizontal: 20, 
-    paddingTop: 30, 
-    paddingBottom: 10 
-  },
-  headerTitle: { 
-    fontSize: 26, 
-    fontWeight: 'bold', 
-    color: '#2D68A6',
-    marginBottom: -5 
-  },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 30, paddingBottom: 10 },
+  headerTitle: { fontSize: 26, fontWeight: 'bold', color: '#2D68A6', marginBottom: -5 },
+  subHeaderContainer: { paddingHorizontal: 20, marginTop: 20, marginBottom: 20 },
+  subHeaderTitle: { fontSize: 18, fontWeight: '600', color: '#2D68A6' },
 
-  // Subtítulo
-  subHeaderContainer: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    paddingHorizontal: 20, 
-    marginTop: 20, 
-    marginBottom: 20 
-  },
-  subHeaderTitle: { 
-    fontSize: 18, 
-    fontWeight: '600', 
-    color: '#2D68A6' 
-  },
-
-  // Grid
   listContent: { paddingHorizontal: 15, paddingBottom: 20 },
   row: { justifyContent: 'space-between', marginBottom: 15 },
-  cardContainer: { backgroundColor: '#fff', borderRadius: 12, width: '48%', overflow: 'hidden', shadowColor: "#2D68A6", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3, borderWidth: 1, borderColor: '#f0f0f0' },
+  cardContainer: { backgroundColor: '#fff', borderRadius: 12, width: '48%', overflow: 'hidden', elevation: 3, borderWidth: 1, borderColor: '#f0f0f0', shadowColor: "#2D68A6", shadowOpacity: 0.1, shadowRadius: 4, shadowOffset: {width:0, height:2} },
   cardImage: { width: '100%', height: 130 },
   cardInfo: { padding: 10 },
   cardName: { fontSize: 16, fontWeight: 'bold', color: '#2D68A6', marginBottom: 4 },
@@ -296,27 +269,75 @@ const styles = StyleSheet.create({
   verMaisLink: { alignSelf: 'flex-end', marginTop: 8 },
   verMaisText: { fontSize: 10, color: '#8FA7B8', fontWeight: 'bold' },
 
-  // Modal Filtro
+  // --- FILTRO STYLES ---
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', flexDirection: 'row' },
-  filterSidebar: { width: '75%', backgroundColor: '#fff', padding: 20, borderTopRightRadius: 20, borderBottomRightRadius: 20 },
-  modalCloserArea: { width: '25%' },
+  filterSidebar: { 
+    width: '80%', 
+    backgroundColor: '#fff', 
+    padding: 20, 
+    borderTopRightRadius: 30, 
+    borderBottomRightRadius: 30 
+  },
+  modalCloserArea: { width: '20%' },
   
-  filterHeader: { alignItems: 'center', marginBottom: 25, marginTop: 40 }, 
-  filterTitle: { fontSize: 26, fontWeight: 'bold', color: '#2D68A6' },
+  filterHeader: { alignItems: 'center', marginBottom: 25, marginTop: 20 },
+  filterTitle: { fontSize: 28, fontWeight: 'bold', color: '#2D68A6' },
   
-  filterLabel: { fontSize: 16, fontWeight: '500', color: '#2D68A6', marginTop: 15, marginBottom: 8 },
-  filterInput: { borderWidth: 1, borderColor: '#A0B4CC', borderRadius: 6, paddingVertical: 4, paddingHorizontal: 10, height: 35 },
+  filterLabel: { fontSize: 18, fontWeight: '500', color: '#2D68A6', marginTop: 15, marginBottom: 8 },
+  filterInput: { 
+    borderWidth: 1, 
+    borderColor: '#A0B4CC', 
+    borderRadius: 8, 
+    paddingVertical: 5, 
+    paddingHorizontal: 10, 
+    height: 40,
+    fontSize: 16
+  },
   
-  switchContainer: { paddingLeft: 5 },
-  switchRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10, gap: 10 },
-  switchLabel: { fontSize: 16, color: '#2D68A6' },
+  switchContainer: { paddingLeft: 0 },
+  switchRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+  switchLabel: { fontSize: 18, color: '#2D68A6', marginLeft: 15 },
 
-  optionsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  optionBtn: { borderWidth: 1, borderColor: '#A0B4CC', borderRadius: 20, paddingVertical: 6, paddingHorizontal: 12, backgroundColor: '#fff', marginBottom: 5 },
-  optionBtnSelected: { backgroundColor: '#2D68A6', borderColor: '#2D68A6' },
-  optionText: { color: '#2D68A6', fontSize: 14, fontWeight: '500' },
-  optionTextSelected: { color: '#fff', fontWeight: 'bold' },
+  chipsContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 10,
+  },
+  chip: {
+      borderWidth: 1,
+      borderColor: '#A0B4CC',
+      borderRadius: 20,
+      paddingVertical: 8,
+      paddingHorizontal: 15,
+      backgroundColor: '#fff',
+  },
+  chipSelected: {
+      backgroundColor: '#2D68A6',
+      borderColor: '#2D68A6',
+  },
+  chipText: {
+      color: '#2D68A6',
+      fontSize: 14,
+      fontWeight: '600',
+  },
+  chipTextSelected: {
+      color: '#fff',
+  },
 
-  lostFoundButton: { marginTop: 40, marginBottom: 20 },
+  applyButton: {
+      backgroundColor: '#2D68A6',
+      paddingVertical: 12,
+      borderRadius: 8,
+      alignItems: 'center',
+      marginTop: 30,
+      marginBottom: 10,
+  },
+  applyButtonText: {
+      color: '#fff',
+      fontWeight: 'bold',
+      fontSize: 16,
+  },
+
+  lostFoundButton: { marginTop: 10, marginBottom: 20, alignItems: 'center' },
   lostFoundText: { color: '#2D68A6', fontWeight: 'bold', fontSize: 16, textTransform: 'uppercase' }
 });
