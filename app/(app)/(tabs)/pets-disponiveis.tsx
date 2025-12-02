@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useMemo } from "react";
+import React, { useState, useLayoutEffect, useMemo, useEffect, useCallback } from "react";
 import {
   SafeAreaView,
   View,
@@ -6,31 +6,32 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  ImageSourcePropType,
   Image,
   Dimensions,
   Modal,
   Switch,
   TextInput,
   ScrollView,
-  StatusBar,
+  ActivityIndicator,
+  RefreshControl,
   Platform
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRouter } from "expo-router";
-import { DenuncieModal } from "../../../components/denuncieModal"; // Verifique se o caminho está certo
+import { DenuncieModal } from "../../../components/denuncieModal"; 
+import api from "../../../lib/axios"; 
 
 // --- TIPOS ---
 interface Pet {
-  id: string;
+  id: number;
   nome: string;
   raca: string;
   genero: string;
   especie: string;
-  idade: string;
-  tamanho: string;
-  imagem: ImageSourcePropType;
-  status: 'disponivel' | 'adotado' | 'perdido';
+  idade: string; // Mapeado de número para texto (Filhote, Adulto...)
+  tamanho: string; // Mapeado de 'porte'
+  photoURL: string | null;
+  status: string;
 }
 
 interface Filtros {
@@ -46,16 +47,6 @@ interface Filtros {
 
 const { width } = Dimensions.get('window');
 const cardWidth = (width - 20 * 3) / 2;
-
-// --- DADOS MOCKADOS ---
-const PETS_COMPLETOS: Pet[] = [
-  { id: "1", nome: "Branquinho", raca: "SRD", genero: "Macho", especie: "Gato", idade: "Adulto", tamanho: "Pequeno", imagem: require("../../../assets/images/pets/branquinho.png"), status: 'disponivel' },
-  { id: "2", nome: "Shanti",     raca: "SRD", genero: "Fêmea", especie: "Cachorro", idade: "Filhote", tamanho: "Pequeno", imagem: require("../../../assets/images/pets/shanti.png"), status: 'disponivel' },
-  { id: "3", nome: "Zeus",       raca: "Pitbull", genero: "Macho", especie: "Cachorro", idade: "Adulto", tamanho: "Grande", imagem: require("../../../assets/images/pets/zeus.png"), status: 'disponivel' },
-  { id: "4" , nome: "Paçoca",    raca: "SRD", genero: "Macho", especie: "Cachorro", idade: "Idoso", tamanho: "Medio", imagem: require("../../../assets/images/pets/paçoca.png"), status: 'disponivel' },
-  { id: "5", nome: "Neguinho",   raca: "SRD", genero: "Macho", especie: "Cachorro", idade: "Filhote", tamanho: "Pequeno", imagem: require("../../../assets/images/pets/neguinho.png"), status: 'disponivel' },
-  { id: "6", nome: "Caramelo",   raca: "SRD", genero: "Macho", especie: "Cachorro", idade: "Adulto", tamanho: "Medio", imagem: require("../../../assets/images/pets/caramelo.png"), status: 'disponivel' },
-];
 
 // --- MODAL DE FILTRO (VISUAL ONG) ---
 const FilterModal = ({ visible, onClose, onApply }: { visible: boolean; onClose: () => void; onApply: (f: Filtros) => void }) => {
@@ -182,32 +173,91 @@ export default function TelaAdotar() {
   const [denunciaVisivel, setDenunciaVisivel] = useState(false);
   const [filtrosAplicados, setFiltrosAplicados] = useState<Filtros>({});
   
+  // Estados para dados da API
+  const [pets, setPets] = useState<Pet[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
   const navigation = useNavigation();
   const router = useRouter();
 
-  // Filtragem
+  // Função auxiliar para categorizar a idade (Número -> Texto)
+  const formatarIdade = (idadeNum: number | null): string => {
+      if (idadeNum === null) return "Adulto";
+      if (idadeNum <= 1) return "Filhote";
+      if (idadeNum >= 8) return "Idoso";
+      return "Adulto";
+  };
+
+  // BUSCA DADOS DA API
+  const fetchPets = useCallback(async () => {
+    try {
+        const response = await api.get('/animais');
+        const todosAnimais = response.data;
+
+        // Filtra apenas disponíveis e mapeia para o formato visual
+        const disponiveis = todosAnimais
+            .filter((p: any) => p.status === 'DISPONIVEL')
+            .map((p: any) => ({
+                id: p.id,
+                nome: p.nome,
+                raca: p.raca || "SRD",
+                genero: p.sexo === 'MACHO' ? 'Macho' : 'Fêmea',
+                especie: p.especie, // "Cachorro" ou "Gato" (conforme salvo no banco)
+                idade: formatarIdade(p.idade), // Converte int para string
+                tamanho: p.porte || "Médio", // Mapeia 'porte' para 'tamanho'
+                photoURL: p.photoURL,
+                status: 'disponivel' // Para controle de cor do bolinha
+            }));
+
+        setPets(disponiveis);
+    } catch (error) {
+        console.error("Erro ao buscar pets:", error);
+    } finally {
+        setLoading(false);
+        setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPets();
+  }, [fetchPets]);
+
+  const onRefresh = () => {
+      setRefreshing(true);
+      fetchPets();
+  };
+
+  // Filtragem no Client-Side
   const petsFiltrados = useMemo(() => {
-    if (Object.keys(filtrosAplicados).length === 0) return PETS_COMPLETOS;
-    return PETS_COMPLETOS.filter((pet) => {
+    if (Object.keys(filtrosAplicados).length === 0) return pets;
+    
+    return pets.filter((pet) => {
       const f = filtrosAplicados;
+      
       if (f.nome && !pet.nome.toLowerCase().includes(f.nome.toLowerCase())) return false;
+      
+      // Ajuste para bater com o que vem do banco (Cachorro/Gato vs Gato/Cães)
       if (f.isGato === false && pet.especie === "Gato") return false;
-      if (f.isCao === false && pet.especie === "Cachorro") return false;
+      if (f.isCao === false && (pet.especie === "Cachorro" || pet.especie === "Cães")) return false;
+      
       if (f.isMacho === false && pet.genero === "Macho") return false;
       if (f.isFemea === false && pet.genero === "Fêmea") return false;
+      
       if (f.porte && pet.tamanho.toLowerCase() !== f.porte.toLowerCase()) return false;
       if (f.raca && !pet.raca.toLowerCase().includes(f.raca.toLowerCase())) return false;
       if (f.idade && pet.idade.toLowerCase() !== f.idade.toLowerCase()) return false;
+      
       return true;
     });
-  }, [filtrosAplicados]);
+  }, [filtrosAplicados, pets]);
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
 
- const handlePetPress = (petId: string) => {
-    // Rota para a nova tela de detalhes (na pasta (app))
+  const handlePetPress = (petId: number) => {
+    // Rota para detalhes (passando ID numérico)
     router.push({
       pathname: '/(app)/detalhes-pet',
       params: { id: petId }
@@ -243,26 +293,41 @@ export default function TelaAdotar() {
           <View style={{ width: 28 }} /> 
         </View>
 
-        <FlatList
-          data={petsFiltrados}
-          renderItem={({ item }) => (
-            <TouchableOpacity style={styles.petCard} onPress={() => handlePetPress(item.id)}>
-              <Image source={item.imagem} style={styles.petCardImage} />
-              <View style={styles.petCardOverlay}>
-                <Text style={styles.petCardNome}>{item.nome}</Text>
-                <View style={styles.petCardStatus}>
-                  <Text style={styles.petCardDetalhe}>{item.raca} {item.genero === 'Macho' ? 'M' : 'F'}.</Text>
-                  <View style={[styles.statusCircle, item.status === 'disponivel' && styles.statusDisponivel]} />
+        {loading ? (
+            <ActivityIndicator size="large" color="#2D68A6" style={{marginTop: 50}} />
+        ) : (
+            <FlatList
+            data={petsFiltrados}
+            renderItem={({ item }) => (
+                <TouchableOpacity style={styles.petCard} onPress={() => handlePetPress(item.id)}>
+                {/* LÓGICA DE IMAGEM: Usa a URL do backend ou Placeholder local */}
+                <Image 
+                    source={item.photoURL ? { uri: item.photoURL } : require("../../../assets/images/pets/branquinho.png")} 
+                    style={styles.petCardImage} 
+                />
+                
+                <View style={styles.petCardOverlay}>
+                    <Text style={styles.petCardNome}>{item.nome}</Text>
+                    <View style={styles.petCardStatus}>
+                    <Text style={styles.petCardDetalhe}>
+                        {item.raca} {item.genero === 'Macho' ? 'M' : 'F'}.
+                    </Text>
+                    <View style={[styles.statusCircle, styles.statusDisponivel]} />
+                    </View>
                 </View>
-              </View>
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          columnWrapperStyle={styles.row}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={<Text style={styles.textoVazio}>Nenhum animal encontrado.</Text>}
-        />
+                </TouchableOpacity>
+            )}
+            keyExtractor={(item) => item.id.toString()} // Garante que o ID seja string para a lista
+            numColumns={2}
+            columnWrapperStyle={styles.row}
+            showsVerticalScrollIndicator={false}
+            // Pull to Refresh
+            refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#2D68A6']} />
+            }
+            ListEmptyComponent={<Text style={styles.textoVazio}>Nenhum animal encontrado.</Text>}
+            />
+        )}
       </View>
     </SafeAreaView>
   );
@@ -273,7 +338,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 10 },
   
   // Header
-  customHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 50, paddingBottom: 10, paddingHorizontal: 10 },
+  customHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: Platform.OS === 'android' ? 40 : 10, paddingBottom: 10, paddingHorizontal: 10 },
   headerTitle: { fontSize: 22, fontWeight: 'bold', color: '#2D68A6' },
   subCabecalho: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 10, marginTop: 10, marginBottom: 15 },
   tituloSecundario: { fontSize: 18, fontWeight: "600", color: "#3A5C7A" },
