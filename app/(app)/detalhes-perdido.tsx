@@ -1,20 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  Image, 
-  ScrollView, 
-  TouchableOpacity, 
-  Platform, 
-  StatusBar,
-  ActivityIndicator,
-  Alert
-} from 'react-native';
+import {  View,  Text,  StyleSheet,  Image,  ScrollView,  TouchableOpacity, Platform,  StatusBar, ActivityIndicator, Alert} from 'react-native';
 import { Ionicons, Feather, FontAwesome } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 
-// --- DADOS FAKE (SIMULAÇÃO DO BANCO DE DADOS) ---
+//dados para simular a API
 const BANCO_PERDIDOS: any = {
   '1': {
     nome: "Tobby",
@@ -67,13 +56,12 @@ export default function DetalhesPerdidoScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simula API
+    //simula API
     setTimeout(() => {
       const idString = Array.isArray(id) ? id[0] : id; 
       const dados = BANCO_PERDIDOS[idString || '1']; 
       if (dados) setPet(dados);
-      else setPet(BANCO_PERDIDOS['2']); // Fallback para o Hero (que é igual a imagem)
-      setLoading(false);
+      else setPet(BANCO_PERDIDOS['2']);
     }, 500);
   }, [id]);
 
@@ -91,14 +79,13 @@ export default function DetalhesPerdidoScreen() {
     <View style={styles.mainContainer}>
       <ScrollView showsVerticalScrollIndicator={false}>
         
-        {/* --- HEADER AZUL CLARO --- */}
         <View style={styles.headerBackground}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <Ionicons name="arrow-back" size={28} color="#2D68A6" />
           </TouchableOpacity>
 
           <View style={styles.topRow}>
-            {/* Foto + Tag */}
+            {/* foto + tag */}
             <View style={styles.imageColumn}>
                 <Image source={pet.imagem} style={styles.petAvatar} />
                 <View style={[
@@ -109,7 +96,7 @@ export default function DetalhesPerdidoScreen() {
                 </View>
             </View>
 
-            {/* Informações Principais */}
+            {/* informações principais */}
             <View style={styles.infoColumn}>
                 <Text style={styles.petName}>{pet.nome}</Text>
                 <Text style={styles.petSubInfo}>{pet.genero} • {pet.tipo} • {pet.raca}</Text>
@@ -123,7 +110,7 @@ export default function DetalhesPerdidoScreen() {
           </View>
         </View>
 
-        {/* --- CONTEÚDO BRANCO --- */}
+        {/*conteudo branco*/}
         <View style={styles.contentContainer}>
           
           <View style={styles.sectionHeader}>
@@ -134,7 +121,7 @@ export default function DetalhesPerdidoScreen() {
           </View>
           <View style={styles.divider} />
 
-          {/* Lista de Características */}
+          {/*lista de Características */}
           <View style={styles.charItem}>
             <Text style={styles.charLabel}>RAÇA</Text>
             <Text style={styles.charValue}>{pet.raca}</Text>
@@ -160,12 +147,12 @@ export default function DetalhesPerdidoScreen() {
             <Text style={styles.charValue}>{pet.olhos}</Text>
           </View>
 
-          {/* Botão Contato */}
+          {/*botao Contato*/}
           <TouchableOpacity style={styles.contactButton} onPress={() => Alert.alert("Contato", "Abrir WhatsApp do dono...")}>
             <Text style={styles.contactButtonText}>MOSTRAR CONTATO</Text>
           </TouchableOpacity>
 
-          {/* Banner de Recompensa (Só mostra se tiver valor) */}
+          {/* banner de recompensa (So mostra se tiver valor)*/}
           {pet.recompensa && (
             <View style={styles.rewardBanner}>
                 <View style={styles.coinCircle}><FontAwesome name="dollar" size={16} color="#15803D" /></View>
@@ -188,7 +175,7 @@ const styles = StyleSheet.create({
   
   // Header Azul Claro
   headerBackground: {
-    backgroundColor: '#DCE9F5', // Azul bem clarinho da imagem
+    backgroundColor: '#DCE9F5',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight! + 10 : 50,
     paddingBottom: 30,
     paddingHorizontal: 20,
@@ -196,11 +183,11 @@ const styles = StyleSheet.create({
   backButton: { marginBottom: 20, alignSelf: 'flex-start' },
   topRow: { flexDirection: 'row' },
   
-  // Coluna da Imagem
+  // coluna da imagem
   imageColumn: { marginRight: 15, alignItems: 'center' },
   petAvatar: { width: 110, height: 110, borderRadius: 16 },
   statusTag: {
-    marginTop: -12, // Sobe para ficar em cima da borda da foto
+    marginTop: -12, 
     paddingVertical: 4,
     paddingHorizontal: 20,
     borderRadius: 12,
@@ -208,27 +195,27 @@ const styles = StyleSheet.create({
   },
   statusText: { color: '#fff', fontWeight: 'bold', fontSize: 12 },
 
-  // Coluna de Informações
+  //coluna de informações
   infoColumn: { flex: 1, paddingTop: 5 },
   petName: { fontSize: 26, fontWeight: 'bold', color: '#2D68A6', marginBottom: 2 },
   petSubInfo: { fontSize: 12, color: '#2D68A6', fontWeight: '600', marginBottom: 10 },
   labelBlue: { fontSize: 12, color: '#2D68A6', fontWeight: 'bold', marginTop: 6 },
   textGray: { fontSize: 11, color: '#555', lineHeight: 14 },
 
-  // Conteúdo Branco
+  //conteudo branco
   contentContainer: { padding: 25 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   sectionTitle: { fontSize: 22, fontWeight: 'bold', color: '#2D68A6' },
   divider: { height: 1, backgroundColor: '#E0E0E0', marginVertical: 15 },
 
-  // Itens da Lista
+  //itens da lista
   charItem: { marginBottom: 15 },
   charLabel: { fontSize: 13, fontWeight: 'bold', color: '#2D68A6', textTransform: 'uppercase' },
   charValue: { fontSize: 16, color: '#2D68A6', marginTop: 2 },
 
-  // Botões
+  // botões
   contactButton: {
-    backgroundColor: '#94B9D8', // Azul médio
+    backgroundColor: '#94B9D8', 
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
@@ -237,9 +224,9 @@ const styles = StyleSheet.create({
   },
   contactButtonText: { color: '#2D68A6', fontWeight: 'bold', fontSize: 16 },
 
-  // Banner Recompensa
+  //banner recompensa
   rewardBanner: {
-    backgroundColor: '#C6EBC5', // Verde claro
+    backgroundColor: '#C6EBC5', 
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

@@ -8,7 +8,7 @@ import MaskInput from 'react-native-mask-input';
 const CustomCheckbox = ({ label, isSelected, onSelect }: { label: string, isSelected: boolean, onSelect: () => void }) => (
   <TouchableOpacity style={styles.optionButton} onPress={onSelect}>
     <Ionicons
-      name={isSelected ? 'checkbox' : 'square-outline'} // Corrigido
+      name={isSelected ? 'checkbox' : 'square-outline'} 
       size={26}
       color={isSelected ? '#005A9C' : '#a0a0a0'}
     />
@@ -20,10 +20,10 @@ export default function EsqueciSenhaScreen() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  // --- Estado Geral ---
+  
   const [step, setStep] = useState(1); //Email/Fone, 2: Código, 3: Nova Senha
 
-  // --- Estado do Passo 1 ---
+  //estado do Passo 1 
   const [email, setEmail] = useState('');
   const [telefone, setTelefone] = useState('');
   const [telefoneUnmasked, setTelefoneUnmasked] = useState('');
@@ -125,9 +125,6 @@ export default function EsqueciSenhaScreen() {
       setIsLoading(false);
     }
   };
-
-
-  //funções Auxiliares (para o input de código)
 
   const handleCodeChange = (text: string, index: number) => {
     const newCode = [...code];

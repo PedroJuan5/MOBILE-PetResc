@@ -21,7 +21,7 @@ import { useNavigation, useRouter } from "expo-router";
 import { DenuncieModal } from "../../../components/denuncieModal"; 
 import api from "../../../lib/axios"; 
 
-// --- TIPOS ---
+// Tipos
 interface Pet {
   id: number;
   nome: string;
@@ -52,7 +52,7 @@ const cardWidth = (width - 20 * 3) / 2;
 const FilterModal = ({ visible, onClose, onApply }: { visible: boolean; onClose: () => void; onApply: (f: Filtros) => void }) => {
     const router = useRouter();
     
-    // Estados do Filtro
+    //estados do Filtro
     const [isGato, setIsGato] = useState(true);
     const [isCaes, setIsCaes] = useState(true);
     const [isTodos, setIsTodos] = useState(true);
@@ -65,12 +65,12 @@ const FilterModal = ({ visible, onClose, onApply }: { visible: boolean; onClose:
     const [racaDigitada, setRacaDigitada] = useState('');
     const [nomeDigitado, setNomeDigitado] = useState('');
 
-    // Toggle Seleção Única (Porte/Idade)
+    //toggle Seleção Única (Porte/Idade)
     const toggleSelection = (currentValue: string, newValue: string, setter: (val: string) => void) => {
         setter(currentValue === newValue ? '' : newValue);
     };
 
-    // Linha com Switch
+    //linha com Switch
     const SwitchRow = ({ label, value, onValueChange }: any) => (
         <View style={styles.switchRow}>
             <Switch 
@@ -84,7 +84,7 @@ const FilterModal = ({ visible, onClose, onApply }: { visible: boolean; onClose:
         </View>
     );
 
-    // Botão Chip
+    //botão Chip
     const FilterChip = ({ label, selected, onPress }: any) => (
         <TouchableOpacity style={[styles.chip, selected && styles.chipSelected]} onPress={onPress}>
             <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{label}</Text>
@@ -143,12 +143,12 @@ const FilterModal = ({ visible, onClose, onApply }: { visible: boolean; onClose:
                     ))}
                 </View>
 
-                {/* BOTÃO APLICAR */}
+              
                 <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
                     <Text style={styles.applyButtonText}>APLICAR FILTROS</Text>
                 </TouchableOpacity>
 
-                {/* BOTÃO PERDIDOS E ACHADOS */}
+                {/*botão perdidos e achados*/}
              <TouchableOpacity 
                     style={styles.lostFoundButton}
                     onPress={() => {
@@ -167,7 +167,7 @@ const FilterModal = ({ visible, onClose, onApply }: { visible: boolean; onClose:
     );
 };
 
-// --- TELA PRINCIPAL ---
+//tela principal
 export default function TelaAdotar() {
   const [filtroVisivel, setFiltroVisivel] = useState(false);
   const [denunciaVisivel, setDenunciaVisivel] = useState(false);
@@ -267,7 +267,7 @@ export default function TelaAdotar() {
   return (
     <SafeAreaView style={styles.areaSegura}>
       
-      {/* Mancha Azul de Fundo */}
+      {/*mancha azul de fundo*/}
       <View style={styles.bgShapeRight} />
 
       <FilterModal visible={filtroVisivel} onClose={() => setFiltroVisivel(false)} onApply={setFiltrosAplicados} />
@@ -357,10 +357,10 @@ const styles = StyleSheet.create({
   statusAdotado: { backgroundColor: '#FF9500' },
   statusPerdido: { backgroundColor: '#FF3B30' },
   
-  // Fundo Mancha (Visual ONG)
+  // fundo mancha (Visual ONG)
   bgShapeRight: { position: 'absolute', top: 150, right: -50, width: 300, height: 550, backgroundColor: '#94B9D8', borderTopLeftRadius: 200, borderBottomLeftRadius: 200, opacity: 0.6, zIndex: -1 },
 
-  // --- ESTILOS DO MODAL FILTRO ---
+  //estilos do Modal de Filtros
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', flexDirection: 'row' },
   filterSidebar: { width: '80%', backgroundColor: '#fff', padding: 20, borderTopRightRadius: 30, borderBottomRightRadius: 30 },
   modalCloserArea: { width: '20%' },

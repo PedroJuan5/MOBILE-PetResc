@@ -7,13 +7,10 @@ import { DenuncieModal } from '../../../components/denuncieModal';
 import CustomHeaderRight from '../../../components/elementosDireita';
 import CustomHeaderLeft from '../../../components/elementosEsquerda';
 
-// --- CORREÇÃO DO ERRO "setImmediate is not defined" ---
-// O react-native-swiper tenta usar essa função que não existe mais nativamente.
-// Estamos criando ela manualmente aqui.
+
 if (!global.setImmediate) {
   global.setImmediate = ((callback: (...args: any[]) => void) => setTimeout(callback, 0)) as any;
 }
-// ------------------------------------------------------
 
 const voluntarioSlides = [
   {

@@ -1,20 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  Image, 
-  ScrollView, 
-  TouchableOpacity, 
-  Platform, 
-  StatusBar,
-  ActivityIndicator,
-  Alert
-} from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Platform, StatusBar,ActivityIndicator,Alert} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 
-// Dados Mockados para Simulação (Igual aos da lista pública)
+//dados mockados para simulação de API
 const BANCO_DE_DADOS_PUBLICO: any = {
   '1': {
     nome: "Branquinho",
@@ -97,7 +86,7 @@ export default function DetalhesPetUsuarioScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simula busca na API
+    //simula busca na API
     setTimeout(() => {
       const idString = Array.isArray(id) ? id[0] : id; 
       const dados = BANCO_DE_DADOS_PUBLICO[idString || '1']; // Fallback para 1 se nulo
@@ -131,14 +120,13 @@ export default function DetalhesPetUsuarioScreen() {
     <View style={styles.mainContainer}>
       <ScrollView showsVerticalScrollIndicator={false}>
         
-        {/* --- TOPO AZUL (CARD) --- */}
         <View style={styles.headerBackground}>
           
           <TouchableOpacity 
             style={styles.backButton}
-            // MUDANÇA: Volta para a tela de pets disponíveis do usuário
             onPress={() => router.back()} 
           >
+
             <Ionicons name="arrow-back" size={28} color="#2D68A6" />
           </TouchableOpacity>
 
@@ -165,7 +153,6 @@ export default function DetalhesPetUsuarioScreen() {
           </View>
         </View>
 
-        {/* --- CONTEÚDO BRANCO --- */}
         <View style={styles.contentContainer}>
           
           <Text style={styles.sectionTitle}>Características</Text>
@@ -177,7 +164,7 @@ export default function DetalhesPetUsuarioScreen() {
           <View style={styles.charRow}><Text style={styles.charLabel}>COR</Text><Text style={styles.charValue}>{pet.cor}</Text></View>
           <View style={styles.charRow}><Text style={styles.charLabel}>OLHOS</Text><Text style={styles.charValue}>{pet.olhos}</Text></View>
 
-          {/* Botão de Ação do Usuário */}
+          {/*botão de ação do usuário*/}
           <TouchableOpacity 
             style={styles.contactButton}
             onPress={() => Alert.alert("Interesse", "Função de chat/contato será implementada aqui.")}

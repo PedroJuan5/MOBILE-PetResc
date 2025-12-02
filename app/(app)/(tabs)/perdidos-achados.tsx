@@ -54,7 +54,6 @@ const PETS_PERDIDOS: Pet[] = [
     raca: "Sem raça definida (SRD)", 
     genero: "Macho", 
     especie: "Cachorro", 
-    // Adicionei mais um "../" aqui 👇
     imagem: require("../../../assets/images/pets/caramelo.png"), 
     status: 'Perdido', 
     local: "Centro" 
@@ -65,7 +64,6 @@ const PETS_PERDIDOS: Pet[] = [
     raca: "Labrador Retriever", 
     genero: "Macho", 
     especie: "Cachorro", 
-    // Aqui também 👇
     imagem: require("../../../assets/images/pets/shanti.png"), 
     status: 'Perdido', 
     local: "Jd. Flores" 
@@ -76,7 +74,6 @@ const PETS_PERDIDOS: Pet[] = [
     raca: "Dálmata", 
     genero: "Macho", 
     especie: "Cachorro", 
-    // E aqui 👇
     imagem: require("../../../assets/images/pets/branquinho.png"), 
     status: 'Perdido', 
     local: "Zona Sul" 
@@ -87,7 +84,6 @@ const PETS_PERDIDOS: Pet[] = [
     raca: "Sem raça definida (SRD)", 
     genero: "Macho", 
     especie: "Gato", 
-    // E aqui 👇
     imagem: require("../../../assets/images/ui/gatoHome.png"), 
     status: 'Achado', 
     local: "Praça Central" 
@@ -98,7 +94,6 @@ const PETS_PERDIDOS: Pet[] = [
     raca: "SRD", 
     genero: "Macho", 
     especie: "Gato", 
-    // E aqui 👇
     imagem: require("../../../assets/images/pets/neguinho.png"), 
     status: 'Perdido', 
     local: "Vila Nova" 
@@ -109,18 +104,17 @@ const PETS_PERDIDOS: Pet[] = [
     raca: "Angorá", 
     genero: "Fêmea", 
     especie: "Gato", 
-    // E aqui 👇
     imagem: require("../../../assets/images/pets/branquinho.png"), 
     status: 'Achado', 
     local: "Parque" 
   },
 ];
 
-// --- MODAL DE FILTRO ---
+//filtro
 const FilterModal = ({ visible, onClose, onApply }: { visible: boolean; onClose: () => void; onApply: (f: Filtros) => void }) => {
     const router = useRouter();
     
-    // Estados do Filtro
+    //estados do Filtro
     const [isGato, setIsGato] = useState(true);
     const [isCaes, setIsCaes] = useState(true);
     const [isTodos, setIsTodos] = useState(true);
@@ -201,12 +195,12 @@ const FilterModal = ({ visible, onClose, onApply }: { visible: boolean; onClose:
                     <Text style={styles.applyButtonText}>APLICAR FILTROS</Text>
                 </TouchableOpacity>
 
-                {/* --- BOTÃO PARA VOLTAR PARA ADOÇÃO --- */}
+                {/*botão que volta para adoção*/}
                 <TouchableOpacity 
                     style={styles.lostFoundButton}
                     onPress={() => {
                         onClose(); 
-                        // Volta para a aba de pets disponíveis
+                        //volta para a aba de pets disponíveis
                         router.navigate('/(app)/(tabs)/pets-disponiveis' as any); 
                     }}
                 >
@@ -221,7 +215,7 @@ const FilterModal = ({ visible, onClose, onApply }: { visible: boolean; onClose:
     );
 };
 
-// --- TELA PRINCIPAL PERDIDOS E ACHADOS ---
+//perdidos e achados
 export default function PerdidosAchadosScreen() {
   const [filtroVisivel, setFiltroVisivel] = useState(false);
   const [denunciaVisivel, setDenunciaVisivel] = useState(false);
@@ -255,9 +249,9 @@ export default function PerdidosAchadosScreen() {
 
       <View style={styles.container}>
         
-        {/* --- CABEÇALHO PADRÃO (Igual Pets Disponíveis) --- */}
+        {/*cabeçalho padrão*/}
         <View style={styles.customHeader}>
-          {/* Esquerda: Denúncia */}
+          {/* esquerda: Denuncia*/}
           <TouchableOpacity onPress={() => setDenunciaVisivel(true)}>
             <Ionicons name="alert-circle-outline" size={28} color="#2D68A6" />
           </TouchableOpacity>
@@ -265,13 +259,13 @@ export default function PerdidosAchadosScreen() {
           {/* Centro: Título */}
           <Text style={styles.headerTitle}>Perdidos e Achados</Text>
 
-          {/* Direita: Notificação */}
+          {/* Direita: notificação */}
           <TouchableOpacity onPress={() => router.push('/notificacoes')}>
             <Ionicons name="notifications-outline" size={28} color="#2D68A6" /> 
           </TouchableOpacity>
         </View>
 
-        {/* --- SUB-CABEÇALHO --- */}
+        {/*sub cabeçalho*/}
         <View style={styles.subCabecalho}>
           <TouchableOpacity onPress={() => setFiltroVisivel(true)}>
             <Ionicons name="menu" size={32} color="#2D68A6" />
