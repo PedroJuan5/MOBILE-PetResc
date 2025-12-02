@@ -1,26 +1,10 @@
 import React, { useState, useLayoutEffect, useMemo } from "react";
-import {
-  SafeAreaView,
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  ImageSourcePropType,
-  Image,
-  Dimensions,
-  Modal,
-  Switch,
-  TextInput,
-  ScrollView,
-  StatusBar,
-  Platform
-} from "react-native";
+import { SafeAreaView, View, Text,StyleSheet, FlatList,TouchableOpacity, ImageSourcePropType,Image, Modal, Switch,TextInput, ScrollView, StatusBar, Platform, Dimensions} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRouter } from "expo-router";
-import { DenuncieModal } from "../../../components/denuncieModal"; // Verifique se o caminho está certo
+import { DenuncieModal } from "../../../components/denuncieModal"; 
 
-// --- TIPOS ---
+// Tipos
 interface Pet {
   id: string;
   nome: string;
@@ -47,7 +31,7 @@ interface Filtros {
 const { width } = Dimensions.get('window');
 const cardWidth = (width - 20 * 3) / 2;
 
-// --- DADOS MOCKADOS ---
+//dados de simulação
 const PETS_COMPLETOS: Pet[] = [
   { id: "1", nome: "Branquinho", raca: "SRD", genero: "Macho", especie: "Gato", idade: "Adulto", tamanho: "Pequeno", imagem: require("../../../assets/images/pets/branquinho.png"), status: 'disponivel' },
   { id: "2", nome: "Shanti",     raca: "SRD", genero: "Fêmea", especie: "Cachorro", idade: "Filhote", tamanho: "Pequeno", imagem: require("../../../assets/images/pets/shanti.png"), status: 'disponivel' },
@@ -57,11 +41,11 @@ const PETS_COMPLETOS: Pet[] = [
   { id: "6", nome: "Caramelo",   raca: "SRD", genero: "Macho", especie: "Cachorro", idade: "Adulto", tamanho: "Medio", imagem: require("../../../assets/images/pets/caramelo.png"), status: 'disponivel' },
 ];
 
-// --- MODAL DE FILTRO (VISUAL ONG) ---
+// modal de filtros(VISUAL ONG)
 const FilterModal = ({ visible, onClose, onApply }: { visible: boolean; onClose: () => void; onApply: (f: Filtros) => void }) => {
     const router = useRouter();
     
-    // Estados do Filtro
+    //estados do Filtro
     const [isGato, setIsGato] = useState(true);
     const [isCaes, setIsCaes] = useState(true);
     const [isTodos, setIsTodos] = useState(true);
@@ -74,12 +58,12 @@ const FilterModal = ({ visible, onClose, onApply }: { visible: boolean; onClose:
     const [racaDigitada, setRacaDigitada] = useState('');
     const [nomeDigitado, setNomeDigitado] = useState('');
 
-    // Toggle Seleção Única (Porte/Idade)
+    //toggle Seleção Única (Porte/Idade)
     const toggleSelection = (currentValue: string, newValue: string, setter: (val: string) => void) => {
         setter(currentValue === newValue ? '' : newValue);
     };
 
-    // Linha com Switch
+    //linha com Switch
     const SwitchRow = ({ label, value, onValueChange }: any) => (
         <View style={styles.switchRow}>
             <Switch 
@@ -93,7 +77,7 @@ const FilterModal = ({ visible, onClose, onApply }: { visible: boolean; onClose:
         </View>
     );
 
-    // Botão Chip
+    //botão Chip
     const FilterChip = ({ label, selected, onPress }: any) => (
         <TouchableOpacity style={[styles.chip, selected && styles.chipSelected]} onPress={onPress}>
             <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{label}</Text>
@@ -152,12 +136,12 @@ const FilterModal = ({ visible, onClose, onApply }: { visible: boolean; onClose:
                     ))}
                 </View>
 
-                {/* BOTÃO APLICAR */}
+              
                 <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
                     <Text style={styles.applyButtonText}>APLICAR FILTROS</Text>
                 </TouchableOpacity>
 
-                {/* BOTÃO PERDIDOS E ACHADOS */}
+                {/*botão perdidos e achados*/}
              <TouchableOpacity 
                     style={styles.lostFoundButton}
                     onPress={() => {
@@ -176,7 +160,7 @@ const FilterModal = ({ visible, onClose, onApply }: { visible: boolean; onClose:
     );
 };
 
-// --- TELA PRINCIPAL ---
+//tela principal
 export default function TelaAdotar() {
   const [filtroVisivel, setFiltroVisivel] = useState(false);
   const [denunciaVisivel, setDenunciaVisivel] = useState(false);
@@ -185,7 +169,7 @@ export default function TelaAdotar() {
   const navigation = useNavigation();
   const router = useRouter();
 
-  // Filtragem
+  //filtragem
   const petsFiltrados = useMemo(() => {
     if (Object.keys(filtrosAplicados).length === 0) return PETS_COMPLETOS;
     return PETS_COMPLETOS.filter((pet) => {
@@ -207,7 +191,6 @@ export default function TelaAdotar() {
   }, [navigation]);
 
  const handlePetPress = (petId: string) => {
-    // Rota para a nova tela de detalhes (na pasta (app))
     router.push({
       pathname: '/(app)/detalhes-pet',
       params: { id: petId }
@@ -217,7 +200,7 @@ export default function TelaAdotar() {
   return (
     <SafeAreaView style={styles.areaSegura}>
       
-      {/* Mancha Azul de Fundo */}
+      {/*mancha azul de fundo*/}
       <View style={styles.bgShapeRight} />
 
       <FilterModal visible={filtroVisivel} onClose={() => setFiltroVisivel(false)} onApply={setFiltrosAplicados} />
@@ -292,10 +275,10 @@ const styles = StyleSheet.create({
   statusAdotado: { backgroundColor: '#FF9500' },
   statusPerdido: { backgroundColor: '#FF3B30' },
   
-  // Fundo Mancha (Visual ONG)
+  // fundo mancha (Visual ONG)
   bgShapeRight: { position: 'absolute', top: 150, right: -50, width: 300, height: 550, backgroundColor: '#94B9D8', borderTopLeftRadius: 200, borderBottomLeftRadius: 200, opacity: 0.6, zIndex: -1 },
 
-  // --- ESTILOS DO MODAL FILTRO ---
+  //estilos do Modal de Filtros
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', flexDirection: 'row' },
   filterSidebar: { width: '80%', backgroundColor: '#fff', padding: 20, borderTopRightRadius: 30, borderBottomRightRadius: 30 },
   modalCloserArea: { width: '20%' },

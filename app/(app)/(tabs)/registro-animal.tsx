@@ -30,7 +30,7 @@ export default function RegistroPet() {
   const [etapa, setEtapa] = useState(1);
   const [dados, setDados] = useState<DadosPet>({});
   const [modalSucesso, setModalSucesso] = useState(false);
-  const navigation = useNavigation(); // Mantido para o 'useLayoutEffect' customizado
+  const navigation = useNavigation(); 
   const router = useRouter();
   const totalEtapas = 4;
 
@@ -164,7 +164,7 @@ export default function RegistroPet() {
 
   return (
     <>
-      {/*Garante que o cabeçalho nativo está desligado*/}
+      {/*garante que o cabeçalho nativo esteja desligado*/}
       <Stack.Screen options={{ headerShown: false }} />
     
       <SafeAreaView style={styles.areaSegura}>
@@ -182,7 +182,6 @@ export default function RegistroPet() {
 
             <Text style={styles.titulo}>Criar registro Pet</Text>
             
-            {/* Espaço vazio para manter o título centralizado */}
             <View style={styles.backButton} /> 
           </View>
           
@@ -236,14 +235,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   subtitulo: { fontSize: 16, color: "#ffffff", marginBottom: 18, textAlign: 'center' }, // Centralizado
-  // Formulário
+  //formulário
   rotulo: { fontSize: 16, fontWeight: "700", color: "#ffffff", marginTop: 12, marginBottom: 8 },
   ajuda: { fontSize: 12, color: "#BFE1F7", marginBottom: 10 },
   campo: { backgroundColor: "#F0F2F5", borderRadius: 10, padding: 12, fontSize: 16, color: "#2D68A6", marginBottom: 8 },
   campoMultiline: { backgroundColor: "#F0F2F5", borderRadius: 10, padding: 12, fontSize: 16, color: "#2D68A6", height: 120, textAlignVertical: "top", marginBottom: 8 },
   seletor: { backgroundColor: "#F0F2F5", borderRadius: 10, justifyContent: "center", marginBottom: 10, overflow: "hidden" },
 
-  // Área de Imagem
+  //area de Imagem
   areaImagem: { height: 200, backgroundColor: "rgba(255,255,255,0.08)", borderRadius: 10, justifyContent: "center", alignItems: "center", padding: 18, borderWidth: 2, borderColor: "#BFE1F7", borderStyle: "dashed", marginBottom: 10 },
   imagemSelecionada: { width: "100%", height: "100%", borderRadius: 8 },
   textoArea: { color: "#ffffff", textAlign: "center", marginTop: 10 },
@@ -256,7 +255,7 @@ const styles = StyleSheet.create({
   botaoAcao: { width: "100%", backgroundColor: "#2D68A6", padding: 14, borderRadius: 10, alignItems: "center", marginTop: 6 },
   textoBotao: { color: "#ffffff", fontSize: 16, fontWeight: "700" },
 
-  // Modal de Sucesso
+  //modal de Sucesso
   fundoModal: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)", justifyContent: "center", alignItems: "center" },
   cardModal: { width: "86%", backgroundColor: "#ffffff", borderRadius: 14, padding: 20, alignItems: "center" },
   tituloModal: { fontSize: 20, fontWeight: "700", color: "#2D68A6", marginBottom: 8 },

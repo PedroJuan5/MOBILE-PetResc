@@ -9,15 +9,15 @@ import CustomHeaderLeft from '../../../components/elementosEsquerda';
 
  //pega um endereço em string, formata para URL e tenta abrir no Maps
 const handleOpenMaps = async (endereco: string) => {
-  // Codifica o endereço para ser usado em uma URL
+  
   const encodedAddress = encodeURIComponent(endereco);
   const url = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
 
   try {
-    // Tenta abrir a URL
+    //tenta abrir a URL
     await Linking.openURL(url);
   } catch (err) {
-    //se falhar (ex: app do Maps não instalado), mostra um alerta
+    //se falhar mostra um alerta
     Alert.alert('Erro', 'Não foi possível abrir o aplicativo de mapas.');
     console.error('Falha ao abrir o link do Maps:', err);
   }

@@ -33,7 +33,7 @@ export default function PublicIndex() {
   const { user, isLoading } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && user) { // Troca 'session' por 'user'
+    if (!isLoading && user) { 
       router.replace('/home');
     }
   }, [user, isLoading]);

@@ -16,7 +16,7 @@ export default function AccountScreen() {
   };
 
   const pickAvatar = async () => {
-    // pedir permissão
+    // pedir permissao
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert('Permissão necessária', 'Precisamos de acesso às suas fotos para alterar a foto de perfil.');
@@ -37,7 +37,7 @@ export default function AccountScreen() {
         const uri = (result as any).assets?.[0]?.uri ?? (result as any).uri;
         if (uri) {
           setAvatarUri(uri);
-          // aqui você pode chamar uma função para enviar a imagem ao servidor
+          // aqui chama uma função para enviar a imagem ao servidor
         }
       }
     } catch (err) {
@@ -46,7 +46,7 @@ export default function AccountScreen() {
   };
 
   const pickFromCamera = async () => {
-    // pedir permissão de câmera
+    // pedir permissão de camera
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert('Permissão necessária', 'Precisamos de acesso à câmera para tirar a foto.');

@@ -50,7 +50,6 @@ export default function PerfilScreen() {
         
         {/* Cabeçalho Superior (Notificação) */}
         <View style={styles.headerTop}>
-          {/* --- MUDANÇA: Adicionado onPress para ir para notificações --- */}
           <TouchableOpacity onPress={irParaNotificacoes}>
             <Ionicons name="notifications-outline" size={28} color="#2D68A6" />
             <View style={styles.notificacaoDot} />
@@ -66,7 +65,6 @@ export default function PerfilScreen() {
           <Text style={styles.username}>Username</Text>
         </View>
 
-        {/* Abas: Meu perfil / Salvos */}
         <View style={styles.toggleContainer}>
           <TouchableOpacity
             style={[styles.toggleButton, abaAtiva === 'perfil' && styles.toggleButtonAtivo]}
@@ -87,10 +85,9 @@ export default function PerfilScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Conteúdo da Aba "Meu Perfil" */}
         {abaAtiva === 'perfil' && (
           <>
-            {/* Informações de Contato e Localização */}
+            {/* Informações de Contato e localizaçao */}
             <View style={styles.infoSection}>
               <View style={styles.infoColumn}>
                 <Text style={styles.infoTitle}>Contato</Text>
@@ -108,7 +105,7 @@ export default function PerfilScreen() {
             <View style={styles.petsSection}>
               <View style={styles.petsHeader}>
                 <Text style={styles.petsTitle}>Meus pets</Text>
-                {/* --- MUDANÇA: Botão de adicionar removido daqui --- */}
+
               </View>
 
               <View style={styles.petsGrid}>
@@ -134,7 +131,6 @@ export default function PerfilScreen() {
           </>
         )}
 
-        {/* Conteúdo da Aba "Salvos" */}
         {abaAtiva === 'salvos' && (
            <View style={{ padding: 40, alignItems: 'center' }}>
              <Text style={{ color: '#3A5C7A' }}>Seus pets favoritos aparecerão aqui.</Text>
@@ -143,7 +139,7 @@ export default function PerfilScreen() {
 
       </ScrollView>
 
-      {/* Botão Flutuante de Configuração */}
+      {/* Botão flutuante de Configuraçao */}
       <TouchableOpacity style={styles.settingsButton} onPress={irParaConfiguracoes}>
         <Ionicons name="settings-outline" size={26} color="#2D68A6" />
       </TouchableOpacity>

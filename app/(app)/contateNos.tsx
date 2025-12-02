@@ -20,14 +20,14 @@ const ContatoScreen = () => {
           <Text style={styles.title}>Contate-nos</Text>
         </View>
 
-        {/* Seção principal de informações */}
+        {/*seção principal de informaçoes*/}
         <View style={styles.content}>
           <Text style={styles.subtitle}>Fale conosco!</Text>
           <Text style={styles.introText}>
             Tem alguma dúvida, sugestão ou problema? Entre em contato pelos canais abaixo:
           </Text>
 
-          {/* 1. E-mail */}
+          {/* 1. e-mail*/}
           <Text style={styles.sectionTitle}>1. E-mail</Text>
           <Text style={styles.listItem}>• petresc@gmail.com</Text>
 
@@ -42,12 +42,12 @@ const ContatoScreen = () => {
           <Text style={styles.listItem}>• durante o horário de</Text>
           <Text style={styles.listItem}>  atendimento: 09:00 - 18:00</Text>
           
-          {/* 4. Redes sociais */}
+          {/* 4.redes sociais */}
           <Text style={styles.sectionTitle}>4. Redes sociais</Text>
           <Text style={styles.listItem}>• Instagram: @petco</Text>
           <Text style={styles.listItem}>• Facebook: /petco</Text>
 
-          {/* 5. Formulário de contato */}
+          {/* 5.formulário de contato */}
           <Text style={styles.sectionTitle}>5. Formulário de contato</Text>
           
           <View style={styles.form}>
@@ -69,7 +69,7 @@ const ContatoScreen = () => {
               <TextInput style={styles.input} />
             </View>
             
-            {/* Botão Enviar */}
+            {/* Botao Enviar */}
             <View style={styles.buttonContainer}>
               <TouchableOpacity style={styles.button}>
                 <Text style={styles.buttonText}>Enviar</Text>
