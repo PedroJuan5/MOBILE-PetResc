@@ -44,16 +44,6 @@ export default function OngTabLayout() {
           tabBarIcon: ({ color, size }) => <Ionicons name="gift-outline" size={size} color={color} />,
         }}
       />
-
-      {/* 4. Solicitações (Coração) */}
-      <Tabs.Screen
-        name="solicitacoes"
-        options={{
-          title: "Interesse",
-          tabBarIcon: ({ color, size }) => <Ionicons name="heart-outline" size={size} color={color} />,
-        }}
-      />
-
       {/* 5. Registro (Sinal de Mais) */}
       <Tabs.Screen
         name="registroAnimal-ong"
