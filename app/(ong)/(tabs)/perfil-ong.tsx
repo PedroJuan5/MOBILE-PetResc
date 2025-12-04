@@ -86,26 +86,28 @@ export default function HomeScreen(): React.ReactElement {
       {/* GRÁFICO 6 MESES */}
       <Text style={styles.graphTitle}>Processos de adoção (6 meses)</Text>
 
-      <View style={styles.chartCard}>
-        <BarChart
-          data={{
-            labels: ["Mai", "Jun", "Jul", "Ago", "Set", "Out"],
-            datasets: [{ data: [23, 12, 25, 16, 22, 7] }]
-          }}
-          width={screenWidth}
-          height={220}
-          fromZero
-          chartConfig={{
-            backgroundGradientFrom: "#fff",
-            backgroundGradientTo: "#fff",
-            decimalPlaces: 0,
-            color: () => "#1A3C6E",
-            labelColor: () => "#1A3C6E",
-            barPercentage: 0.55,
-          }}
-          style={{ borderRadius: 12 }}
-        />
-      </View>
+   <View style={styles.chartCard}>
+  <BarChart
+    data={{
+      labels: ["Mai", "Jun", "Jul", "Ago", "Set", "Out"],
+      datasets: [{ data: [23, 12, 25, 16, 22, 7] }]
+    }}
+    width={screenWidth}
+    height={220}
+    yAxisLabel=""  // <--- ADICIONE ESTA LINHA
+    yAxisSuffix="" // <--- ADICIONE ESTA LINHA
+    fromZero
+    chartConfig={{
+      backgroundGradientFrom: "#fff",
+      backgroundGradientTo: "#fff",
+      decimalPlaces: 0,
+      color: () => "#1A3C6E",
+      labelColor: () => "#1A3C6E",
+      barPercentage: 0.55,
+    }}
+    style={{ borderRadius: 12 }}
+  />
+</View>
 
       {/* GRÁFICO 1 SEMANA */}
       <Text style={styles.graphTitle}>Processos de adoção (1 semana) - (05/10 - 11/10)</Text>

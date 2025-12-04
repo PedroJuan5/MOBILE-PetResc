@@ -19,15 +19,13 @@ export default function RegistradosScreen() {
       {/* BANNER DA ONG */}
       <View style={styles.cardOng}>
         <Image
-          source={require("../../../assets/images/ui/institutoCaramelo.png")}
+          source={require("../../assets/images/ui/institutoCaramelo.png")}
           style={styles.ongImage}
         />
         <View style={styles.ongProfileCircle} />
       </View>
 
       <Text style={styles.ongName}>Nome da ONG</Text>
-      
-     
        
              {/* CONTATO E LOCAL */}
              <View style={styles.infoRow}>
@@ -44,31 +42,87 @@ export default function RegistradosScreen() {
              </View>
        
       {/* BOTÕES */}
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        style={styles.buttonsScrollView}
-      >
-        <TouchableOpacity style={styles.btn} onPress={() => router.push("/perfil-ong")}>
-          <Text style={styles.btnText}>Adotados</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.btn} onPress={() => router.push("/registrados")}>
-          <Text style={styles.btnText}>Registrados</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.btn} onPress={() => router.push("/lar-temporario")}>
-          <Text style={styles.btnText}>Lar Temporario</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.btn} onPress={() => router.push("/doacoes-ong")}>
-          <Text style={styles.btnText}>Doações</Text>
-        </TouchableOpacity>
-      </ScrollView>
+       <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              style={styles.buttonsScrollView}
+            >
+              <TouchableOpacity style={styles.btn} onPress={() => router.push("/perfil-ong")}>
+                <Text style={styles.btnText}>Adotados</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity style={styles.btn} onPress={() => router.push("/registrados")}>
+                <Text style={styles.btnText}>Registrados</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.btn} onPress={() => router.push("/lar-temporario")}>
+                <Text style={styles.btnText}>Lar Temporario</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.btn} onPress={() => router.push("/doacoes-ong")}>
+                <Text style={styles.btnText}>Doações</Text>
+              </TouchableOpacity>
+            </ScrollView>
+      
+      {/* CARD DE PET */}
+      <View style={styles.petCard}>
+        <Image
+          source={require("../../assets/images/pets/branquinho.png")}
+          style={styles.petImg}
+        />
 
-       {/* MENSAGEM INFORMATIVA */}
-      <View style={styles.infoContainer}>
-        <Text style={styles.infoContainerText}>
-          Todos os meses, nossa ONG resgata, cuida e alimenta dezenas de cães e gatos abandonados. Com sua ajuda, podemos salvar ainda mais vidas.
-        </Text>
+        <View style={styles.petInfo}>
+          <Text style={styles.petName}>Nome</Text>
+          <Text style={styles.petSub}>Sem raça definida (SRD) - AD</Text>
+          <Text style={styles.petDetails}>
+            Adotado em 00/00/0000 {"\n"}
+            Status: Visita Agendada
+          </Text>
+ 
+          <TouchableOpacity style={styles.infoButton} onPress={() => router.push("/detalhes-pet-ong")}>
+            <Text style={styles.infoButtonText}>Ver informações</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* CARD DE PET */}
+      <View style={styles.petCard}>
+        <Image
+          source={require("../../assets/images/pets/branquinho.png")}
+          style={styles.petImg}
+        />
+
+        <View style={styles.petInfo}>
+          <Text style={styles.petName}>Nome</Text>
+          <Text style={styles.petSub}>Sem raça definida (SRD) - AD</Text>
+          <Text style={styles.petDetails}>
+            Adotado em 00/00/0000 {"\n"}
+            Status: Visita Agendada
+          </Text>
+ 
+          <TouchableOpacity style={styles.infoButton} onPress={() => router.push("/detalhes-pet-ong")}>
+            <Text style={styles.infoButtonText}>Ver informações</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* CARD DE PET */}
+      <View style={styles.petCard}>
+        <Image
+          source={require("../../assets/images/pets/branquinho.png")}
+          style={styles.petImg}
+        />
+
+        <View style={styles.petInfo}>
+          <Text style={styles.petName}>Nome</Text>
+          <Text style={styles.petSub}>Sem raça definida (SRD) - AD</Text>
+          <Text style={styles.petDetails}>
+            Adotado em 00/00/0000 {"\n"}
+            Status: Visita Agendada
+          </Text>
+ 
+          <TouchableOpacity style={styles.infoButton} onPress={() => router.push("/detalhes-pet-ong")}>
+            <Text style={styles.infoButtonText}>Ver informações</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={{ height: 40 }} />
@@ -176,8 +230,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#87b0ceff",
     borderRadius: 12,
     padding: 15,
-    marginBottom: 20,
+    marginBottom: 30,
     gap: 15,
+    position: "relative",
   },
 
   petImg: {
@@ -194,6 +249,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#1A3C6E",
+    
   },
 
   petSub: {
@@ -208,74 +264,20 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
 
-  graphTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#1A3C6E",
-    marginBottom: 10,
-    marginTop: 5,
-  },
-
-  chartCard: {
-    backgroundColor: "#fff",
-    paddingVertical: 20,
-    borderRadius: 20,
-    marginBottom: 25,
-    elevation: 2,
-    alignItems: "center",
-  },
-
-  statsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 30,
-    elevation: 2,
-  },
-
-  statItem: {
-    alignItems: "center",
-  },
-
-  statNumber: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#1A3C6E",
-  },
-
-  statLabel: {
-    fontSize: 12,
-    color: "#999",
-    marginTop: 5,
-  },
-
   infoButton: {
+    position: "absolute",
+    right: 15,
+    bottom: 15,
+    backgroundColor: "transparent",
     paddingVertical: 6,
     paddingHorizontal: 10,
-    borderRadius: 6,
-    alignSelf: "flex-end",
-    marginTop: 8,
+    borderRadius: 0,
+    elevation: 0,
   },
 
   infoButtonText: {
     color: "#1A3C6E",
     fontWeight: "600",
     fontSize: 12,
-  },
-  infoContainer: {
-    backgroundColor: "#e2e2e2ff",
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 15,
-    elevation: 2,
-  },
-  infoContainerText: {
-    color: "#333",
-    fontSize: 14,
-    lineHeight: 20,
-    textAlign: "left",
-    fontWeight: "500",
   },
 });

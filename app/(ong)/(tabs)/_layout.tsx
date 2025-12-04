@@ -55,7 +55,7 @@ export default function OngTabLayout() {
 
       {/* 6. Perfil (Bonequinho) */}
       <Tabs.Screen
-        name="perfil"
+        name="perfil-ong"
         options={{
           title: "Perfil",
           tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,

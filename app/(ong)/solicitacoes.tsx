@@ -4,8 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 
 // Dados simulados de pessoas interessadas
 const INTERESSADOS = [
-  { id: '1', nome: 'Ana Clara', pet: 'Branquinho', contato: '(11) 99999-9999', imgPet: require('../../../assets/images/pets/branquinho.png') },
-  { id: '2', nome: 'Roberto Alves', pet: 'Zeus', contato: '(11) 98888-8888', imgPet: require('../../../assets/images/pets/zeus.png') },
+  { id: '1', nome: 'Ana Clara', pet: 'Branquinho', contato: '(11) 99999-9999', imgPet: require('../../assets/images/pets/branquinho.png') },
+  { id: '2', nome: 'Roberto Alves', pet: 'Zeus', contato: '(11) 98888-8888', imgPet: require('../../assets/images/pets/zeus.png') },
 ];
 
 export default function SolicitacoesScreen() {

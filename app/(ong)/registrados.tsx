@@ -20,7 +20,7 @@ export default function RegistradosScreen() {
       {/* BANNER DA ONG */}
       <View style={styles.cardOng}>
         <Image
-          source={require("../../../assets/images/ui/institutoCaramelo.png")}
+          source={require("../../assets/images/ui/institutoCaramelo.png")}
           style={styles.ongImage}
         />
         <View style={styles.ongProfileCircle} />
@@ -45,7 +45,7 @@ export default function RegistradosScreen() {
       {/* CARD DE PET */}
       <View style={styles.petCard}>
       <Image
-  source={require("../../../assets/images/pets/branquinho.png")}
+  source={require("../../assets/images/pets/branquinho.png")}
   style={styles.petImg}
 />
 
