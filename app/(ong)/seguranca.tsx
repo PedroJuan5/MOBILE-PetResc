@@ -12,8 +12,8 @@ export default function SegurancaScreen() {
   };
 
   const opcoes = [
-    { id: 1, titulo: 'Alterar senha', icone: 'key-outline', rota: 'AlterarSenha' },
-    { id: 2, titulo: 'Histórico de Solicitações', icone: 'time-outline', rota: 'HistoricoSolicitacoes' },
+    { id: 1, titulo: 'Alterar senha', icone: 'key-outline', rota: '/(ong)/AlterarSenha-ong' },
+    { id: 2, titulo: 'Histórico de Solicitações', icone: 'time-outline', rota: '/(ong)/HistoricoSolicitacoes' },
     { id: 3, titulo: 'Excluir conta', icone: 'trash-outline', rota: null },
   ];
 
@@ -21,7 +21,7 @@ export default function SegurancaScreen() {
     <View style={styles.container}>
       {/* Cabeçalho */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.push("/(app)/menu-configuracoes" as any)}>
+        <TouchableOpacity onPress={() => router.push("/(ong)/menu-configuracoes" as any)}>
           <Ionicons name="arrow-back" size={24} color="#2D68A6" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Segurança</Text>

@@ -1,5 +1,5 @@
-import { AuthProvider, useAuth } from '@/context/AuthContext';
-import { Stack, SplashScreen, useRouter, useSegments } from 'expo-router';
+import { useAuth } from '@/context/AuthContext';
+import { SplashScreen, Stack, useRouter, useSegments } from 'expo-router';
 import React, { useEffect } from 'react';
 
 SplashScreen.preventAutoHideAsync();
@@ -41,13 +41,16 @@ function RootLayoutNav() {
       }}
     >
 
-      <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="formulario-interesse" />
-      <Stack.Screen name="pet/[id]" />
-      <Stack.Screen name="formulario-voluntarios" />
-      <Stack.Screen name="meus-dados" />
-      <Stack.Screen name="seguranca" />
-      <Stack.Screen name="notificacoes" />
+  <Stack.Screen name="(tabs)" />
+  <Stack.Screen name="formulario-interesse" />
+  <Stack.Screen name="pet/[id]" />
+  <Stack.Screen name="formulario-voluntarios" />
+  <Stack.Screen name="meus-dados" />
+  {/* Mostrar header nativo apenas nessas telas específicas */}
+  <Stack.Screen name="seguranca"   />
+  <Stack.Screen name="HistoricoSolicitacoes" options={{ headerShown: true, title: 'Histórico' }} />
+  <Stack.Screen name="notificacoes"  options={{ headerShown: true, title: 'Histórico' }} />
+  <Stack.Screen name="AlterarSenha-ong" options={{ headerShown: true, title: 'Alterar Senha' }} />
     </Stack>
   );
 }

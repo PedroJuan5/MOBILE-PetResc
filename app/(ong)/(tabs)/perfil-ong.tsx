@@ -158,7 +158,9 @@ export default function HomeScreen(): React.ReactElement {
 
       {/* FOOTER */}
       <View style={{ alignItems: "flex-end", marginTop: 20, marginBottom: 40 }}>
-        <Ionicons name="settings-outline" size={28} color="#1A3C6E" />
+        <TouchableOpacity onPress={() => router.push("/(ong)/menuconfiguracoes-ong" as any)}>
+          <Ionicons name="settings-outline" size={28} color="#1A3C6E" />
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
