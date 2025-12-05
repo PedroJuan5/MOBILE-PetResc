@@ -119,7 +119,7 @@ export default function DoacoesOngScreen() {
     </TouchableOpacity>
   );
 
-  // --- CONTEÚDOS (APENAS O QUE ROLA) ---
+  // --- CONTEÚDOS ---
 
   const renderDashboardContent = () => (
     <View style={{ paddingBottom: 100 }}>
@@ -209,6 +209,14 @@ export default function DoacoesOngScreen() {
 
   const renderDonationFormContent = () => (
     <View style={{ paddingBottom: 40 }}>
+        {/* --- HEADER VOLTAR (DENTRO DO CONTEÚDO SCROLLÁVEL DA ETAPA 3) --- */}
+        <View style={styles.backHeaderContainer}>
+            <TouchableOpacity onPress={() => setStep(1)} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
+                <Text style={styles.backButtonText}>Voltar</Text>
+            </TouchableOpacity>
+        </View>
+
         <View style={styles.formContent}>
             <Text style={styles.blueTitle}>Obrigado por apoiar a causa!</Text>
             <Text style={styles.blueSubtitle}>Sua doação ajuda animais a terem uma nova chance.</Text>
@@ -257,21 +265,36 @@ export default function DoacoesOngScreen() {
 
   return (
     <SafeAreaView style={[styles.container, step === 2 && { backgroundColor: COLORS.primary }]} edges={['top', 'left', 'right']}>
+      
       {/* 1. HEADER FIXO (FORA DO SCROLLVIEW) 
-          Ele fica preso no topo da tela. 
+          Só mostramos o header padrão (Dashboard) se estivermos no Step 1.
+          Se estiver no Step 2 (Nova Campanha) mostramos o header azul.
+          Se estiver no Step 3 (Doar), NÃO MOSTRAMOS header fixo (usamos o botão voltar interno).
       */}
-      {step === 2 ? (
+      
+      {step === 1 && (
+        // HEADER PADRÃO (Dashboard)
+        <View style={styles.headerFixed}>
+            <TouchableOpacity onPress={() => setDenunciaVisivel(true)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                <Ionicons name="alert-circle-outline" size={26} color="#D9534F" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Painel de Doações</Text>
+            <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes' as any)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                <Ionicons name="notifications-outline" size={26} color="#2D68A6" />
+            </TouchableOpacity>
+        </View>
+      )}
+
+      {step === 2 && (
         // HEADER AZUL (Nova Campanha)
         <View style={styles.ncHeaderFixed}>
             <TouchableOpacity onPress={() => setStep(1)} style={{padding: 5}}>
                 <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
             </TouchableOpacity>
-            
             <View style={{flex: 1, marginLeft: 10}}>
                 <Ionicons name="alert-circle" size={20} color={COLORS.primary} />
                 <Text style={styles.ncHeaderTitle}>Iniciar uma nova campanha</Text>
             </View>
-
             <View style={styles.headerIcons}>
                 <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes' as any)}>
                     <Ionicons name="notifications" size={24} color="#E57373" />
@@ -282,27 +305,9 @@ export default function DoacoesOngScreen() {
                 </View>
             </View>
         </View>
-      ) : (
-        // HEADER PADRÃO (Dashboard e Doação) - IGUAL AO DA HOME
-        <View style={styles.headerFixed}>
-            {/* Esquerda: Alerta Vermelho */}
-            <TouchableOpacity onPress={() => setDenunciaVisivel(true)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                <Ionicons name="alert-circle-outline" size={26} color="#D9534F" />
-            </TouchableOpacity>
-            
-            {/* Centro: Título */}
-            <Text style={styles.headerTitle}>Painel de Doações</Text>
-            
-            {/* Direita: Notificação Azul */}
-            <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes' as any)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                <Ionicons name="notifications-outline" size={26} color="#2D68A6" />
-            </TouchableOpacity>
-        </View>
       )}
 
-      {/* 2. CONTEÚDO QUE ROLA 
-          Fica abaixo do header e ocupa o resto da tela (flex: 1).
-      */}
+      {/* 2. CONTEÚDO QUE ROLA */}
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
         <StatusBar barStyle={step === 2 ? "light-content" : "dark-content"} backgroundColor={step === 2 ? COLORS.primary : "#FFF"} />
         <DenuncieModal visible={denunciaVisivel} onClose={() => setDenunciaVisivel(false)} />
@@ -344,7 +349,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF', 
     borderBottomWidth: 1, 
     borderBottomColor: '#F0F0F0',
-    // Não precisa de position absolute aqui, pois está antes do ScrollView dentro de um Flex Column
   },
   
   headerTitle: { fontSize: 20, fontWeight: 'bold', color: COLORS.primary },
@@ -360,6 +364,23 @@ const styles = StyleSheet.create({
   },
   ncHeaderTitle: { fontSize: 24, fontWeight: 'bold', color: COLORS.primary, marginTop: 5, lineHeight: 30, width: '70%' },
   headerIcons: { flexDirection: 'row', position: 'absolute', top: 15, right: 20 },
+
+  // --- BOTÃO VOLTAR (Etapa 3) ---
+  backHeaderContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 15,
+    paddingBottom: 5,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: COLORS.primary,
+    fontWeight: 'bold',
+    marginLeft: 5,
+  },
 
   // DASHBOARD CONTENT
   introSection: { padding: 25 },

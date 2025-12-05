@@ -36,7 +36,7 @@ export default function HomeScreen(): React.ReactElement {
           {/* Ícones do Topo (Alerta e Notificação) */}
           <View style={styles.headerIcons}>
             <TouchableOpacity onPress={() => setDenuncieVisible(true)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <Ionicons name="alert-circle-outline" size={26} color="#D9534F" />
+              <Ionicons name="alert-circle-outline" size={26} color="#2D68A6" />
             </TouchableOpacity>
             
             <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes' as any)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>

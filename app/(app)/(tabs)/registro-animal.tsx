@@ -1,10 +1,22 @@
 import React, { useState } from "react"; 
-import { Image, Modal,SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert,} from "react-native";
+import { Image, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert, FlatList } from "react-native";
 import { useNavigation, useRouter, Stack } from "expo-router"; 
 import { Ionicons } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 
+// --- CORES DO SEU OUTRO ARQUIVO ---
+const COLORS = {
+  primary: '#2D68A6',
+  background: '#205A8D',
+  inputBg: '#CFDEE9', // Fundo azul claro dos inputs
+  textLight: '#FFF',
+  textDark: '#2D68A6',
+  placeholder: '#7E9EB6',
+  border: '#A0B4CC',
+  white: '#FFFFFF',
+};
+
+// --- DADOS ---
 interface DadosPet {
   situacao?: string; especie?: string; genero?: string; imagemUri?: string;
   raca?: string; porte?: string; cor?: string; idade?: string;
@@ -14,6 +26,36 @@ interface DadosPet {
 const OPCOES_SITUACAO = ["Perdido", "Para Adoção", "Encontrado"];
 const OPCOES_ESPECIE = ["Cachorro", "Gato", "Outro"];
 const OPCOES_GENERO = ["Macho", "Fêmea"];
+const OPCOES_PORTE = ["Pequeno", "Médio", "Grande"];
+const OPCOES_IDADE = ["Filhote", "Adulto", "Idoso"];
+
+// --- COMPONENTES VISUAIS (COPIADOS DO SEU OUTRO ARQUIVO) ---
+
+const InputField = ({ label, value, onChangeText, placeholder, multiline }: any) => (
+  <View style={styles.inputWrapper}>
+    <Text style={styles.labelText}>{label}</Text>
+    <TextInput
+      style={[styles.input, multiline && { height: 100, textAlignVertical: 'top', paddingTop: 15 }]}
+      value={value || ''}
+      onChangeText={onChangeText}
+      placeholder={placeholder || ""}
+      placeholderTextColor={COLORS.placeholder}
+      multiline={multiline}
+    />
+  </View>
+);
+
+const SelectField = ({ label, value, placeholder, onPress }: any) => (
+  <View style={styles.inputWrapper}>
+    <Text style={styles.labelText}>{label}</Text>
+    <TouchableOpacity style={styles.selectButton} activeOpacity={0.8} onPress={onPress}>
+      <Text style={[styles.selectValueText, !value && { color: COLORS.placeholder }]}>
+        {value || placeholder}
+      </Text>
+      <Ionicons name="chevron-down" size={24} color={COLORS.primary} />
+    </TouchableOpacity>
+  </View>
+);
 
 const IndicadorEtapas = ({ etapaAtual, total }: { etapaAtual: number; total: number }) => (
   <View style={styles.indicadorWrapper}>
@@ -29,8 +71,13 @@ const IndicadorEtapas = ({ etapaAtual, total }: { etapaAtual: number; total: num
 export default function RegistroPet() {
   const [etapa, setEtapa] = useState(1);
   const [dados, setDados] = useState<DadosPet>({});
+  
+  // MODAIS
   const [modalSucesso, setModalSucesso] = useState(false);
-  const navigation = useNavigation(); 
+  const [modalOptionsVisible, setModalOptionsVisible] = useState(false);
+  const [currentOptions, setCurrentOptions] = useState<string[]>([]);
+  const [currentField, setCurrentField] = useState<keyof DadosPet | null>(null);
+
   const router = useRouter();
   const totalEtapas = 4;
 
@@ -39,6 +86,18 @@ export default function RegistroPet() {
 
   const atualizarCampo = (campo: keyof DadosPet, valor: string) =>
     setDados((ant) => ({ ...ant, [campo]: valor }));
+
+  // Função para abrir o modal de seleção (igual ao seu outro arquivo)
+  const openOptionModal = (field: keyof DadosPet, options: string[]) => {
+    setCurrentField(field);
+    setCurrentOptions(options);
+    setModalOptionsVisible(true);
+  };
+
+  const handleSelectOption = (option: string) => {
+    if (currentField) atualizarCampo(currentField, option);
+    setModalOptionsVisible(false);
+  };
 
   const escolherImagem = async () => {
     const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -90,36 +149,37 @@ export default function RegistroPet() {
       case 1:
         return (
           <>
-            <Text style={styles.rotulo}>Situação *</Text>
-            <View style={styles.seletor}>
-              <Picker selectedValue={dados.situacao} onValueChange={(v) => atualizarCampo("situacao", v)}>
-                <Picker.Item label="Selecione..." value="" />
-                {OPCOES_SITUACAO.map((op) => <Picker.Item key={op} label={op} value={op} />)}
-              </Picker>
-            </View>
+            <SelectField 
+              label="Situação *" 
+              value={dados.situacao} 
+              placeholder="Selecione..." 
+              onPress={() => openOptionModal("situacao", OPCOES_SITUACAO)}
+            />
             <Text style={styles.ajuda}>Se seu pet sumiu, o app pode ajudar a encontrá-lo.</Text>
-            <Text style={styles.rotulo}>Espécie *</Text>
-            <View style={styles.seletor}>
-              <Picker selectedValue={dados.especie} onValueChange={(v) => atualizarCampo("especie", v)}>
-                <Picker.Item label="Selecione..." value="" />
-                {OPCOES_ESPECIE.map((op) => <Picker.Item key={op} label={op} value={op} />)}
-              </Picker>
-            </View>
-            <Text style={styles.rotulo}>Gênero *</Text>
-            <View style={styles.seletor}>
-              <Picker selectedValue={dados.genero} onValueChange={(v) => atualizarCampo("genero", v)}>
-                <Picker.Item label="Selecione..." value="" />
-                {OPCOES_GENERO.map((op) => <Picker.Item key={op} label={op} value={op} />)}
-              </Picker>
-            </View>
+            
+            <SelectField 
+              label="Espécie *" 
+              value={dados.especie} 
+              placeholder="Selecione..." 
+              onPress={() => openOptionModal("especie", OPCOES_ESPECIE)}
+            />
+            
+            <SelectField 
+              label="Gênero *" 
+              value={dados.genero} 
+              placeholder="Selecione..." 
+              onPress={() => openOptionModal("genero", OPCOES_GENERO)}
+            />
           </>
         );
       case 2:
         return (
           <>
-            <Text style={styles.rotulo}>Adicione a foto do pet *</Text>
-            <TouchableOpacity style={styles.areaImagem} onPress={escolherImagem} accessibilityLabel="Selecionar imagem">
-              {dados.imagemUri ? ( <Image source={{ uri: dados.imagemUri }} style={styles.imagemSelecionada} /> ) : (
+            <Text style={styles.labelText}>Adicione a foto do pet *</Text>
+            <TouchableOpacity style={styles.areaImagem} onPress={escolherImagem}>
+              {dados.imagemUri ? ( 
+                <Image source={{ uri: dados.imagemUri }} style={styles.imagemSelecionada} /> 
+              ) : (
                 <>
                   <Ionicons name="image-outline" size={48} color="#BFE1F7" />
                   <Text style={styles.textoArea}>Toque para escolher uma imagem</Text>
@@ -131,31 +191,52 @@ export default function RegistroPet() {
       case 3:
         return (
           <>
-            <Text style={styles.rotulo}>Raça</Text>
-            <TextInput style={styles.campo} value={dados.raca} onChangeText={(v) => atualizarCampo("raca", v)} placeholder="Opcional" placeholderTextColor="#7a98b2" />
-            <Text style={styles.rotulo}>Porte</Text>
-            <View style={styles.seletor}>
-              <Picker selectedValue={dados.porte} onValueChange={(v) => atualizarCampo("porte", v)}>
-                <Picker.Item label="Opcional" value="" /><Picker.Item label="Pequeno" value="pequeno" /><Picker.Item label="Médio" value="medio" /><Picker.Item label="Grande" value="grande" />
-              </Picker>
-            </View>
-            <Text style={styles.rotulo}>Cor predominante</Text>
-            <TextInput style={styles.campo} value={dados.cor} onChangeText={(v) => atualizarCampo("cor", v)} placeholder="Opcional" placeholderTextColor="#7a98b2" />
-            <Text style={styles.rotulo}>Idade</Text>
-            <View style={styles.seletor}>
-              <Picker selectedValue={dados.idade} onValueChange={(v) => atualizarCampo("idade", v)}>
-                <Picker.Item label="Opcional" value="" /><Picker.Item label="Filhote" value="filhote" /><Picker.Item label="Adulto" value="adulto" /><Picker.Item label="Idoso" value="idoso" />
-              </Picker>
-            </View>
+            <InputField 
+              label="Raça" 
+              value={dados.raca} 
+              onChangeText={(v: string) => atualizarCampo("raca", v)} 
+              placeholder="Opcional" 
+            />
+            
+            <SelectField 
+              label="Porte" 
+              value={dados.porte} 
+              placeholder="Opcional" 
+              onPress={() => openOptionModal("porte", OPCOES_PORTE)}
+            />
+            
+            <InputField 
+              label="Cor predominante" 
+              value={dados.cor} 
+              onChangeText={(v: string) => atualizarCampo("cor", v)} 
+              placeholder="Opcional" 
+            />
+            
+            <SelectField 
+              label="Idade" 
+              value={dados.idade} 
+              placeholder="Opcional" 
+              onPress={() => openOptionModal("idade", OPCOES_IDADE)}
+            />
           </>
         );
       case 4:
         return (
           <>
-            <Text style={styles.rotulo}>Nome do pet</Text>
-            <TextInput style={styles.campo} value={dados.nome} onChangeText={(v) => atualizarCampo("nome", v)} placeholder="Opcional" placeholderTextColor="#7a98b2" />
-            <Text style={styles.rotulo}>História do pet</Text>
-            <TextInput style={styles.campoMultiline} value={dados.historia} onChangeText={(v) => atualizarCampo("historia", v)} placeholder="Opcional - conte a história do pet..." placeholderTextColor="#7a98b2" multiline />
+            <InputField 
+              label="Nome do pet" 
+              value={dados.nome} 
+              onChangeText={(v: string) => atualizarCampo("nome", v)} 
+              placeholder="Opcional" 
+            />
+            
+            <InputField 
+              label="História do pet" 
+              value={dados.historia} 
+              onChangeText={(v: string) => atualizarCampo("historia", v)} 
+              placeholder="Conte a história do pet..." 
+              multiline={true}
+            />
           </>
         );
       default: return null;
@@ -164,47 +245,66 @@ export default function RegistroPet() {
 
   return (
     <>
-      {/*garante que o cabeçalho nativo esteja desligado*/}
       <Stack.Screen options={{ headerShown: false }} />
     
       <SafeAreaView style={styles.areaSegura}>
-        <ScrollView style={styles.wrapper}>
+        <ScrollView style={styles.wrapper} showsVerticalScrollIndicator={false}>
           
           <View style={styles.headerContainer}>
             {etapa > 1 ? (
-              <TouchableOpacity onPress={voltar} style={styles.backButton} accessibilityLabel="Voltar etapa">
+              <TouchableOpacity onPress={voltar} style={styles.backButton}>
                 <Ionicons name="arrow-back" size={24} color="white" />
               </TouchableOpacity>
             ) : (
-         
               <View style={styles.backButton} /> 
             )}
 
             <Text style={styles.titulo}>Criar registro Pet</Text>
-            
             <View style={styles.backButton} /> 
           </View>
           
           <Text style={styles.subtitulo}>Crie o perfil do pet passo a passo</Text>
+          
           {renderEtapa()}
+          
+          <View style={{ height: 100 }} /> 
         </ScrollView>
 
+        {/* RODAPÉ */}
         <View style={styles.rodape}>
           <IndicadorEtapas etapaAtual={etapa} total={totalEtapas} />
           <TouchableOpacity
             style={styles.botaoAcao}
             onPress={etapa === totalEtapas ? finalizar : handleAvancar}
-            accessibilityLabel={etapa === totalEtapas ? "Finalizar registro" : "Próxima etapa"}>
+          >
             <Text style={styles.textoBotao}>{etapa === totalEtapas ? "Finalizar" : "Prosseguir"}</Text>
           </TouchableOpacity>
         </View>
 
+        {/* MODAL DE SELEÇÃO (Igual ao do arquivo ONG) */}
+        <Modal visible={modalOptionsVisible} transparent animationType="fade">
+          <TouchableOpacity style={styles.modalOverlay} onPress={() => setModalOptionsVisible(false)} activeOpacity={1}>
+              <View style={styles.modalContent}>
+                  <Text style={styles.modalHeaderTitle}>Selecione</Text>
+                  <FlatList 
+                    data={currentOptions} 
+                    keyExtractor={(item) => item} 
+                    renderItem={({item}) => (
+                      <TouchableOpacity style={styles.modalItem} onPress={() => handleSelectOption(item)}>
+                          <Text style={styles.modalItemText}>{item}</Text>
+                      </TouchableOpacity>
+                  )}/>
+              </View>
+          </TouchableOpacity>
+        </Modal>
+
+        {/* MODAL SUCESSO */}
         <Modal visible={modalSucesso} transparent animationType="fade">
           <View style={styles.fundoModal}>
             <View style={styles.cardModal}>
               <Text style={styles.tituloModal}>Registrado com sucesso</Text>
               <Text style={styles.subModal}>O pet foi cadastrado no sistema.</Text>
-              <TouchableOpacity style={styles.botaoModal} onPress={() => { setModalSucesso(false); router.push("/(app)/(tabs)/home"); }} accessibilityLabel="Confirmar">
+              <TouchableOpacity style={styles.botaoModal} onPress={() => { setModalSucesso(false); router.push("/(app)/(tabs)/home"); }}>
                 <Text style={styles.textoBotaoModal}>OK</Text>
               </TouchableOpacity>
             </View>
@@ -216,50 +316,83 @@ export default function RegistroPet() {
 }
 
 const styles = StyleSheet.create({
-  areaSegura: { flex: 1, backgroundColor: "#2D68A6" },
+  areaSegura: { flex: 1, backgroundColor: COLORS.background }, // Usei a cor do outro arquivo
   wrapper: { flex: 1, padding: 22 },
-  headerContainer: {
+  
+  headerContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  backButton: { width: 24, height: 24 },
+  titulo: { fontSize: 24, fontWeight: 'bold', color: COLORS.white, textAlign: 'center' },
+  subtitulo: { fontSize: 16, color: COLORS.white, marginBottom: 18, textAlign: 'center' },
+
+  // --- ESTILOS DOS INPUTS (COPIADOS) ---
+  inputWrapper: { marginBottom: 20 },
+  labelText: { fontSize: 18, color: COLORS.white, fontWeight: '500', marginBottom: 8 },
+  
+  input: {
+    backgroundColor: COLORS.inputBg, // #CFDEE9
+    borderRadius: 6,
+    height: 55,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: COLORS.primary,
+  },
+  
+  selectButton: {
+    backgroundColor: COLORS.inputBg, // #CFDEE9
+    borderRadius: 6,
+    height: 55,
+    paddingHorizontal: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
   },
-  backButton: {
-    width: 24, 
-    height: 24,
-  },
-  titulo: {
-    fontSize: 24, 
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    textAlign: 'center',
-  },
-  subtitulo: { fontSize: 16, color: "#ffffff", marginBottom: 18, textAlign: 'center' }, // Centralizado
-  //formulário
-  rotulo: { fontSize: 16, fontWeight: "700", color: "#ffffff", marginTop: 12, marginBottom: 8 },
-  ajuda: { fontSize: 12, color: "#BFE1F7", marginBottom: 10 },
-  campo: { backgroundColor: "#F0F2F5", borderRadius: 10, padding: 12, fontSize: 16, color: "#2D68A6", marginBottom: 8 },
-  campoMultiline: { backgroundColor: "#F0F2F5", borderRadius: 10, padding: 12, fontSize: 16, color: "#2D68A6", height: 120, textAlignVertical: "top", marginBottom: 8 },
-  seletor: { backgroundColor: "#F0F2F5", borderRadius: 10, justifyContent: "center", marginBottom: 10, overflow: "hidden" },
+  selectValueText: { fontSize: 16, color: COLORS.primary },
+  
+  ajuda: { fontSize: 12, color: "#BFE1F7", marginBottom: 10, marginTop: -10 },
 
-  //area de Imagem
-  areaImagem: { height: 200, backgroundColor: "rgba(255,255,255,0.08)", borderRadius: 10, justifyContent: "center", alignItems: "center", padding: 18, borderWidth: 2, borderColor: "#BFE1F7", borderStyle: "dashed", marginBottom: 10 },
+  // Área de Imagem
+  areaImagem: { 
+    height: 200, 
+    backgroundColor: "rgba(255,255,255,0.08)", 
+    borderRadius: 10, 
+    justifyContent: "center", 
+    alignItems: "center", 
+    padding: 18, 
+    borderWidth: 2, 
+    borderColor: "#BFE1F7", 
+    borderStyle: "dashed", 
+    marginBottom: 10 
+  },
   imagemSelecionada: { width: "100%", height: "100%", borderRadius: 8 },
-  textoArea: { color: "#ffffff", textAlign: "center", marginTop: 10 },
+  textoArea: { color: COLORS.white, textAlign: "center", marginTop: 10 },
 
   // Rodapé
-  rodape: { backgroundColor: "#ffffff", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 18, paddingTop: 12, alignItems: "center" },
+  rodape: { 
+    backgroundColor: COLORS.white, 
+    borderTopLeftRadius: 22, 
+    borderTopRightRadius: 22, 
+    padding: 18, 
+    paddingTop: 12, 
+    alignItems: "center",
+    position: 'absolute', bottom: 0, left: 0, right: 0
+  },
   indicadorWrapper: { flexDirection: "row", gap: 8, marginBottom: 12 },
   indicadorPonto: { width: 10, height: 10, borderRadius: 5, backgroundColor: "#E6F0FA" },
-  indicadorAtivo: { backgroundColor: "#2D68A6" },
-  botaoAcao: { width: "100%", backgroundColor: "#2D68A6", padding: 14, borderRadius: 10, alignItems: "center", marginTop: 6 },
-  textoBotao: { color: "#ffffff", fontSize: 16, fontWeight: "700" },
+  indicadorAtivo: { backgroundColor: COLORS.primary },
+  botaoAcao: { width: "100%", backgroundColor: COLORS.primary, padding: 14, borderRadius: 10, alignItems: "center", marginTop: 6 },
+  textoBotao: { color: COLORS.white, fontSize: 16, fontWeight: "700" },
 
-  //modal de Sucesso
+  // Modais
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalContent: { backgroundColor: COLORS.white, width: '80%', borderRadius: 12, padding: 20, maxHeight: '50%' },
+  modalHeaderTitle: { fontSize: 18, fontWeight: 'bold', color: COLORS.primary, marginBottom: 15, textAlign: 'center' },
+  modalItem: { paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#EEE' },
+  modalItemText: { fontSize: 16, color: '#333', textAlign: 'center' },
+
   fundoModal: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)", justifyContent: "center", alignItems: "center" },
-  cardModal: { width: "86%", backgroundColor: "#ffffff", borderRadius: 14, padding: 20, alignItems: "center" },
-  tituloModal: { fontSize: 20, fontWeight: "700", color: "#2D68A6", marginBottom: 8 },
+  cardModal: { width: "86%", backgroundColor: COLORS.white, borderRadius: 14, padding: 20, alignItems: "center" },
+  tituloModal: { fontSize: 20, fontWeight: "700", color: COLORS.primary, marginBottom: 8 },
   subModal: { fontSize: 14, color: "#3A5C7A", textAlign: "center", marginBottom: 14 },
   botaoModal: { width: "100%", backgroundColor: "#BFE1F7", padding: 12, borderRadius: 10, alignItems: "center" },
-  textoBotaoModal: { color: "#2D68A6", fontWeight: "700" },
+  textoBotaoModal: { color: COLORS.primary, fontWeight: "700" },
 });

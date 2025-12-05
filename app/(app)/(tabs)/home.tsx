@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { DenuncieModal } from '../../../components/denuncieModal';
 import CustomHeaderRight from '../../../components/elementosDireita';
 import CustomHeaderLeft from '../../../components/elementosEsquerda';
+import { useRouter } from 'expo-router';
 
 
  //pega um endereço em string, formata para URL e tenta abrir no Maps
@@ -59,7 +60,7 @@ const ANIMAIS: Animal[] = [
   {
     id: "2",
     nome: "Bigodes",
-    imagem: require("../../../assets/images/ui/gatoHome.png"),
+    imagem: require("../../../assets/images/pets/shanti.png"),
     raca: "Siamês",
     sexo: "M",
     larTemporario: false,
@@ -71,14 +72,14 @@ const ONGS: Ong[] = [
   {
     id: "1",
     nome: "Abrigo do Bairro",
-    imagem: require("../../../assets/images/pets/jimjim.png"),
+    imagem: require("../../../assets/images/ui/maps1.png"),
     endereco:
       "Rua do Saber, 223 - Vila Santo Antônio, Cotia - SP, 06706-281",
   },
   {
     id: "2",
     nome: "Resgate Feliz",
-    imagem: require("../../../assets/images/pets/mel.png"),
+    imagem: require("../../../assets/images/ui/maps2.png"),
     endereco:
       "Avenida da Inovação, 1420 - Vila Santa Antônia, Cotia - SP, 06708-282",
   },
@@ -131,6 +132,7 @@ export default function HomeScreen() {
 
   const [modalVisible, setModalVisible] = useState(false);
   const handleDenunciePress = () => setModalVisible(true);
+  const router = useRouter();
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -174,10 +176,13 @@ export default function HomeScreen() {
                 Com a sua ajuda garantimos comida, atendimento veterinário e
                 um lar temporário seguro enquanto buscamos adoção responsável.
               </Text>
-              <TouchableOpacity style={styles.botaoDoar}>
-                <Text style={styles.textoBotaoDoar}>Doe agora</Text>
-              </TouchableOpacity>
-            </View>
+           <TouchableOpacity 
+        style={styles.botaoDoar}
+        onPress={() => router.push('/doar')}
+       >
+        <Text style={styles.textoBotaoDoar}>Doe agora</Text>
+       </TouchableOpacity>
+       </View>
             <Image
               source={require("../../../assets/images/ui/gatoHome.png")}
               style={styles.imagemContribuicao}

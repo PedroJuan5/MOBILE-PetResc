@@ -94,8 +94,8 @@ export default function HomeScreen(): React.ReactElement {
     }}
     width={screenWidth}
     height={220}
-    yAxisLabel=""  // <--- ADICIONE ESTA LINHA
-    yAxisSuffix="" // <--- ADICIONE ESTA LINHA
+    yAxisLabel=""  
+    yAxisSuffix="" 
     fromZero
     chartConfig={{
       backgroundGradientFrom: "#fff",

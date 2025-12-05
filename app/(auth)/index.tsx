@@ -12,9 +12,6 @@ const FeatureCard = ({ icon, title, description }: { icon: string, title: string
     </View>
     <Text style={styles.featureTitle}>{title}</Text>
     <Text style={styles.featureDescription}>{description}</Text>
-    <TouchableOpacity>
-      <Text style={styles.featureLink}>Saiba mais</Text>
-    </TouchableOpacity>
   </View>
 );
 
