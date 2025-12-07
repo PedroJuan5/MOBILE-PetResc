@@ -1,19 +1,77 @@
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { 
+  SafeAreaView, 
+  StyleSheet, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  View, 
+  Alert, 
+  ActivityIndicator,
+  ScrollView // <--- Adicionado para permitir rolar até o botão
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import api from '@/lib/axios';
 
 export default function AlterarSenhaScreen() {
-    // Estados para controlar a visibilidade de cada campo individualmente
+    const router = useRouter();
+
     const [secureAtual, setSecureAtual] = useState(true);
     const [secureNova, setSecureNova] = useState(true);
     const [secureConfirmar, setSecureConfirmar] = useState(true);
+
+    const [senhaAtual, setSenhaAtual] = useState('');
+    const [novaSenha, setNovaSenha] = useState('');
+    const [confirmarSenha, setConfirmarSenha] = useState('');
+    
+    const [loading, setLoading] = useState(false);
+
+    // FUNÇÃO QUE ENVIA A SENHA
+    const handleAlterarSenha = async () => {
+        if (!senhaAtual || !novaSenha || !confirmarSenha) {
+            Alert.alert("Erro", "Por favor, preencha todos os campos.");
+            return;
+        }
+
+        if (novaSenha.length < 6) {
+            Alert.alert("Erro", "A nova senha deve ter pelo menos 6 caracteres.");
+            return;
+        }
+
+        if (novaSenha !== confirmarSenha) {
+            Alert.alert("Erro", "A nova senha e a confirmação não conferem.");
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            await api.put('/usuarios/me/alterar-senha', {
+                senhaAntiga: senhaAtual,
+                novaSenha: novaSenha
+            });
+
+            Alert.alert("Sucesso", "Senha alterada com sucesso!", [
+                { text: "OK", onPress: () => router.back() }
+            ]);
+
+        } catch (error: any) {
+            console.error(error);
+            const msg = error.response?.data?.error || "Erro ao alterar a senha.";
+            Alert.alert("Erro", msg);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <>
             <Stack.Screen options={{ title: 'Segurança', headerShown: true }} />
             <SafeAreaView style={styles.container}>
-                <View style={styles.content}>
+                {/* Troquei View por ScrollView para o botão não sumir da tela */}
+                <ScrollView contentContainerStyle={styles.content}>
+                    
                     <Text style={styles.title}>Alterar senha</Text>
 
                     {/* Senha Atual */}
@@ -23,6 +81,8 @@ export default function AlterarSenhaScreen() {
                             secureTextEntry={secureAtual} 
                             style={styles.inputField} 
                             placeholderTextColor="#999"
+                            value={senhaAtual}
+                            onChangeText={setSenhaAtual}
                         />
                         <TouchableOpacity onPress={() => setSecureAtual(!secureAtual)}>
                             <Ionicons name={secureAtual ? "eye-off-outline" : "eye-outline"} size={24} color="#3A5C7A" />
@@ -36,6 +96,8 @@ export default function AlterarSenhaScreen() {
                             secureTextEntry={secureNova} 
                             style={styles.inputField} 
                             placeholderTextColor="#999"
+                            value={novaSenha}
+                            onChangeText={setNovaSenha}
                         />
                         <TouchableOpacity onPress={() => setSecureNova(!secureNova)}>
                             <Ionicons name={secureNova ? "eye-off-outline" : "eye-outline"} size={24} color="#3A5C7A" />
@@ -49,16 +111,29 @@ export default function AlterarSenhaScreen() {
                             secureTextEntry={secureConfirmar} 
                             style={styles.inputField} 
                             placeholderTextColor="#999"
+                            value={confirmarSenha}
+                            onChangeText={setConfirmarSenha}
                         />
                         <TouchableOpacity onPress={() => setSecureConfirmar(!secureConfirmar)}>
                             <Ionicons name={secureConfirmar ? "eye-off-outline" : "eye-outline"} size={24} color="#3A5C7A" />
                         </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity style={styles.button} accessibilityRole="button">
-                        <Text style={styles.buttonText}>Finalizar</Text>
+                    {/* ESTE É O BOTÃO QUE ENVIA */}
+                    <TouchableOpacity 
+                        style={styles.button} 
+                        accessibilityRole="button"
+                        onPress={handleAlterarSenha} // <--- A AÇÃO ESTÁ AQUI
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <Text style={styles.buttonText}>Finalizar</Text>
+                        )}
                     </TouchableOpacity>
-                </View>
+
+                </ScrollView>
             </SafeAreaView>
         </>
     );
@@ -71,7 +146,8 @@ const styles = StyleSheet.create({
     },
     content: {
         padding: 20,
-        paddingTop: 40
+        paddingTop: 40,
+        flexGrow: 1 // Garante que o scroll ocupe a tela toda
     },
     title: {
         fontSize: 22,
@@ -99,7 +175,8 @@ const styles = StyleSheet.create({
         padding: 12,
         borderRadius: 10,
         alignItems: 'center',
-        marginTop: 400
+        marginTop: 350, // Reduzi levemente de 400 para 350 para caber em mais telas, mas mantém o visual "lá embaixo"
+        marginBottom: 40 // Margem inferior para segurança
     },
     buttonText: {
         color: '#fff',

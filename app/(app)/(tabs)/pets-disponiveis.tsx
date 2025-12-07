@@ -257,7 +257,9 @@ export default function TelaAdotar() {
   }, [navigation]);
 
   const handlePetPress = (petId: number) => {
-    // Rota para detalhes (passando ID numérico)
+    console.log("Navegando para detalhes do pet:", petId);
+    
+    // Rota dinâmica: /(app)/detalhes-pet?id=123
     router.push({
       pathname: '/(app)/detalhes-pet',
       params: { id: petId }
