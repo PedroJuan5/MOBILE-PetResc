@@ -1,22 +1,29 @@
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, Stack } from "expo-router"; // Importei Stack
 import React from "react";
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { BarChart, LineChart } from "react-native-chart-kit";
 
 const screenWidth = Dimensions.get("window").width - 40;
 
-export default function HomeScreen(): React.ReactElement {
+export default function PerfilOngScreen(): React.ReactElement {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       
-      {/* HEADER */}
+      <Stack.Screen options={{ headerShown: false }} />
+
       <View style={styles.header}>
-        <Ionicons name="home-outline" size={24} color="#1A3C6E" />
-        <Ionicons name="notifications-outline" size={24} color="#1A3C6E" />
+        {/* Botão Home */}
+        <TouchableOpacity onPress={() => router.push('/(ong)/home-ong' as any)}>
+            <Ionicons name="home-outline" size={24} color="#1A3C6E" />
+        </TouchableOpacity>
+
+        {/* Botão Notificações */}
+        <TouchableOpacity onPress={() => router.push('/(ong)/notificacao-ong' as any)}>
+            <Ionicons name="notifications-outline" size={24} color="#1A3C6E" />
+        </TouchableOpacity>
       </View>
 
-      {/* FOTO + NOME ONG */}
       <View style={styles.cardOng}>
         <Image
           source={require("../../../assets/images/ui/institutoCaramelo.png")}
@@ -177,6 +184,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 15,
+    marginTop: 10, 
   },
 
   cardOng: {

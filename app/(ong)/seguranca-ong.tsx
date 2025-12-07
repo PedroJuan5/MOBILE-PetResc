@@ -9,6 +9,8 @@ export default function SegurancaScreen() {
   const handleDelete = () => {
     console.log("Conta excluída com sucesso!");
     setVisible(false);
+    // Aqui seria bom redirecionar para Login
+    router.replace('/'); 
   };
 
   const opcoes = [
@@ -21,9 +23,11 @@ export default function SegurancaScreen() {
     <View style={styles.container}>
       {/* Cabeçalho */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.push("/(ong)/menu-configuracoes" as any)}>
+        {/* --- CORREÇÃO AQUI: USAR router.back() --- */}
+        <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color="#2D68A6" />
         </TouchableOpacity>
+        
         <Text style={styles.headerTitle}>Segurança</Text>
         <View style={{ width: 24 }} />
       </View>
@@ -41,6 +45,7 @@ export default function SegurancaScreen() {
               if (item.id === 3) {
                 setVisible(true);
               } else if (item.rota) {
+                // Aqui mantemos push para ir para frente (ex: mudar senha)
                 router.push(item.rota as any);
               }
             }}
@@ -127,10 +132,7 @@ const styles = StyleSheet.create({
     color: '#2D68A6',
     marginBottom: 16,
   },
-  optionsContainer: {
-    // 'gap' não é suportado pelo StyleSheet do React Native em muitas versões.
-    // Usaremos marginBottom em cada item (.option) para espaçamento.
-  },
+  optionsContainer: {},
   option: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -183,7 +185,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 26,
     marginBottom: 24,
-   
   },
   warning: {
     fontSize: 20,

@@ -8,16 +8,9 @@ export default function ConfigScreen() {
   const router = useRouter();
   const { signOut } = useAuth(); 
   
-  // --- CORREÇÃO DO GO BACK (Com P Maiúsculo) ---
-  const handleGoBackToProfile = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      // Força a rota para o grupo (app) -> (tabs) -> Perfil (com P maiúsculo)
-      router.replace('/(app)/(tabs)/Perfil' as any); 
-    }
+const handleGoBackToProfile = () => {
+    router.push('/(ong)/(tabs)/perfil-ong' as any);
   };
-
   // --- BOTÃO DE SAÍDA ---
   const handleLogout = () => {
     signOut(); 
@@ -62,7 +55,7 @@ export default function ConfigScreen() {
             <Feather name="chevron-right" size={20} color="#2D68A6" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/(ong)/seguranca')}>
+          <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/(ong)/seguranca-ong')}>
             <Ionicons name="lock-closed-outline" size={22} color="#2D68A6" />
             <Text style={styles.itemText}>Segurança</Text>
             <Feather name="chevron-right" size={20} color="#2D68A6" />

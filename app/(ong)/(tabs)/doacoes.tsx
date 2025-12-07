@@ -1,23 +1,12 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  ScrollView, 
-  StatusBar,
-  Image,
-  ImageBackground,
-  Dimensions,
-  TextInput,
-  Modal,
-  Alert
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar,Image,ImageBackground,Dimensions,TextInput,Modal,Alert} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { DenuncieModal } from "../../../components/denuncieModal"; 
+import CustomHeaderRight from '../../../components/elementosDireita';
+import CustomHeaderLeft from '../../../components/elementosEsquerda';
 
 const { width } = Dimensions.get('window');
 
@@ -266,19 +255,14 @@ export default function DoacoesOngScreen() {
   return (
     <SafeAreaView style={[styles.container, step === 2 && { backgroundColor: COLORS.primary }]} edges={['top', 'left', 'right']}>
       
-      {/* 1. HEADER FIXO (FORA DO SCROLLVIEW) 
-          Só mostramos o header padrão (Dashboard) se estivermos no Step 1.
-          Se estiver no Step 2 (Nova Campanha) mostramos o header azul.
-          Se estiver no Step 3 (Doar), NÃO MOSTRAMOS header fixo (usamos o botão voltar interno).
-      */}
       
       {step === 1 && (
         // HEADER PADRÃO (Dashboard)
         <View style={styles.headerFixed}>
             <TouchableOpacity onPress={() => setDenunciaVisivel(true)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                <Ionicons name="alert-circle-outline" size={26} color="#D9534F" />
+                <Ionicons name="alert-circle-outline" size={26} color="#2D68A6" />
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>Painel de Doações</Text>
+          
             <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes' as any)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                 <Ionicons name="notifications-outline" size={26} color="#2D68A6" />
             </TouchableOpacity>
@@ -296,7 +280,7 @@ export default function DoacoesOngScreen() {
                 <Text style={styles.ncHeaderTitle}>Iniciar uma nova campanha</Text>
             </View>
             <View style={styles.headerIcons}>
-                <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes' as any)}>
+                <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes-ong' as any)}>
                     <Ionicons name="notifications" size={24} color="#E57373" />
                 </TouchableOpacity>
                 <View style={{marginLeft: 10}}>

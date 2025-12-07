@@ -218,7 +218,7 @@ export default function PetsOngScreen() {
             <Ionicons name="menu-outline" size={32} color="#2D68A6" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Animais da ONG</Text>
-          <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes' as any)}>
+          <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes-ong' as any)}>
             <Ionicons name="notifications-outline" size={28} color="#2D68A6" />
           </TouchableOpacity>
         </View>

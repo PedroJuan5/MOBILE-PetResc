@@ -44,8 +44,8 @@ const ContatoScreen = () => {
           
           {/* 4.redes sociais */}
           <Text style={styles.sectionTitle}>4. Redes sociais</Text>
-          <Text style={styles.listItem}>• Instagram: @petco</Text>
-          <Text style={styles.listItem}>• Facebook: /petco</Text>
+          <Text style={styles.listItem}>• Instagram: @petResc</Text>
+          <Text style={styles.listItem}>• Facebook: /petResc</Text>
 
           {/* 5.formulário de contato */}
           <Text style={styles.sectionTitle}>5. Formulário de contato</Text>

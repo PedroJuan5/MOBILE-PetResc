@@ -1,8 +1,7 @@
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
-import { Stack } from 'expo-router';
+import { useRouter } from 'expo-router'; // Importar useRouter
 import React, { useState } from "react";
-import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from "react-native";
-
+import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, StatusBar } from "react-native";
 
 const UNREAD = [
   { id: "1", icon: "alert-circle", text: "Termos de uso e privacidade" },
@@ -13,8 +12,6 @@ const READ = [
   { id: "4", icon: "checkmark-circle", text: "Seu cadastro foi concluído." },
 ];
 
-
-
 const ItemNotificacao = ({ item }: { item: { id: string; icon: string; text: string } }) => (
   <TouchableOpacity style={styles.row} accessibilityRole="button">
     <Ionicons name={item.icon as any} size={24} color="#3A5C7A" />
@@ -24,15 +21,26 @@ const ItemNotificacao = ({ item }: { item: { id: string; icon: string; text: str
 );
 
 export default function Notificacoes() {
+  const router = useRouter(); // Hook de navegação
   const [aba, setAba] = useState<"UNREAD" | "READ">("UNREAD");
 
   const lista = aba === "READ" ? READ : UNREAD;
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" backgroundColor="#F6FBFF" />
+      
+      {/* CABEÇALHO PERSONALIZADO COM SETA DE VOLTAR */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#2D68A6" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Notificações</Text>
+        <View style={{ width: 24 }} /> {/* Espaçador para centralizar título */}
+      </View>
+
       <View style={styles.container}>
-        {/* Define opções de header apenas para esta tela (usa o header do Stack) */}
-  <Stack.Screen options={{ title: 'Notificações', headerShown: true }} />
+        
         {/* Abas (Lidos / Não lidos) */}
         <View style={styles.tabsContainer}>
           <TouchableOpacity
@@ -55,7 +63,7 @@ export default function Notificacoes() {
         </View>
 
         {/* Lista de notificações */}
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false}>
           {lista.map((item) => (
             <ItemNotificacao key={item.id} item={item} />
           ))}
@@ -78,6 +86,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F6FBFF",
   },
+  
+  // ESTILO DO CABEÇALHO
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E6F0FA',
+    backgroundColor: "#F6FBFF",
+  },
+  backButton: {
+    padding: 5,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#2D68A6',
+  },
+
   container: {
     flex: 1,
     paddingHorizontal: 20,
@@ -148,25 +177,5 @@ const styles = StyleSheet.create({
     bottom: 80,
     right: 20,
     transform: [{ rotate: "30deg" }],
-  },
-
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#666",
-    marginBottom: 20,
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 10,
-  },
-  linkText: {
-    color: "#2D68A6",
-    fontSize: 16,
   },
 });

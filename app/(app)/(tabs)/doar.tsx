@@ -198,7 +198,7 @@ export default function DoarUsuarioScreen() {
     </TouchableOpacity>
   );
 
-  // --- RENDER DASHBOARD ---
+  //1.DASHBOARD
   const renderDashboard = () => (
     <View style={{ paddingBottom: 100, paddingHorizontal: 20 }}>
         <Text style={styles.tituloDePagina}>Veja a diferença que você pode fazer!</Text>
@@ -347,14 +347,14 @@ export default function DoarUsuarioScreen() {
     <SafeAreaView style={styles.safeArea}>
       <DenuncieModal visible={modalVisible} onClose={() => setModalVisible(false)} />
 
-      {/* LOADING OVERLAY */}
-      {loadingDetalhes && (
-        <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color="#2D68A6" />
-            <Text style={styles.loadingText}>Carregando detalhes...</Text>
+      {step === 1 && (
+        <View style={styles.iconHeaderContainer}>
+            <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
+            <CustomHeaderRight />
         </View>
       )}
 
+      {/*modal de sucesso*/}
       <Modal visible={showSuccessModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
@@ -384,7 +384,8 @@ export default function DoarUsuarioScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#FFFFFF" },
-  iconHeaderContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, marginTop: 10, paddingHorizontal: 20 },
+  
+
   tituloDePagina: { fontSize: 26, fontWeight: "700", color: "#2D68A6", width: "80%", marginBottom: 20, marginTop: 10 },
   paragraph: { fontSize: 18, lineHeight: 28, color: '#333', textAlign: 'left', marginBottom: 20 },
   cartao: { flexDirection: 'row', backgroundColor: '#fff', marginVertical: 10 },
@@ -392,14 +393,33 @@ const styles = StyleSheet.create({
   caixaTexto: { width: '50%', backgroundColor: '#bcd0e8', alignItems: 'center', justifyContent: 'center', padding: 10 },
   numero: { fontSize: 40, fontWeight: 'bold', color: '#4a6a8a' },
   texto: { fontSize: 18, textAlign: 'center', color: '#4a6a8a' },
-  
+  overlayText: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(45,104,166,0.65)', justifyContent: 'center', alignItems: 'center' },
+
+
   cardOng: { backgroundColor: '#fff', borderRadius: 14, padding: 14, marginBottom: 35, borderWidth: 1, borderColor: '#E5ECF3', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 2, elevation: 1 },
   cardOngImage: { width: '100%', height: 150, borderRadius: 10, backgroundColor: '#eee' }, // Adicionado bg color
   cardOngTitle: { fontSize: 15, fontWeight: '600', marginTop: 8, color: '#000' },
   cardOngAddress: { fontSize: 12, color: '#444', flex: 1 },
 
+  
   formContent: { paddingHorizontal: 20 },
-  ongHeaderImage: { width: '100%', height: 200, borderRadius: 12, marginBottom: 15, marginTop: 20, backgroundColor: '#eee' },
+  
+  ongHeaderImage: { 
+    width: '100%', 
+    height: 200, 
+    borderRadius: 12, 
+    marginBottom: 15,
+    marginTop: 20 
+  },
+   iconHeaderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20, 
+    paddingTop: 10,        
+    paddingBottom: 10,     
+  },
+  
   ongHeaderTitle: { fontSize: 24, fontWeight: 'bold', color: COLORS.primary, marginBottom: 5 },
   ongHeaderLocation: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
   ongHeaderAddress: { fontSize: 13, color: '#666', marginLeft: 5, flex: 1 },
