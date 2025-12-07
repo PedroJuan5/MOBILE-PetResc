@@ -1,14 +1,15 @@
-import React, { useState } from "react"; 
-import { Image, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert, FlatList } from "react-native";
-import { useNavigation, useRouter, Stack } from "expo-router"; 
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import { Stack, useRouter } from "expo-router";
+import React, { useState } from "react";
+import { Alert, FlatList, Image, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from "react-native";
+import api from "@/lib/axios"; // Seu axios configurado
 
-// --- CORES DO SEU OUTRO ARQUIVO ---
+// --- CORES (MANTIDAS) ---
 const COLORS = {
   primary: '#2D68A6',
   background: '#205A8D',
-  inputBg: '#CFDEE9', // Fundo azul claro dos inputs
+  inputBg: '#CFDEE9',
   textLight: '#FFF',
   textDark: '#2D68A6',
   placeholder: '#7E9EB6',
@@ -16,21 +17,23 @@ const COLORS = {
   white: '#FFFFFF',
 };
 
-// --- DADOS ---
+// --- DADOS DO FORMULÁRIO ---
 interface DadosPet {
   situacao?: string; especie?: string; genero?: string; imagemUri?: string;
   raca?: string; porte?: string; cor?: string; idade?: string;
   nome?: string; historia?: string;
 }
 
-const OPCOES_SITUACAO = ["Perdido", "Para Adoção", "Encontrado"];
+const OPCOES_SITUACAO = ["DISPONIVEL", "ENCONTRADO", "ADOTADO"]; // Adaptado para bater com o banco se possível
+// Mas se quiser manter visualmente "Para Adoção", mapeamos no envio.
+const OPCOES_VISUAIS_SITUACAO = ["Perdido", "Para Adoção", "Encontrado"];
+
 const OPCOES_ESPECIE = ["Cachorro", "Gato", "Outro"];
 const OPCOES_GENERO = ["Macho", "Fêmea"];
 const OPCOES_PORTE = ["Pequeno", "Médio", "Grande"];
 const OPCOES_IDADE = ["Filhote", "Adulto", "Idoso"];
 
-// --- COMPONENTES VISUAIS (COPIADOS DO SEU OUTRO ARQUIVO) ---
-
+// --- COMPONENTES VISUAIS (MANTIDOS) ---
 const InputField = ({ label, value, onChangeText, placeholder, multiline }: any) => (
   <View style={styles.inputWrapper}>
     <Text style={styles.labelText}>{label}</Text>
@@ -71,6 +74,7 @@ const IndicadorEtapas = ({ etapaAtual, total }: { etapaAtual: number; total: num
 export default function RegistroPet() {
   const [etapa, setEtapa] = useState(1);
   const [dados, setDados] = useState<DadosPet>({});
+  const [isLoading, setIsLoading] = useState(false); // Loading state
   
   // MODAIS
   const [modalSucesso, setModalSucesso] = useState(false);
@@ -87,7 +91,6 @@ export default function RegistroPet() {
   const atualizarCampo = (campo: keyof DadosPet, valor: string) =>
     setDados((ant) => ({ ...ant, [campo]: valor }));
 
-  // Função para abrir o modal de seleção (igual ao seu outro arquivo)
   const openOptionModal = (field: keyof DadosPet, options: string[]) => {
     setCurrentField(field);
     setCurrentOptions(options);
@@ -102,12 +105,12 @@ export default function RegistroPet() {
   const escolherImagem = async () => {
     const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissao.granted) {
-      alert("Permissão necessária para acessar a galeria de fotos.");
+      Alert.alert("Permissão necessária", "Precisamos acessar sua galeria.");
       return;
     }
     const resultado = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true,
-      aspect: [4, 4], quality: 1,
+      aspect: [4, 4], quality: 0.8, // Qualidade 0.8 para não ficar gigante
     });
     if (!resultado.canceled) {
       atualizarCampo("imagemUri", resultado.assets[0].uri);
@@ -139,9 +142,63 @@ export default function RegistroPet() {
     }
   };
 
-  const finalizar = () => {
-    console.log("Enviar para API:", dados);
-    setModalSucesso(true);
+  // --- INTEGRAÇÃO COM BACKEND ---
+  const finalizar = async () => {
+    setIsLoading(true);
+    
+    try {
+      // 1. Preparar FormData (Necessário para upload de imagem)
+      const formData = new FormData();
+
+      // Mapeamento de campos visuais para o banco
+      let statusBanco = 'DISPONIVEL';
+      if (dados.situacao === 'Perdido') statusBanco = 'PERDIDO'; // Se seu banco suportar
+      if (dados.situacao === 'Encontrado') statusBanco = 'ENCONTRADO';
+
+      formData.append('nome', dados.nome || 'Sem nome');
+      formData.append('especie', dados.especie || '');
+      formData.append('raca', dados.raca || 'SRD');
+      formData.append('porte', dados.porte || '');
+      formData.append('sexo', dados.genero === 'Macho' ? 'MACHO' : 'FEMEA');
+      formData.append('descricao', dados.historia || ''); // História vai em descricao
+      formData.append('idade', dados.idade || '');
+      formData.append('cor', dados.cor || ''); // Back mapeia para corPredominante
+      formData.append('status', statusBanco);
+
+      // Campos obrigatórios do banco que não estão no form mobile (Defaults)
+      formData.append('tinha_filhotes', 'nao');
+      formData.append('tinha_coleira', 'nao');
+      formData.append('vermifugado', 'nao');
+      formData.append('vacinado', 'nao');
+      formData.append('castrado', 'nao');
+      formData.append('testado_doencas', 'nao');
+
+      // 2. Anexar Imagem
+      if (dados.imagemUri) {
+        const uri = dados.imagemUri;
+        const filename = uri.split('/').pop();
+        const match = /\.(\w+)$/.exec(filename || '');
+        const type = match ? `image/${match[1]}` : `image`;
+
+        // @ts-ignore: O tipo do React Native aceita isso, mas o TS reclama
+        formData.append('imagem', { uri, name: filename, type });
+      }
+
+      // 3. Enviar (IMPORTANTE: Content-Type multipart é automático no axios se passar formData)
+      await api.post('/animais', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      setModalSucesso(true);
+
+    } catch (error) {
+      console.error("Erro ao cadastrar pet:", error);
+      Alert.alert("Erro", "Não foi possível cadastrar o animal. Tente novamente.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderEtapa = () => {
@@ -153,7 +210,7 @@ export default function RegistroPet() {
               label="Situação *" 
               value={dados.situacao} 
               placeholder="Selecione..." 
-              onPress={() => openOptionModal("situacao", OPCOES_SITUACAO)}
+              onPress={() => openOptionModal("situacao", OPCOES_VISUAIS_SITUACAO)}
             />
             <Text style={styles.ajuda}>Se seu pet sumiu, o app pode ajudar a encontrá-lo.</Text>
             
@@ -276,12 +333,17 @@ export default function RegistroPet() {
           <TouchableOpacity
             style={styles.botaoAcao}
             onPress={etapa === totalEtapas ? finalizar : handleAvancar}
+            disabled={isLoading}
           >
-            <Text style={styles.textoBotao}>{etapa === totalEtapas ? "Finalizar" : "Prosseguir"}</Text>
+            {isLoading ? (
+               <ActivityIndicator color={COLORS.white} />
+            ) : (
+               <Text style={styles.textoBotao}>{etapa === totalEtapas ? "Finalizar" : "Prosseguir"}</Text>
+            )}
           </TouchableOpacity>
         </View>
 
-        {/* MODAL DE SELEÇÃO (Igual ao do arquivo ONG) */}
+        {/* MODAL DE SELEÇÃO */}
         <Modal visible={modalOptionsVisible} transparent animationType="fade">
           <TouchableOpacity style={styles.modalOverlay} onPress={() => setModalOptionsVisible(false)} activeOpacity={1}>
               <View style={styles.modalContent}>
@@ -304,7 +366,14 @@ export default function RegistroPet() {
             <View style={styles.cardModal}>
               <Text style={styles.tituloModal}>Registrado com sucesso</Text>
               <Text style={styles.subModal}>O pet foi cadastrado no sistema.</Text>
-              <TouchableOpacity style={styles.botaoModal} onPress={() => { setModalSucesso(false); router.push("/(app)/(tabs)/home"); }}>
+              <TouchableOpacity 
+                style={styles.botaoModal} 
+                onPress={() => { 
+                    setModalSucesso(false); 
+                    // Ajuste a rota para onde deve voltar (Home ou Lista de Pets)
+                    router.back(); 
+                }}
+              >
                 <Text style={styles.textoBotaoModal}>OK</Text>
               </TouchableOpacity>
             </View>
@@ -316,7 +385,7 @@ export default function RegistroPet() {
 }
 
 const styles = StyleSheet.create({
-  areaSegura: { flex: 1, backgroundColor: COLORS.background }, // Usei a cor do outro arquivo
+  areaSegura: { flex: 1, backgroundColor: COLORS.background }, 
   wrapper: { flex: 1, padding: 22 },
   
   headerContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
@@ -324,12 +393,11 @@ const styles = StyleSheet.create({
   titulo: { fontSize: 24, fontWeight: 'bold', color: COLORS.white, textAlign: 'center' },
   subtitulo: { fontSize: 16, color: COLORS.white, marginBottom: 18, textAlign: 'center' },
 
-  // --- ESTILOS DOS INPUTS (COPIADOS) ---
   inputWrapper: { marginBottom: 20 },
   labelText: { fontSize: 18, color: COLORS.white, fontWeight: '500', marginBottom: 8 },
   
   input: {
-    backgroundColor: COLORS.inputBg, // #CFDEE9
+    backgroundColor: COLORS.inputBg, 
     borderRadius: 6,
     height: 55,
     paddingHorizontal: 15,
@@ -338,7 +406,7 @@ const styles = StyleSheet.create({
   },
   
   selectButton: {
-    backgroundColor: COLORS.inputBg, // #CFDEE9
+    backgroundColor: COLORS.inputBg, 
     borderRadius: 6,
     height: 55,
     paddingHorizontal: 15,
@@ -350,7 +418,6 @@ const styles = StyleSheet.create({
   
   ajuda: { fontSize: 12, color: "#BFE1F7", marginBottom: 10, marginTop: -10 },
 
-  // Área de Imagem
   areaImagem: { 
     height: 200, 
     backgroundColor: "rgba(255,255,255,0.08)", 
@@ -366,7 +433,6 @@ const styles = StyleSheet.create({
   imagemSelecionada: { width: "100%", height: "100%", borderRadius: 8 },
   textoArea: { color: COLORS.white, textAlign: "center", marginTop: 10 },
 
-  // Rodapé
   rodape: { 
     backgroundColor: COLORS.white, 
     borderTopLeftRadius: 22, 
@@ -382,7 +448,6 @@ const styles = StyleSheet.create({
   botaoAcao: { width: "100%", backgroundColor: COLORS.primary, padding: 14, borderRadius: 10, alignItems: "center", marginTop: 6 },
   textoBotao: { color: COLORS.white, fontSize: 16, fontWeight: "700" },
 
-  // Modais
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   modalContent: { backgroundColor: COLORS.white, width: '80%', borderRadius: 12, padding: 20, maxHeight: '50%' },
   modalHeaderTitle: { fontSize: 18, fontWeight: 'bold', color: COLORS.primary, marginBottom: 15, textAlign: 'center' },

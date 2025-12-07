@@ -14,9 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-// 1. IMPORTANDO A API CORRETAMENTE
-import api from '../../../lib/axios'; 
-// 2. IMPORTANDO O HOOK CORRETAMENTE
+import api from '@/lib/axios'; // Verifique se o caminho está correto
 import { useFocusEffect } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
@@ -36,7 +34,7 @@ interface Pet {
   id: number;
   nome: string;
   raca: string | null;
-  idade: string | null; // Já formatado ou número
+  idade: string | null;
   photoURL: string | null;
 }
 
@@ -47,42 +45,55 @@ export default function PerfilScreen() {
   // Estados
   const [user, setUser] = useState<UserData | null>(null);
   const [meusPets, setMeusPets] = useState<Pet[]>([]);
-  const [petsSalvos, setPetsSalvos] = useState<Pet[]>([]); // Para favoritos
+  const [petsSalvos, setPetsSalvos] = useState<Pet[]>([]);
   
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Helper de idade
+  const formatIdade = (val: any) => {
+    if (!val) return "";
+    if (typeof val === 'string') return val;
+    return val <= 1 ? "Filhote" : (val >= 8 ? "Idoso" : "Adulto");
+  };
 
   // BUSCAR DADOS
   const fetchDados = useCallback(async () => {
     try {
       // 1. Dados do Usuário
-      const resUser = await api.get('/me');
+      // Rota no arquivo usuarios.js: router.get('/me', ...)
+      const resUser = await api.get('/usuarios/me');
       setUser(resUser.data);
 
       // 2. Meus Pets (Cadastrados por mim)
-      const resMeus = await api.get('/animais/gerenciar/lista');
+      // Rota no arquivo usuarios.js: router.get('/me/animais', ...)
+      const resMeus = await api.get('/usuarios/me/animais');
+      
       const meusFormatados = resMeus.data.map((p: any) => ({
           id: p.id,
           nome: p.nome,
           raca: p.raca || "SRD",
           idade: formatIdade(p.idade),
-          photoURL: p.photoURL
+          photoURL: p.photoURL || p.foto // Tenta os dois nomes por segurança
       }));
       setMeusPets(meusFormatados);
 
-      // 3. Favoritos (Tenta buscar, se falhar, fica vazio)
+      // 3. Favoritos
+      // Rota no arquivo usuarios.js: router.get('/me/favoritos', ...)
       try {
-          const resSalvos = await api.get('/favoritos/meus'); // Se não existir, vai pro catch
-          const salvosFormatados = resSalvos.data.map((item: any) => ({
-              id: item.animal.id,
-              nome: item.animal.nome,
-              raca: item.animal.raca || "SRD",
-              idade: formatIdade(item.animal.idade),
-              photoURL: item.animal.photoURL
+          const resSalvos = await api.get('/usuarios/me/favoritos');
+          
+          // Seu controller retorna a lista de animais direta (res.json(animaisFavoritos))
+          const salvosFormatados = resSalvos.data.map((animal: any) => ({
+              id: animal.id,
+              nome: animal.nome,
+              raca: animal.raca || "SRD",
+              idade: formatIdade(animal.idade),
+              photoURL: animal.photoURL || animal.foto
           }));
           setPetsSalvos(salvosFormatados);
       } catch (err) {
-          console.log("Favoritos não carregados (rota pode não existir)");
+          console.log("Favoritos vazios ou erro na rota.");
           setPetsSalvos([]);
       }
 
@@ -105,24 +116,9 @@ export default function PerfilScreen() {
     fetchDados();
   };
 
-  // NAVEGAÇÃO INTELIGENTE (Igual Web)
   const handlePetPress = (petId: number) => {
-      if (abaAtiva === 'perfil') {
-          // Se é MEU pet -> Gerenciar
-          // router.push(`/(app)/gerenciar-adocao/${petId}`); // Se tiver tela de gerenciar no mobile
-          // Por enquanto, vamos mandar para detalhes ou avisar
-          Alert.alert("Gerenciar Pet", "Funcionalidade de gestão completa disponível na Web.");
-      } else {
-          // Se é FAVORITO -> Ver Detalhes
-          router.push({ pathname: '/(app)/detalhes-pet', params: { id: petId } } as any);
-      }
-  };
-
-  // Helper Idade
-  const formatIdade = (val: any) => {
-      if (!val) return "";
-      if (typeof val === 'string') return val; // Se já vier texto
-      return val <= 1 ? "FI." : (val >= 8 ? "ID." : "AD.");
+      // Ajuste aqui para a rota correta de detalhes do seu app
+      router.push({ pathname: '/(tabs)/adocao', params: { screen: 'detalhes', id: petId } } as any);
   };
 
   const listaExibida = abaAtiva === 'perfil' ? meusPets : petsSalvos;
@@ -143,15 +139,15 @@ export default function PerfilScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#2D68A6']} />}
       >
         
-        {/* Header */}
+        {/* Header (Notificações) */}
         <View style={styles.headerTop}>
           <TouchableOpacity onPress={() => router.push('/notificacoes' as any)}>
             <Ionicons name="notifications-outline" size={28} color="#2D68A6" />
-            <View style={styles.notificacaoDot} />
+            <View style={styles.notificacaoDot} /> 
           </TouchableOpacity>
         </View>
 
-        {/* Perfil Info */}
+        {/* Info do Usuário */}
         <View style={styles.perfilHeader}>
           <View style={styles.banner} />
           <View style={styles.avatarContainer}>
@@ -164,7 +160,7 @@ export default function PerfilScreen() {
           <Text style={styles.username}>{user?.nome || "Usuário"}</Text>
         </View>
 
-        {/* Abas */}
+        {/* Botões de Aba */}
         <View style={styles.toggleContainer}>
           <TouchableOpacity
             style={[styles.toggleButton, abaAtiva === 'perfil' && styles.toggleButtonAtivo]}
@@ -185,23 +181,24 @@ export default function PerfilScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Conteúdo Dinâmico (Muda conforme a aba) */}
-        
-        {/* Se for aba Perfil, mostra info extra */}
+        {/* CONTEÚDO DA ABA PERFIL: Detalhes do Usuário */}
         {abaAtiva === 'perfil' && (
             <View style={styles.infoSection}>
               <View style={styles.infoColumn}>
                 <Text style={styles.infoTitle}>Contato</Text>
-                <Text style={styles.infoText}>{user?.email}</Text>
+                <Text style={styles.infoText} numberOfLines={1}>{user?.email}</Text>
                 <Text style={styles.infoText}>{user?.telefone || "Sem telefone"}</Text>
               </View>
               <View style={styles.infoColumnDireita}>
                 <Text style={styles.infoTitle}>Localização</Text>
-                <Text style={styles.infoText}>{user?.cidade ? `${user.cidade}, ${user.estado}` : "Brasil"}</Text>
+                <Text style={styles.infoText}>
+                    {user?.cidade ? `${user.cidade}, ${user.estado}` : "Local não inf."}
+                </Text>
               </View>
             </View>
         )}
 
+        {/* LISTA DE PETS (Meus ou Salvos) */}
         <View style={styles.petsSection}>
             <View style={styles.petsHeader}>
             <Text style={styles.petsTitle}>
@@ -210,46 +207,55 @@ export default function PerfilScreen() {
             </View>
 
             {listaExibida.length === 0 ? (
-                <Text style={{textAlign: 'center', color: '#888', marginTop: 20}}>
-                    {abaAtiva === 'perfil' ? "Nenhum animal cadastrado." : "Nenhum favorito ainda."}
-                </Text>
+                <View style={{padding: 20, alignItems: 'center'}}>
+                    <Ionicons name="paw-outline" size={40} color="#CCC" />
+                    <Text style={{textAlign: 'center', color: '#888', marginTop: 10}}>
+                        {abaAtiva === 'perfil' 
+                            ? "Você ainda não cadastrou nenhum pet." 
+                            : "Você ainda não favoritou nenhum pet."}
+                    </Text>
+                </View>
             ) : (
             <View style={styles.petsGrid}>
-                {listaExibida.map((pet) => (
-                <View key={pet.id} style={styles.petCard}>
-                    {/* Imagem clicável */}
-                    <TouchableOpacity onPress={() => handlePetPress(pet.id)}>
-                        <Image 
-                            source={pet.photoURL ? { uri: pet.photoURL } : require('../../../assets/images/pets/branquinho.png')} 
-                            style={styles.petImage} 
-                            resizeMode="cover" 
-                        />
-                    </TouchableOpacity>
-                    
-                    <View style={styles.petInfo}>
-                        <View style={styles.petHeaderInfo}>
-                            <Text style={styles.petName} numberOfLines={1}>{pet.nome}</Text>
-                            <Text style={styles.petAge}>{pet.idade}</Text>
-                        </View>
-                        <View style={styles.petFooterInfo}>
-                            <Text style={styles.petBreed} numberOfLines={1}>{pet.raca}</Text>
-                            <TouchableOpacity>
-                                <Ionicons 
-                                    name={abaAtiva === 'salvos' ? "heart" : "paw"} 
-                                    size={16} 
-                                    color={abaAtiva === 'salvos' ? "#FF3B30" : "#2D68A6"} 
+                {listaExibida.map((pet) => {
+                    const imageSource = pet.photoURL 
+                        ? { uri: pet.photoURL } 
+                        : require('../../../assets/images/ui/gato-preto-branco.png');
+
+                    return (
+                        <View key={pet.id} style={styles.petCard}>
+                            <TouchableOpacity onPress={() => handlePetPress(pet.id)}>
+                                <Image 
+                                    source={imageSource} 
+                                    style={styles.petImage} 
+                                    resizeMode="cover" 
                                 />
                             </TouchableOpacity>
+                            
+                            <View style={styles.petInfo}>
+                                <View style={styles.petHeaderInfo}>
+                                    <Text style={styles.petName} numberOfLines={1}>{pet.nome}</Text>
+                                    <Text style={styles.petAge}>{pet.idade}</Text>
+                                </View>
+                                <View style={styles.petFooterInfo}>
+                                    <Text style={styles.petBreed} numberOfLines={1}>{pet.raca}</Text>
+                                    <Ionicons 
+                                        name={abaAtiva === 'salvos' ? "heart" : "paw"} 
+                                        size={16} 
+                                        color={abaAtiva === 'salvos' ? "#FF3B30" : "#2D68A6"} 
+                                    />
+                                </View>
+                            </View>
                         </View>
-                    </View>
-                </View>
-                ))}
+                    );
+                })}
             </View>
             )}
         </View>
 
       </ScrollView>
 
+      {/* Botão Flutuante de Configurações */}
       <TouchableOpacity style={styles.settingsButton} onPress={() => router.push('/menu-configuracoes' as any)}>
         <Ionicons name="settings-outline" size={26} color="#2D68A6" />
       </TouchableOpacity>
@@ -281,7 +287,7 @@ const styles = StyleSheet.create({
   petsTitle: { fontSize: 18, color: '#2D68A6', fontWeight: 'bold' },
   petsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
   petCard: { width: cardWidth, backgroundColor: '#F7F9FC', borderRadius: 15, marginBottom: 15, padding: 10, shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2, elevation: 2 },
-  petImage: { width: '100%', height: 110, borderRadius: 10, marginBottom: 8 },
+  petImage: { width: '100%', height: 110, borderRadius: 10, marginBottom: 8, backgroundColor: '#eee' },
   petInfo: { paddingHorizontal: 2 },
   petHeaderInfo: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
   petName: { fontSize: 15, fontWeight: 'bold', color: '#2D68A6', flex: 1 },

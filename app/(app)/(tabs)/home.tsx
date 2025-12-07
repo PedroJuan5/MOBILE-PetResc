@@ -1,138 +1,136 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
-import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, TouchableOpacity, View, Linking,  Alert } from "react-native";
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useState, useEffect, useCallback } from "react";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Linking, Alert, ActivityIndicator } from "react-native";
 import { DenuncieModal } from '../../../components/denuncieModal';
 import CustomHeaderRight from '../../../components/elementosDireita';
 import CustomHeaderLeft from '../../../components/elementosEsquerda';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
+import api from '@/lib/axios'; 
+import { SafeAreaView } from "react-native";
 
 
- //pega um endereço em string, formata para URL e tenta abrir no Maps
+// --- Função Auxiliar Maps ---
 const handleOpenMaps = async (endereco: string) => {
-  
   const encodedAddress = encodeURIComponent(endereco);
   const url = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
-
   try {
-    //tenta abrir a URL
     await Linking.openURL(url);
   } catch (err) {
-    //se falhar mostra um alerta
     Alert.alert('Erro', 'Não foi possível abrir o aplicativo de mapas.');
-    console.error('Falha ao abrir o link do Maps:', err);
   }
 };
 
-//tipos para TypeScript
+// --- Tipagens ---
 interface Animal {
-  id: string;
+  id: number;
   nome: string;
-  imagem: ImageSourcePropType;
-  raca: string;
-  sexo: string;
-  larTemporario: boolean;
+  photoURL: string | null; // URL do banco
+  especie: string;
+  sexo: string | null;
   status: string;
+  // larTemporario não vem por padrão no listagem simples, adapte se necessário
 }
+
 interface Ong {
-  id: string;
+  id: number;
   nome: string;
-  imagem: ImageSourcePropType;
-  endereco: string;
-}
-interface CartaoAnimalProps {
-  animal: Animal;
-}
-interface CartaoOngProps {
-  ong: Ong;
+  email: string;
+  ong?: {
+    nome?: string;
+    rua?: string;
+    numero?: string;
+    bairro?: string;
+    cidade?: string;
+    estado?: string;
+  }
 }
 
-const ANIMAIS: Animal[] = [
-  {
-    id: "1",
-    nome: "Amendoim",
-    imagem: require("../../../assets/images/pets/caramelo.png"),
-    raca: "Sem raça definida (SRD)",
-    sexo: "F",
-    larTemporario: true,
-    status: "Disponível",
-  },
-  {
-    id: "2",
-    nome: "Bigodes",
-    imagem: require("../../../assets/images/pets/shanti.png"),
-    raca: "Siamês",
-    sexo: "M",
-    larTemporario: false,
-    status: "Em tratamento",
-  },
-];
+// --- Componentes ---
+const CartaoAnimal = ({ animal }: { animal: Animal }) => {
+  // Lógica da imagem: Se tiver URL, usa URI. Se não, usa imagem local.
+  const imageSource = animal.photoURL 
+    ? { uri: animal.photoURL } 
+    : require("../../../assets/images/pets/caramelo.png");
 
-const ONGS: Ong[] = [
-  {
-    id: "1",
-    nome: "Abrigo do Bairro",
-    imagem: require("../../../assets/images/ui/maps1.png"),
-    endereco:
-      "Rua do Saber, 223 - Vila Santo Antônio, Cotia - SP, 06706-281",
-  },
-  {
-    id: "2",
-    nome: "Resgate Feliz",
-    imagem: require("../../../assets/images/ui/maps2.png"),
-    endereco:
-      "Avenida da Inovação, 1420 - Vila Santa Antônia, Cotia - SP, 06708-282",
-  },
-];
-
-//componentes reutilizáveis
-const CartaoAnimal = ({ animal }: CartaoAnimalProps) => (
-  <View style={styles.cartaoAnimal}>
-    <Image source={animal.imagem} style={styles.imagemAnimal} />
-    <View style={styles.infoAnimal}>
-      <Text style={styles.nomeAnimal}>{animal.nome}</Text>
-      <Text style={styles.detalheAnimal}>
-        {animal.raca}  {animal.sexo}
-      </Text>
-      <Text style={styles.detalheAnimal}>
-        {animal.larTemporario ? "Lar temporário" : "Abrigo"}
-      </Text>
-      <Text style={[styles.detalheAnimal, { fontWeight: "700" }]}>
-        Status: {animal.status}
-      </Text>
+  return (
+    <View style={styles.cartaoAnimal}>
+      <Image source={imageSource} style={styles.imagemAnimal} />
+      <View style={styles.infoAnimal}>
+        <Text style={styles.nomeAnimal}>{animal.nome}</Text>
+        <Text style={styles.detalheAnimal}>
+          {animal.especie} {animal.sexo ? `• ${animal.sexo}` : ''}
+        </Text>
+        <Text style={styles.detalheAnimal}>
+          {/* Campo estático ou vindo do banco se tiver */}
+          Abrigo / Lar
+        </Text>
+        <Text style={[styles.detalheAnimal, { fontWeight: "700", color: "#2D68A6" }]}>
+          Status: {animal.status}
+        </Text>
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
-const CartaoOng = ({ ong }: CartaoOngProps) => (
-  <View style={styles.cartaoOng}>
-    <Image source={ong.imagem} style={styles.imagemOng} />
-    <View style={styles.infoOng}>
-      <Text style={styles.nomeOng}>{ong.nome}</Text>
-      <Text style={styles.enderecoOng}>{ong.endereco}</Text>
-      
-      <TouchableOpacity 
-        style={styles.botaoMaps}
-        onPress={() => handleOpenMaps(ong.endereco)} // Chama a função com o endereço da ONG
-      >
-        <Text style={styles.textoBotaoMaps}>Abrir no MAPS</Text>
-        <Ionicons
-          name="location"
-          size={16}
-          color="#2D68A6"
-          style={{ marginLeft: 6 }}
-        />
-      </TouchableOpacity>
+const CartaoOng = ({ ong }: { ong: Ong }) => {
+  // Formata endereço
+  const dadosOng = ong.ong || {};
+  const enderecoCompleto = dadosOng.rua 
+    ? `${dadosOng.rua}, ${dadosOng.numero || ''} - ${dadosOng.bairro || ''}, ${dadosOng.cidade || ''} - ${dadosOng.estado || ''}`
+    : "Endereço não informado";
+  
+  const nomeExibicao = dadosOng.nome || ong.nome;
+
+  return (
+    <View style={styles.cartaoOng}>
+      <Image source={require("../../../assets/images/ui/maps1.png")} style={styles.imagemOng} />
+      <View style={styles.infoOng}>
+        <Text style={styles.nomeOng}>{nomeExibicao}</Text>
+        <Text style={styles.enderecoOng} numberOfLines={2}>{enderecoCompleto}</Text>
+        
+        <TouchableOpacity 
+          style={styles.botaoMaps}
+          onPress={() => handleOpenMaps(enderecoCompleto)} 
+        >
+          <Text style={styles.textoBotaoMaps}>Abrir no MAPS</Text>
+          <Ionicons name="location" size={16} color="#2D68A6" style={{ marginLeft: 6 }} />
+        </TouchableOpacity>
+      </View>
     </View>
-  </View>
-);
-
+  );
+};
 
 export default function HomeScreen() {
-
+  const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
   const handleDenunciePress = () => setModalVisible(true);
-  const router = useRouter();
+
+  // Estados dos Dados
+  const [meusAnimais, setMeusAnimais] = useState<Animal[]>([]);
+  const [ongs, setOngs] = useState<Ong[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Função de Busca
+  const fetchDados = async () => {
+    try {
+      // 1. Busca Meus Animais (Rota específica do usuário logado)
+      // Ajuste a rota '/usuarios/meus-animais' conforme seu arquivo de rotas
+     const resAnimais = await api.get('/usuarios/me/animais');      
+
+      setMeusAnimais(resAnimais.data);
+    } catch (error) {
+      console.error("Erro ao buscar dados da home:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // useFocusEffect recarrega os dados toda vez que a tela ganha foco (útil se você acabou de adicionar um pet)
+  useFocusEffect(
+    useCallback(() => {
+      fetchDados();
+    }, [])
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -149,26 +147,37 @@ export default function HomeScreen() {
 
           <View style={styles.titleContainer}>
             <Text style={styles.tituloDePagina}>Conheça seu novo melhor amigo!</Text>
-
-            <Image 
-              source={require("../../../assets/images/ui/pata.png")} 
-              style={[styles.paw, styles.paw1]} 
-              resizeMode="contain"
-            />
-            <Image 
-              source={require("../../../assets/images/ui/pata.png")} 
-              style={[styles.paw, styles.paw2]} 
-              resizeMode="contain"
-            />
+            <Image source={require("../../../assets/images/ui/pata.png")} style={[styles.paw, styles.paw1]} resizeMode="contain"/>
+            <Image source={require("../../../assets/images/ui/pata.png")} style={[styles.paw, styles.paw2]} resizeMode="contain"/>
           </View>        
 
-          <Text style={styles.subTitulo}>Meus animais</Text>
-          <ScrollView horizontal showsVerticalScrollIndicator={false}>
-            {ANIMAIS.map((a) => (
-              <CartaoAnimal key={a.id} animal={a} />
-            ))}
-          </ScrollView>
+          {/* SESSÃO: MEUS ANIMAIS (Listar apenas animais do usuário) */}
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 15, marginBottom: 15}}>
+             <Text style={styles.subTituloSemMargem}>Meus animais</Text>
+             {/* Botão opcional para adicionar pet rapidamente */}
+             <TouchableOpacity onPress={() => router.push('/(app)/(tabs)/registro-animal')}>
+                <Text style={{color: '#2D68A6', fontWeight: '600'}}>+ Adicionar</Text>
+             </TouchableOpacity>
+          </View>
 
+          {loading ? (
+            <ActivityIndicator size="small" color="#2D68A6" />
+          ) : meusAnimais.length === 0 ? (
+            <View style={{padding: 20, backgroundColor: '#f0f4f8', borderRadius: 10, alignItems: 'center'}}>
+                <Text style={{color: '#666', marginBottom: 5}}>Você ainda não cadastrou animais.</Text>
+                <TouchableOpacity onPress={() => router.push('/(app)/(tabs)/registro-animal')}>
+                    <Text style={{color: '#2D68A6', fontWeight: 'bold'}}>Cadastrar agora</Text>
+                </TouchableOpacity>
+            </View>
+          ) : (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{paddingBottom: 10}}>
+              {meusAnimais.map((a) => (
+                <CartaoAnimal key={a.id} animal={a} />
+              ))}
+            </ScrollView>
+          )}
+
+          {/* SESSÃO: DOAÇÃO */}
           <Text style={styles.subTitulo}>Sua contribuição salva vidas</Text>
           <View style={styles.boxContribuicao}>
             <View style={styles.textoContribuicao}>
@@ -176,23 +185,31 @@ export default function HomeScreen() {
                 Com a sua ajuda garantimos comida, atendimento veterinário e
                 um lar temporário seguro enquanto buscamos adoção responsável.
               </Text>
-           <TouchableOpacity 
-        style={styles.botaoDoar}
-        onPress={() => router.push('/doar')}
-       >
-        <Text style={styles.textoBotaoDoar}>Doe agora</Text>
-       </TouchableOpacity>
-       </View>
+              <TouchableOpacity 
+                style={styles.botaoDoar}
+                onPress={() => router.push('/doar')}
+              >
+                <Text style={styles.textoBotaoDoar}>Doe agora</Text>
+              </TouchableOpacity>
+            </View>
             <Image
               source={require("../../../assets/images/ui/gatoHome.png")}
               style={styles.imagemContribuicao}
             />
           </View>
 
+          {/* SESSÃO: ONGS PRÓXIMAS */}
           <Text style={styles.subTitulo}>ONGs próximas a você</Text>
-          {ONGS.map((o) => (
-            <CartaoOng key={o.id} ong={o} />
-          ))}
+          {loading ? (
+             <ActivityIndicator size="small" color="#2D68A6" />
+          ) : ongs.length === 0 ? (
+             <Text style={{color: '#999'}}>Nenhuma ONG encontrada.</Text>
+          ) : (
+             ongs.map((o) => (
+               <CartaoOng key={o.id} ong={o} />
+             ))
+          )}
+
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -226,21 +243,9 @@ const styles = StyleSheet.create({
     height: 100,
     opacity: 0.5,
   },
-  paw1: {
-    top: -30,
-    right: 50, 
-    transform: [{ rotate: '15deg' }],
-  },
-  paw2: {
-    top: 60, 
-    right: 20, 
-    transform: [{ rotate: '-20deg' }],
-  },
-  paw3: {
-    top: 100, 
-    right: 60, 
-    transform: [{ rotate: '30deg' }],
-  },
+  paw1: { top: -30, right: 50, transform: [{ rotate: '15deg' }] },
+  paw2: { top: 60, right: 20, transform: [{ rotate: '-20deg' }] },
+  
   subTitulo: {
     fontSize: 18,
     fontWeight: "600",
@@ -248,9 +253,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 15,
   },
+  subTituloSemMargem: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#3A5C7A",
+  },
   cartaoAnimal: {
-    width: 300,
-    height: 120,
+    width: 280, // Ajustado para não quebrar layout
+    height: 110,
     backgroundColor: "#E6F0FA",
     borderRadius: 15,
     flexDirection: "row",
@@ -259,8 +269,8 @@ const styles = StyleSheet.create({
   },
   imagemAnimal: { width: 100, height: "100%", resizeMode: "cover" },
   infoAnimal: { flex: 1, padding: 10, justifyContent: "center" },
-  nomeAnimal: { fontSize: 16, fontWeight: "700", color: "#2D68A6" },
-  detalheAnimal: { fontSize: 13, color: "#3A5C7A", marginTop: 9},
+  nomeAnimal: { fontSize: 16, fontWeight: "700", color: "#2D68A6", marginBottom: 2 },
+  detalheAnimal: { fontSize: 13, color: "#3A5C7A", marginTop: 2},
   boxContribuicao: {
     flexDirection: "row",
     alignItems: "center",
@@ -271,7 +281,7 @@ const styles = StyleSheet.create({
   paragrafoContribuicao: {
     fontSize: 14,
     color: "#3A5C7A",
-    lineHeight: 22,
+    lineHeight: 20,
     marginBottom: 20,
   },
   botaoDoar: {
@@ -292,11 +302,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   imagemOng: {
-    width: 80,
-    height: 80,
+    width: 70,
+    height: 70,
     borderRadius: 10,
     marginRight: 15,
     resizeMode: "cover",
+    backgroundColor: '#ccc' // Placeholder color
   },
   infoOng: { flex: 1 },
   nomeOng: { fontSize: 16, fontWeight: "700", color: "#2D68A6" },
