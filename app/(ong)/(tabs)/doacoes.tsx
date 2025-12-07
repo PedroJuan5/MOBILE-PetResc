@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar,Image,ImageBackground,Dimensions,TextInput,Modal,Alert} from 'react-native';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  ScrollView, 
+  StatusBar,
+  Image,
+  ImageBackground,
+  Dimensions,
+  TextInput,
+  Modal,
+  Alert
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -21,19 +34,15 @@ const COLORS = {
 
 export default function DoacoesOngScreen() {
   const router = useRouter();
-  
-  // Controle de Etapas
   const [step, setStep] = useState(1);
   const [denunciaVisivel, setDenunciaVisivel] = useState(false);
 
-  // Estados Formulário
+  // Estados Formulário e Campanha
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const [customValue, setCustomValue] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [totalArrecadado, setTotalArrecadado] = useState(7813);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-
-  // Estados Nova Campanha
   const [campanhaNome, setCampanhaNome] = useState('');
   const [campanhaData, setCampanhaData] = useState('');
   const [campanhaMeta, setCampanhaMeta] = useState('');
@@ -42,13 +51,13 @@ export default function DoacoesOngScreen() {
 
   // --- LÓGICA ---
   const handleFinalizarDoacao = () => {
+    // ... (sua lógica original mantida)
     let valorDoado = 0;
     if (selectedValue === 'custom') {
         valorDoado = parseFloat(customValue.replace(',', '.'));
     } else if (selectedValue) {
         valorDoado = parseFloat(selectedValue);
     }
-
     if (!valorDoado || isNaN(valorDoado) || valorDoado <= 0) {
         Alert.alert("Erro", "Selecione um valor válido.");
         return;
@@ -57,7 +66,6 @@ export default function DoacoesOngScreen() {
         Alert.alert("Erro", "Selecione uma forma de pagamento.");
         return;
     }
-
     setTotalArrecadado(prev => prev + valorDoado);
     setShowSuccessModal(true);
   };
@@ -109,7 +117,6 @@ export default function DoacoesOngScreen() {
   );
 
   // --- CONTEÚDOS ---
-
   const renderDashboardContent = () => (
     <View style={{ paddingBottom: 100 }}>
       <View style={styles.introSection}>
@@ -198,7 +205,6 @@ export default function DoacoesOngScreen() {
 
   const renderDonationFormContent = () => (
     <View style={{ paddingBottom: 40 }}>
-        {/* --- HEADER VOLTAR (DENTRO DO CONTEÚDO SCROLLÁVEL DA ETAPA 3) --- */}
         <View style={styles.backHeaderContainer}>
             <TouchableOpacity onPress={() => setStep(1)} style={styles.backButton}>
                 <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
@@ -252,50 +258,46 @@ export default function DoacoesOngScreen() {
     </View>
   );
 
+  // --- RETURN PRINCIPAL ---
   return (
     <SafeAreaView style={[styles.container, step === 2 && { backgroundColor: COLORS.primary }]} edges={['top', 'left', 'right']}>
-      
-      
+      <StatusBar barStyle={step === 2 ? "light-content" : "dark-content"} backgroundColor={step === 2 ? COLORS.primary : "#FFF"} />
+      <DenuncieModal visible={denunciaVisivel} onClose={() => setDenunciaVisivel(false)} />
+
+      {/* --- HEADER FIXO - BLOCO 1 --- */}
+      {/* Esse View é irmão do ScrollView, logo ele não rola */}
       {step === 1 && (
-        // HEADER PADRÃO (Dashboard)
-        <View style={styles.headerFixed}>
-            <TouchableOpacity onPress={() => setDenunciaVisivel(true)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                <Ionicons name="alert-circle-outline" size={26} color="#2D68A6" />
-            </TouchableOpacity>
-          
-            <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes' as any)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                <Ionicons name="notifications-outline" size={26} color="#2D68A6" />
-            </TouchableOpacity>
+        <View style={styles.headerBlock}>
+            <CustomHeaderLeft onDenunciePress={() => setDenunciaVisivel(true)} />
+            <CustomHeaderRight onNotificationPress={() => router.push('/(ong)/notificacoes-ong' as any)} />
         </View>
       )}
 
+      {/* --- HEADER FIXO - BLOCO 2 (NOVA CAMPANHA) --- */}
       {step === 2 && (
-        // HEADER AZUL (Nova Campanha)
-        <View style={styles.ncHeaderFixed}>
-            <TouchableOpacity onPress={() => setStep(1)} style={{padding: 5}}>
-                <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
-            </TouchableOpacity>
-            <View style={{flex: 1, marginLeft: 10}}>
-                <Ionicons name="alert-circle" size={20} color={COLORS.primary} />
-                <Text style={styles.ncHeaderTitle}>Iniciar uma nova campanha</Text>
-            </View>
-            <View style={styles.headerIcons}>
-                <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes-ong' as any)}>
-                    <Ionicons name="notifications" size={24} color="#E57373" />
+        <View style={styles.ncHeaderBlock}>
+            <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
+                <TouchableOpacity onPress={() => setStep(1)} style={{paddingRight: 10}}>
+                    <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
                 </TouchableOpacity>
-                <View style={{marginLeft: 10}}>
-                    <Ionicons name="paw" size={16} color={COLORS.secondary} />
-                    <Ionicons name="paw" size={16} color={COLORS.secondary} style={{marginLeft: 5, marginTop: 5}} />
+                
+                <View>
+                    <View style={{flexDirection:'row', alignItems:'center'}}>
+                    
+                        <Text style={styles.ncTitle}>Nova Campanha</Text>
+                    </View>
+                
                 </View>
             </View>
+            
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <CustomHeaderRight onNotificationPress={() => router.push('/(ong)/notificacoes-ong' as any)} />
+            </View>
         </View>
       )}
 
-      {/* 2. CONTEÚDO QUE ROLA */}
+      {/* --- CONTEÚDO SCROLLÁVEL --- */}
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
-        <StatusBar barStyle={step === 2 ? "light-content" : "dark-content"} backgroundColor={step === 2 ? COLORS.primary : "#FFF"} />
-        <DenuncieModal visible={denunciaVisivel} onClose={() => setDenunciaVisivel(false)} />
-
         {step === 1 && renderDashboardContent()}
         {step === 2 && renderNewCampaignContent()}
         {step === 3 && renderDonationFormContent()}
@@ -306,9 +308,7 @@ export default function DoacoesOngScreen() {
         <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
                 <Text style={styles.modalTitle}>Doação recebida</Text>
-                <Text style={styles.modalText}>Sua contribuição foi recebida com sucesso e já está ajudando a transformar a vida de cães e gatos resgatados pela (nome da ONG).</Text>
-                <Text style={[styles.modalText, {fontWeight: 'bold', marginTop: 10}]}>Você receberá um e-mail com o comprovante da sua doação.</Text>
-                <View style={styles.modalDivider}/>
+                <Text style={styles.modalText}>Sua contribuição foi recebida com sucesso!</Text>
                 <TouchableOpacity onPress={handleCloseSuccess} style={styles.modalButton}>
                     <Text style={styles.modalButtonText}>OK</Text>
                 </TouchableOpacity>
@@ -323,8 +323,8 @@ export default function DoacoesOngScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFF' },
   
-  // --- HEADER PADRÃO (FIXO) ---
-  headerFixed: { 
+  // HEADER FIXO SIMPLES (DASHBOARD)
+  headerBlock: { 
     flexDirection: 'row', 
     justifyContent: 'space-between', 
     alignItems: 'center', 
@@ -335,38 +335,29 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F0F0F0',
   },
   
-  headerTitle: { fontSize: 20, fontWeight: 'bold', color: COLORS.primary },
-  
-  // --- HEADER NOVA CAMPANHA (FIXO) ---
-  ncHeaderFixed: { 
+  // HEADER FIXO SIMPLES (NOVA CAMPANHA)
+  ncHeaderBlock: { 
     backgroundColor: '#FFF', 
     paddingHorizontal: 20, 
-    paddingVertical: 10,
+    paddingVertical: 15,
     flexDirection: 'row', 
-    alignItems: 'flex-start', 
-    borderBottomRightRadius: 30, 
-  },
-  ncHeaderTitle: { fontSize: 24, fontWeight: 'bold', color: COLORS.primary, marginTop: 5, lineHeight: 30, width: '70%' },
-  headerIcons: { flexDirection: 'row', position: 'absolute', top: 15, right: 20 },
-
-  // --- BOTÃO VOLTAR (Etapa 3) ---
-  backHeaderContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 15,
-    paddingBottom: 5,
-  },
-  backButton: {
-    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomRightRadius: 30, 
+    // Sem absolute, sem zindex maluco, apenas um bloco.
   },
-  backButtonText: {
-    fontSize: 16,
-    color: COLORS.primary,
-    fontWeight: 'bold',
-    marginLeft: 5,
+  ncTitle: { 
+    fontSize: 18, 
+    fontWeight: 'bold', 
+    color: COLORS.primary 
   },
 
-  // DASHBOARD CONTENT
+  // Back Button no Step 3
+  backHeaderContainer: { paddingHorizontal: 20, paddingTop: 15, paddingBottom: 5 },
+  backButton: { flexDirection: 'row', alignItems: 'center' },
+  backButtonText: { fontSize: 16, color: COLORS.primary, fontWeight: 'bold', marginLeft: 5 },
+
+  // DASHBOARD
   introSection: { padding: 25 },
   titleRow: { flexDirection: 'row', marginBottom: 20, width: '80%', justifyContent: 'center' },
   pageTitle: { fontSize: 24, fontWeight: 'bold', color: COLORS.primary, textAlign: 'center', lineHeight: 32 },
@@ -387,7 +378,7 @@ const styles = StyleSheet.create({
   donateSection: { padding: 30, alignItems: 'center' },
   footerText: { fontSize: 15, color: COLORS.primary, textAlign: 'center', marginTop: 15, lineHeight: 22 },
 
-  // NOVA CAMPANHA CONTENT
+  // NOVA CAMPANHA
   ncIntroText: { color: '#FFF', fontSize: 16, textAlign: 'center', marginBottom: 25, lineHeight: 22 },
   ncInputGroup: { marginBottom: 20 },
   ncLabel: { color: '#FFF', fontSize: 16, marginBottom: 8 },
@@ -398,7 +389,7 @@ const styles = StyleSheet.create({
   ncSubmitButton: { backgroundColor: '#FFF', paddingVertical: 15, borderRadius: 30, alignItems: 'center', marginTop: 20, marginBottom: 40 },
   ncSubmitText: { color: COLORS.primary, fontWeight: 'bold', fontSize: 18 },
 
-  // DOAÇÃO FORM CONTENT
+  // FORMULARIO
   formContent: { padding: 25 },
   blueTitle: { fontSize: 20, color: COLORS.primary, textAlign: 'center', marginBottom: 5 },
   blueSubtitle: { fontSize: 18, color: COLORS.primary, textAlign: 'center', marginBottom: 15 },
@@ -414,7 +405,9 @@ const styles = StyleSheet.create({
   radioInputRow: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   inlineInput: { borderBottomWidth: 1, borderBottomColor: '#999', width: 100, padding: 0, height: 20, fontSize: 14 },
   
-  // Footer Arrecadado
+  botaoFinalizar: { backgroundColor: '#2D68A6', width: 180, paddingVertical: 15, borderRadius: 30, alignItems: 'center', alignSelf: 'center', marginTop: 30 },
+  textoBotaoFinalizar: { color: '#FFF', fontSize: 18, fontWeight: 'bold', textTransform: 'uppercase' },
+
   footerInfoBox: { backgroundColor: '#F0F6FA', padding: 20, marginTop: 20, borderTopWidth: 1, borderTopColor: '#E0E0E0' },
   footerContentRow: { flexDirection: 'row', alignItems: 'center' },
   footerTexts: { flex: 1, marginLeft: 15 },
@@ -427,7 +420,6 @@ const styles = StyleSheet.create({
   chartInnerCircle: { justifyContent: 'center', alignItems: 'center' },
   chartPercentage: { fontSize: 14, fontWeight: 'bold', color: '#333' },
 
-  // Modal Styles
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   modalContent: { backgroundColor: '#FFF', borderRadius: 16, padding: 25, width: '90%', alignItems: 'center', elevation: 5 },
   modalTitle: { fontSize: 22, fontWeight: 'bold', color: '#003366', marginBottom: 15 },
