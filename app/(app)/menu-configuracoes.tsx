@@ -8,17 +8,16 @@ export default function ConfigScreen() {
   const router = useRouter();
   const { signOut } = useAuth(); 
   
-  // --- CORREÇÃO DO GO BACK (Com P Maiúsculo) ---
+  
   const handleGoBackToProfile = () => {
     if (router.canGoBack()) {
       router.back();
     } else {
-      // Força a rota para o grupo (app) -> (tabs) -> Perfil (com P maiúsculo)
       router.replace('/(app)/(tabs)/Perfil' as any); 
     }
   };
 
-  // --- BOTÃO DE SAÍDA ---
+  
   const handleLogout = () => {
     signOut(); 
     router.replace('/'); 

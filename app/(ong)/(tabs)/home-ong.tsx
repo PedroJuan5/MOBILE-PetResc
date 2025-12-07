@@ -4,6 +4,10 @@ import React, { useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { DenuncieModal } from "../../../components/denuncieModal"; 
 
+// --- IMPORTAÇÃO DOS SEUS COMPONENTES DE CABEÇALHO ---
+import CustomHeaderRight from '../../../components/elementosDireita';
+import CustomHeaderLeft from '../../../components/elementosEsquerda';
+
 export default function HomeScreen(): React.ReactElement {
   const [denuncieVisible, setDenuncieVisible] = useState<boolean>(false);
   const router = useRouter();
@@ -27,34 +31,33 @@ export default function HomeScreen(): React.ReactElement {
   return (
     <View style={styles.container}>
       
-      {/* ScrollView com pouco padding no final para não sobrar espaço branco */}
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
 
         {/* TOP HEADER */}
         <View style={styles.headerContainer}>
           
-          {/* Ícones do Topo (Alerta e Notificação) */}
+          {/* --- CABEÇALHO OTIMIZADO COM SEUS COMPONENTES --- */}
           <View style={styles.headerIcons}>
-            <TouchableOpacity onPress={() => setDenuncieVisible(true)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <Ionicons name="alert-circle-outline" size={26} color="#2D68A6" />
-            </TouchableOpacity>
             
-            <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes' as any)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <Ionicons name="notifications-outline" size={26} color="#2D68A6" />
-            </TouchableOpacity>
+            {/* Esquerda: Alerta (Abre o modal) */}
+            <CustomHeaderLeft onDenunciePress={() => setDenuncieVisible(true)} />
+            
+            {/* Direita: Notificação (Navega para a tela de notificação da ONG) */}
+            <CustomHeaderRight 
+                onNotificationPress={() => router.push('/(ong)/notificacoes-ong' as any)} 
+            />
+          
           </View>
 
-          {/* --- TÍTULO COM AS PATINHAS (IGUAL AO USUÁRIO) --- */}
+          {/* TÍTULO COM AS PATINHAS */}
           <View style={styles.titleContainer}>
             <Text style={styles.pageTitle}>Conheça seu novo{"\n"}melhor amigo!</Text>
 
-            {/* Pata 1 */}
             <Image 
               source={require("../../../assets/images/ui/pata.png")} 
               style={[styles.paw, styles.paw1]} 
               resizeMode="contain"
             />
-            {/* Pata 2 */}
             <Image 
               source={require("../../../assets/images/ui/pata.png")} 
               style={[styles.paw, styles.paw2]} 
@@ -139,7 +142,15 @@ function Section({ title, subtitle, children }: { title: string; subtitle?: stri
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F0F2F5" },
   headerContainer: { paddingTop: 40, paddingHorizontal: 20, paddingBottom: 15 },
-  headerIcons: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
+  
+  // Header Icons alinhados
+  headerIcons: { 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    marginBottom: 10,
+    alignItems: 'center' 
+  },
+  
   titleContainer: {
     position: 'relative',
     marginBottom: 15,
@@ -148,7 +159,7 @@ const styles = StyleSheet.create({
     fontSize: 24, 
     fontWeight: "700", 
     color: "#2D68A6", 
-    width: "70%", // Limita a largura para o texto não ficar em cima da pata
+    width: "70%", 
     marginTop: 5, 
   },
   paw: {
@@ -183,7 +194,6 @@ const styles = StyleSheet.create({
   verMaisBtn: { alignSelf: "flex-end", marginTop: 5 },
   verMaisText: { color: "#2D68A6", fontWeight: "600" },
 
-  // --- ÁREA DE CAMPANHAS ---
   campanhasContainer: {
     marginTop: 20,
     paddingHorizontal: 20,

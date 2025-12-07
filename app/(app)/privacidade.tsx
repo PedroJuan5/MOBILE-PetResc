@@ -73,11 +73,11 @@ export default function PrivacidadeScreen() {
 
         <Text style={styles.paragraph}>
           Para mais informações ou dúvidas, entre em contato pelo e-mail:
-          suporte@petco.com.br
+          suporte@PetResc.com.br
         </Text>
 
         {/* Seção adicional (Serviço) */}
-        <Text style={styles.sectionTitle}>Serviço PetCo</Text>
+        <Text style={styles.sectionTitle}>Serviço PetResc</Text>
         <Text style={styles.paragraph}>
           Nosso serviço tem como missão promover conexões seguras entre pessoas e animais.
           Acreditamos que cada adoção é um ato de amor e responsabilidade. Trabalhamos para

@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
-import {  View,  Text,  StyleSheet,  TouchableOpacity,  ScrollView,  Image,  TextInput,  Modal,  Alert,  Dimensions,  StatusBar 
-} from 'react-native';
+import {  View,  Text,  StyleSheet,  TouchableOpacity,  ScrollView,  Image,  TextInput,  Modal,  Alert,  Dimensions,  StatusBar, ImageBackground} from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { DenuncieModal } from '../../../components/denuncieModal';
-import CustomHeaderRight from '../../../components/elementosDireita';
-import CustomHeaderLeft from '../../../components/elementosEsquerda';
+import CustomHeaderRight from '../../../components/elementosDireita'; 
+import CustomHeaderLeft from '../../../components/elementosEsquerda'; 
 
 const { width } = Dimensions.get('window');
 
-// CORES DO DESIGN
+//cores
 const COLORS = {
   primary: '#2D68A6',    
   secondary: '#94B9D8',  
@@ -28,12 +27,10 @@ export default function DoarUsuarioScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const handleDenunciePress = () => setModalVisible(true);
 
-  // --- CONTROLE DE ETAPAS ---
+  //controle de etapas
   const [step, setStep] = useState(1); 
-  // 1 = Dashboard (Lista de ONGs)
-  // 3 = Formulário de Doação
 
-  // --- DADOS MOCKADOS (Valores) ---
+  // DADOS MOCKADOS (Valores)
   const [carameloArrecadado, setCarameloArrecadado] = useState(14964);
   const carameloMeta = 30000;
 
@@ -48,7 +45,7 @@ export default function DoarUsuarioScreen() {
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // --- LÓGICA ---
+  //LÓGICA
   const iniciarDoacao = (ong: 'caramelo' | 'suipa') => {
     setOngSelecionada(ong);
     setStep(3);
@@ -105,7 +102,7 @@ export default function DoarUsuarioScreen() {
     return `${Math.min(percent, 100)}%`;
   };
 
-  // --- COMPONENTE RADIO BUTTON ---
+  //COMPONENTE RADIO BUTTON 
   const RadioOption = ({ label, selected, onPress, hasInput, inputValue, onInputChange }: any) => (
     <TouchableOpacity style={styles.radioContainer} onPress={onPress} activeOpacity={0.8}>
       <View style={[styles.radioCircle, selected && styles.radioCircleSelected]} />
@@ -120,9 +117,7 @@ export default function DoarUsuarioScreen() {
     </TouchableOpacity>
   );
 
-  // --- RENDERIZADORES ---
-
-  // 1. DASHBOARD
+  //1.DASHBOARD
   const renderDashboard = () => (
     <View style={{ paddingBottom: 100, paddingHorizontal: 20 }}>
         
@@ -160,7 +155,7 @@ export default function DoarUsuarioScreen() {
         <View style={{ marginTop: 25 }}>
           <Text style={{ color: '#2D68A6', fontSize: 16, fontWeight: '600', marginBottom: 16 }}>Mais populares</Text>
 
-          {/* === CARD 1: INSTITUTO CARAMELO === */}
+          {/*CARD 1: INSTITUTO CARAMELO*/}
           <TouchableOpacity style={styles.cardOng} activeOpacity={0.9} onPress={() => iniciarDoacao('caramelo')}>
             <Image source={require('../../../assets/images/ui/institutoCaramelo.png')} style={styles.cardOngImage} />
             <Text style={styles.cardOngTitle}>Instituto Caramelo</Text>
@@ -181,7 +176,7 @@ export default function DoarUsuarioScreen() {
             </View>
           </TouchableOpacity>
 
-          {/* === CARD 2: SUIPA === */}
+          {/*CARD 2: SUIPA */}
           <TouchableOpacity style={styles.cardOng} activeOpacity={0.9} onPress={() => iniciarDoacao('suipa')}>
             <Image source={require('../../../assets/images/ui/suipa.png')} style={styles.cardOngImage} />
             <Text style={styles.cardOngTitle}>SUIPA</Text>
@@ -227,14 +222,11 @@ export default function DoarUsuarioScreen() {
                 <TouchableOpacity onPress={() => setStep(1)} style={{ padding: 5 }}>
                     <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
                 </TouchableOpacity>
-               
             </View>
 
             <View style={styles.formContent}>
                 
-                {/* --- AQUI ESTÁ O AJUSTE DE ESPAÇAMENTO (marginTop: 20) --- */}
                 <Image source={currentOng.image} style={styles.ongHeaderImage} />
-                {/* -------------------------------------------------------- */}
                 
                 <Text style={styles.ongHeaderTitle}>{currentOng.name}</Text>
                 
@@ -303,7 +295,14 @@ export default function DoarUsuarioScreen() {
     <SafeAreaView style={styles.safeArea}>
       <DenuncieModal visible={modalVisible} onClose={() => setModalVisible(false)} />
 
-      {/* MODAL SUCESSO */}
+      {step === 1 && (
+        <View style={styles.iconHeaderContainer}>
+            <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
+            <CustomHeaderRight />
+        </View>
+      )}
+
+      {/*modal de sucesso*/}
       <Modal visible={showSuccessModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
@@ -318,14 +317,6 @@ export default function DoarUsuarioScreen() {
         </View>
       </Modal>
 
-      {/* HEADER FIXO DO APP */}
-      {step === 1 && (
-        <View style={styles.iconHeaderContainer}>
-            <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
-            <CustomHeaderRight />
-        </View>
-      )}
-
       <ScrollView contentContainerStyle={{flexGrow: 1}} showsVerticalScrollIndicator={false}>
         {step === 1 && renderDashboard()}
         {step === 3 && renderDonationForm()}
@@ -337,8 +328,7 @@ export default function DoarUsuarioScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#FFFFFF" },
   
-  // SEUS ESTILOS ORIGINAIS
-  iconHeaderContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, marginTop: 10, paddingHorizontal: 20 },
+
   tituloDePagina: { fontSize: 26, fontWeight: "700", color: "#2D68A6", width: "80%", marginBottom: 20, marginTop: 10 },
   paragraph: { fontSize: 18, lineHeight: 28, color: '#333', textAlign: 'left', marginBottom: 20 },
   
@@ -350,29 +340,29 @@ const styles = StyleSheet.create({
   texto: { fontSize: 18, textAlign: 'center', color: '#4a6a8a' },
   overlayText: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(45,104,166,0.65)', justifyContent: 'center', alignItems: 'center' },
 
-  // Card ONG
+
   cardOng: { backgroundColor: '#fff', borderRadius: 14, padding: 14, marginBottom: 35, borderWidth: 1, borderColor: '#E5ECF3', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 2, elevation: 1 },
   cardOngImage: { width: '100%', height: 150, borderRadius: 10 },
   cardOngTitle: { fontSize: 15, fontWeight: '600', marginTop: 8, color: '#000' },
   cardOngAddress: { fontSize: 12, color: '#444', flex: 1 },
 
-  boxContribuicao: { flexDirection: "row", alignItems: "center", marginTop: 10, marginBottom: 30 },
-  textoContribuicao: { flex: 1, marginRight: 10 },
-  paragrafoContribuicao: { fontSize: 14, color: "#3A5C7A", lineHeight: 22, marginBottom: 20 },
-  botaoDoar: { backgroundColor: "#BFE1F7", borderRadius: 20, paddingVertical: 10, paddingHorizontal: 20, alignSelf: "flex-start" },
-  textoBotaoDoar: { color: "#2D68A6", fontWeight: "700" },
-  imagemContribuicao: { width: 130, height: 180, resizeMode: "contain" },
-
-  // ESTILOS DO FORMULÁRIO
+  
   formContent: { paddingHorizontal: 20 },
   
-  // ESPAÇAMENTO DA IMAGEM
   ongHeaderImage: { 
     width: '100%', 
     height: 200, 
     borderRadius: 12, 
     marginBottom: 15,
-    marginTop: 20 // <--- AQUI ESTÁ O ESPAÇAMENTO SOLICITADO
+    marginTop: 20 
+  },
+   iconHeaderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20, 
+    paddingTop: 10,        
+    paddingBottom: 10,     
   },
   
   ongHeaderTitle: { fontSize: 24, fontWeight: 'bold', color: COLORS.primary, marginBottom: 5 },
@@ -395,7 +385,7 @@ const styles = StyleSheet.create({
   botaoFinalizar: { backgroundColor: '#2D68A6', width: 180, paddingVertical: 15, borderRadius: 30, alignItems: 'center', alignSelf: 'center', marginTop: 30 },
   textoBotaoFinalizar: { color: '#FFF', fontSize: 18, fontWeight: 'bold', textTransform: 'uppercase' },
 
-  // Footer Arrecadado
+  
   footerInfoBox: { backgroundColor: '#F0F6FA', padding: 20, marginTop: 20, borderTopWidth: 1, borderTopColor: '#E0E0E0' },
   footerContentRow: { flexDirection: 'row', alignItems: 'center' },
   footerTexts: { flex: 1, marginLeft: 15 },
@@ -408,7 +398,6 @@ const styles = StyleSheet.create({
   chartInnerCircle: { justifyContent: 'center', alignItems: 'center' },
   chartPercentage: { fontSize: 14, fontWeight: 'bold', color: '#333' },
 
-  // Modal
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   modalContent: { backgroundColor: '#FFF', borderRadius: 16, padding: 25, width: '90%', alignItems: 'center', elevation: 5 },
   modalTitle: { fontSize: 22, fontWeight: 'bold', color: '#003366', marginBottom: 15 },

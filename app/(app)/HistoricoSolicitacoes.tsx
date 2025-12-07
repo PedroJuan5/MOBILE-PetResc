@@ -1,20 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, Stack } from "expo-router"; 
 import React, { useState } from "react";
-import {
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function HistoricoCliente() {
   const router = useRouter();
   const [filtro, setFiltro] = useState("Adotados");
 
-  // Dados dos pets para cada filtro
   const petsPorFiltro: Record<string, {
     nome: string;
     status: string;
@@ -57,18 +49,18 @@ export default function HistoricoCliente() {
 
   return (
     <View style={styles.container}>
-      {/* HEADER */}
+      <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.push("seguranca" as any)}>
-          <Ionicons name="arrow-back" size={22} color="#2c6eb9ff" />
+        <TouchableOpacity onPress={() => router.back()}>
+             <Ionicons name="arrow-back" size={24} color="#2c6eb9ff" />
         </TouchableOpacity>
 
-        <Text style={styles.titulo}>Segurança</Text>
+        <Text style={styles.titulo}>Historico</Text>
 
-        <View style={{ width: 22 }} />
+      
+        <View style={{ width: 24 }} />
       </View>
 
-      <Text style={styles.subtitulo}>Histórico</Text>
 
       {/* FILTROS */}
       <View style={styles.filtros}>
@@ -132,8 +124,6 @@ export default function HistoricoCliente() {
   );
 }
 
-/* ================== ESTILOS ================== */
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -147,24 +137,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 12,
-    color: "#2c6eb9ff",
     paddingHorizontal: 16,
-    height: 80,
+    height: 60,
   },
 
   titulo: {
     fontSize: 22,
     fontWeight: "600",
     color: "#2c6eb9ff",
-   
-  },
-
-  subtitulo: {
-    fontSize: 22,
-    fontWeight: "600",
-    color: "#2c6eb9ff",
-    marginBottom: 12,
-    paddingHorizontal: 16,
   },
 
   filtros: {
@@ -209,7 +189,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#EFF6FF",
     borderRadius: 14,
     padding: 10,
-    color: "#2c6eb9ff",
     alignItems: "flex-start",
     width: "100%",
     minWidth: 0,
@@ -263,12 +242,10 @@ const styles = StyleSheet.create({
   },
 
   botaoAcompanhamento: {
-    
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 999,
     alignSelf: "flex-start",
-    
   },
 
   textoAcompanhamento: {
