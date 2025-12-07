@@ -1,5 +1,5 @@
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
-import { useRouter } from 'expo-router'; // Importar useRouter
+import { useNavigation, Stack } from 'expo-router'; // 1. Importe useNavigation
 import React, { useState } from "react";
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, StatusBar } from "react-native";
 
@@ -21,7 +21,7 @@ const ItemNotificacao = ({ item }: { item: { id: string; icon: string; text: str
 );
 
 export default function Notificacoes() {
-  const router = useRouter(); // Hook de navegação
+  const navigation = useNavigation(); // 2. Instancie a navegação nativa
   const [aba, setAba] = useState<"UNREAD" | "READ">("UNREAD");
 
   const lista = aba === "READ" ? READ : UNREAD;
@@ -29,14 +29,17 @@ export default function Notificacoes() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#F6FBFF" />
-      
-      {/* CABEÇALHO PERSONALIZADO COM SETA DE VOLTAR */}
+
+      <Stack.Screen options={{ headerShown: false }} />
+
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+     
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color="#2D68A6" />
         </TouchableOpacity>
+        
         <Text style={styles.headerTitle}>Notificações</Text>
-        <View style={{ width: 24 }} /> {/* Espaçador para centralizar título */}
+        <View style={{ width: 24 }} /> 
       </View>
 
       <View style={styles.container}>
@@ -46,8 +49,6 @@ export default function Notificacoes() {
           <TouchableOpacity
             style={[styles.tab, aba === "READ" && styles.activeTab]}
             onPress={() => setAba("READ")}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: aba === "READ" }}
           >
             <Text style={[styles.tabText, aba === "READ" && styles.activeTabText]}>LIDOS</Text>
           </TouchableOpacity>
@@ -55,8 +56,6 @@ export default function Notificacoes() {
           <TouchableOpacity
             style={[styles.tab, aba === "UNREAD" && styles.activeTab]}
             onPress={() => setAba("UNREAD")}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: aba === "UNREAD" }}
           >
             <Text style={[styles.tabText, aba === "UNREAD" && styles.activeTabText]}>NÃO LIDOS</Text>
           </TouchableOpacity>
@@ -70,7 +69,7 @@ export default function Notificacoes() {
         </ScrollView>
       </View>
 
-      {/* Patinhas decorativas no canto inferior direito */}
+      {/* Patinhas decorativas */}
       <View style={styles.pawsContainer} pointerEvents="none">
         <FontAwesome5 name="paw" size={20} color="#D6EAF7" style={styles.paw1} />
         <FontAwesome5 name="paw" size={16} color="#E6F0FA" style={styles.paw2} />
@@ -80,14 +79,11 @@ export default function Notificacoes() {
   );
 }
 
-/* Estilos */
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#F6FBFF",
   },
-  
-  // ESTILO DO CABEÇALHO
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -106,13 +102,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#2D68A6',
   },
-
   container: {
     flex: 1,
     paddingHorizontal: 20,
   },
-
-  // Abas
   tabsContainer: {
     flexDirection: "row",
     backgroundColor: "#E6F0FA",
@@ -136,8 +129,6 @@ const styles = StyleSheet.create({
   activeTabText: {
     color: "#FFFFFF",
   },
-
-  // Itens da lista
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -151,8 +142,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#3A5C7A",
   },
-
-  // Patinhas decorativas
   pawsContainer: {
     position: "absolute",
     bottom: 20,

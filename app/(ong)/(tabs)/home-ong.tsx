@@ -12,10 +12,11 @@ export default function HomeScreen(): React.ReactElement {
   const [denuncieVisible, setDenuncieVisible] = useState<boolean>(false);
   const router = useRouter();
 
-  const animalCard = (name: string, race: string, status?: string): React.ReactElement => (
+  // ATUALIZAÇÃO: Adicionei o parâmetro imageSource
+  const animalCard = (name: string, race: string, status: string, imageSource: any): React.ReactElement => (
     <View style={styles.animalCard}>
       <Image
-        source={require("../../../assets/images/pets/branquinho.png")}
+        source={imageSource} // Usa a imagem passada por parâmetro
         style={styles.petImage}
       />
       <View style={{ flex: 1 }}>
@@ -36,13 +37,12 @@ export default function HomeScreen(): React.ReactElement {
         {/* TOP HEADER */}
         <View style={styles.headerContainer}>
           
-          {/* --- CABEÇALHO OTIMIZADO COM SEUS COMPONENTES --- */}
           <View style={styles.headerIcons}>
             
-            {/* Esquerda: Alerta (Abre o modal) */}
+            {/* Esquerda: Alerta */}
             <CustomHeaderLeft onDenunciePress={() => setDenuncieVisible(true)} />
             
-            {/* Direita: Notificação (Navega para a tela de notificação da ONG) */}
+            {/* Direita: Notificação */}
             <CustomHeaderRight 
                 onNotificationPress={() => router.push('/(ong)/notificacoes-ong' as any)} 
             />
@@ -70,22 +70,30 @@ export default function HomeScreen(): React.ReactElement {
           </TouchableOpacity>
         </View>
 
-        {/* SEÇÕES DE ANIMAIS */}
+        {/* SEÇÕES DE ANIMAIS (COM FOTOS DIFERENTES AGORA) */}
         <Section title="Pedidos de Adoção" subtitle="Pedidos de adoção pendentes: 5">
-          {animalCard("Não possui nome", "Sem raça definida (SRD)   AD", "Em tratamento")}
-          {animalCard("Amendoim", "Sem raça definida (SRD)   FL", "")}
+          {/* Pet 1 - Branquinho */}
+          {animalCard("Não possui nome", "Sem raça definida (SRD)   AD", "Em tratamento", require("../../../assets/images/pets/branquinho.png"))}
+          
+          {/* Pet 2 - Neguinho (Exemplo de outra foto) */}
+          {animalCard("Amendoim", "Sem raça definida (SRD)   FL", "", require("../../../assets/images/pets/neguinho.png"))}
+          
           <TouchableOpacity style={styles.verMaisBtn}><Text style={styles.verMaisText}>Ver mais</Text></TouchableOpacity>
         </Section>
 
         <Section title="Animais em Lares Temporários" subtitle="Animais em lares temporários ativos: 6">
-          {animalCard("Não possui nome", "Sem raça definida (SRD)   AD", "Em tratamento")}
-          {animalCard("Amendoim", "Sem raça definida (SRD)   FL", "")}
+          {/* Pet 3 - Caramelo */}
+          {animalCard("Rex", "Pastor Alemão", "Em tratamento", require("../../../assets/images/pets/caramelo.png"))}
+          
+          {/* Pet 4 - Shanti */}
+          {animalCard("Luna", "Vira-lata", "Disponível", require("../../../assets/images/pets/shanti.png"))}
+          
           <TouchableOpacity style={styles.verMaisBtn}><Text style={styles.verMaisText}>Ver mais</Text></TouchableOpacity>
         </Section>
 
         <Section title="Animais registrados recentemente" subtitle="Animais aguardando vaga: 8">
-          {animalCard("Não possui nome", "Sem raça definida (SRD)   AD", "Em tratamento")}
-          {animalCard("Amendoim", "Sem raça definida (SRD)   FL", "")}
+          {animalCard("Bob", "Poodle", "Aguardando", require("../../../assets/images/pets/neguinho.png"))}
+          {animalCard("Mel", "Labrador", "Em análise", require("../../../assets/images/pets/branquinho.png"))}
           <TouchableOpacity style={styles.verMaisBtn}><Text style={styles.verMaisText}>Ver mais</Text></TouchableOpacity>
         </Section>
 
