@@ -15,7 +15,7 @@ export default function SegurancaScreen() {
 
   const opcoes = [
     { id: 1, titulo: 'Alterar senha', icone: 'key-outline', rota: '/(ong)/AlterarSenha-ong' },
-    { id: 2, titulo: 'Histórico de Solicitações', icone: 'time-outline', rota: '/(ong)/HistoricoSolicitacoes' },
+    { id: 2, titulo: 'Histórico de Solicitações', icone: 'time-outline', rota: '/(ong)/HistoricoSolicitacoes-ong' },
     { id: 3, titulo: 'Excluir conta', icone: 'trash-outline', rota: null },
   ];
 

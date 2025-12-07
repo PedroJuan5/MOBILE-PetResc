@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {  
-  View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, 
-  TextInput, Modal, Alert, Dimensions, ActivityIndicator 
-} from 'react-native';
+import {   View, Text, StyleSheet, TouchableOpacity, ScrollView, Image,  TextInput, Modal, Alert, Dimensions, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -21,15 +18,15 @@ const COLORS = {
   grayBg: '#F0F6FA'      
 };
 
-// --- ALTERAÇÃO 1: Interface atualizada para usar 'imagemUrl' igual ao backend ---
+
 interface Campanha {
   id: number;
   titulo: string;
   descricao: string;
-  metaFinanceira: number | string; // Backend envia como metaFinanceira (camelCase no Prisma?) ou meta_financeira? Geralmente Prisma retorna camelCase. Ajustei para aceitar ambos por segurança.
-  metaValor?: number | string;     // Fallback caso o nome varie
+  metaFinanceira: number | string; 
+  metaValor?: number | string;   
   valorArrecadado: number | string; 
-  imagemUrl: string | null;        // <--- AQUI MUDOU (antes era fotoUrl)
+  imagemUrl: string | null;        
   usuarioCriador: {
     nome: string;
     ong?: {
@@ -79,7 +76,7 @@ export default function DoarUsuarioScreen() {
     fetchCampanhas();
   }, []);
 
-  // --- 2. BUSCAR DETALHES ---
+  //BUSCAR DETALHES
   const iniciarDoacao = async (idCampanha: number) => {
     setLoadingDetalhes(true); 
     try {
@@ -149,7 +146,7 @@ export default function DoarUsuarioScreen() {
     setCampanhaSelecionada(null);
   };
 
-  // --- HELPERS ---
+  //HELPERS 
   const formatCurrency = (value: number | string | undefined | null) => {
     const num = Number(value); 
     if (isNaN(num)) return "0";
@@ -157,7 +154,7 @@ export default function DoarUsuarioScreen() {
   };
 
   const getMeta = (c: Campanha) => {
-    // O Prisma pode retornar 'metaFinanceira' ou o backend pode ter mapeado. 
+
     // Verifica qual campo tem valor.
     return Number(c.metaFinanceira || c.metaValor || 1);
   };
@@ -366,13 +363,6 @@ export default function DoarUsuarioScreen() {
             </View>
         </View>
       </Modal>
-
-      {step === 1 && (
-        <View style={styles.iconHeaderContainer}>
-            <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
-            <CustomHeaderRight />
-        </View>
-      )}
 
       <ScrollView contentContainerStyle={{flexGrow: 1}} showsVerticalScrollIndicator={false}>
         {step === 1 && renderDashboard()}

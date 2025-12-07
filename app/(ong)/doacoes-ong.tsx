@@ -5,15 +5,19 @@ import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View
 
 const screenWidth = Dimensions.get("window").width - 40;
 
-export default function RegistradosScreen() {
+export default function DoacoesOngScreen() {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
 
-      {/* HEADER */}
       <View style={styles.header}>
-        <Ionicons name="chevron-back" size={26} color="#1A3C6E" />
-   
-        <Ionicons name="settings-outline" size={24} color="#1A3C6E" />
+        <TouchableOpacity onPress={() => router.push('/(ong)/home-ong' as any)}>
+            <Ionicons name="home-outline" size={24} color="#1A3C6E" />
+        </TouchableOpacity>
+        
+
+        <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes-ong' as any)}>
+            <Ionicons name="notifications-outline" size={24} color="#1A3C6E" />
+        </TouchableOpacity>
       </View>
 
       {/* BANNER DA ONG */}
@@ -27,22 +31,20 @@ export default function RegistradosScreen() {
 
       <Text style={styles.ongName}>Nome da ONG</Text>
       
-     
-       
-             {/* CONTATO E LOCAL */}
-             <View style={styles.infoRow}>
-               <View style={{ flex: 1 }}>
-                 <Text style={styles.label}>Contato</Text>
-                 <Text style={styles.infoText}>username@gmail.com</Text>
-                 <Text style={styles.infoText}>11 96584 2214</Text>
-               </View>
-       
-               <View style={{ flex: 1 }}>
-                 <Text style={styles.label}>Localização</Text>
-                 <Text style={styles.infoText}>SP, Brasil</Text>
-               </View>
-             </View>
-       
+      {/* CONTATO E LOCAL */}
+      <View style={styles.infoRow}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.label}>Contato</Text>
+          <Text style={styles.infoText}>username@gmail.com</Text>
+          <Text style={styles.infoText}>11 96584 2214</Text>
+        </View>
+
+        <View style={{ flex: 1 }}>
+          <Text style={styles.label}>Localização</Text>
+          <Text style={styles.infoText}>SP, Brasil</Text>
+        </View>
+      </View>
+        
       {/* BOTÕES */}
       <ScrollView 
         horizontal 
@@ -71,7 +73,12 @@ export default function RegistradosScreen() {
         </Text>
       </View>
 
-      <View style={{ height: 40 }} />
+      <View style={{ alignItems: "flex-end", marginTop: 20, marginBottom: 40 }}>
+        <TouchableOpacity onPress={() => router.push("/(ong)/menuconfiguracoes-ong" as any)}>
+          <Ionicons name="settings-outline" size={28} color="#1A3C6E" />
+        </TouchableOpacity>
+      </View>
+
     </ScrollView>
   );
 }
@@ -171,99 +178,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 
-  petCard: {
-    flexDirection: "row",
-    backgroundColor: "#87b0ceff",
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 20,
-    gap: 15,
-  },
-
-  petImg: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
-  },
-
-  petInfo: {
-    flex: 1,
-  },
-
-  petName: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#1A3C6E",
-  },
-
-  petSub: {
-    fontSize: 14,
-    color: "#1A3C6E",
-    marginTop: 2,
-  },
-
-  petDetails: {
-    fontSize: 14,
-    color: "#1A3C6E",
-    marginTop: 5,
-  },
-
-  graphTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#1A3C6E",
-    marginBottom: 10,
-    marginTop: 5,
-  },
-
-  chartCard: {
-    backgroundColor: "#fff",
-    paddingVertical: 20,
-    borderRadius: 20,
-    marginBottom: 25,
-    elevation: 2,
-    alignItems: "center",
-  },
-
-  statsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 30,
-    elevation: 2,
-  },
-
-  statItem: {
-    alignItems: "center",
-  },
-
-  statNumber: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#1A3C6E",
-  },
-
-  statLabel: {
-    fontSize: 12,
-    color: "#999",
-    marginTop: 5,
-  },
-
-  infoButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 6,
-    alignSelf: "flex-end",
-    marginTop: 8,
-  },
-
-  infoButtonText: {
-    color: "#1A3C6E",
-    fontWeight: "600",
-    fontSize: 12,
-  },
   infoContainer: {
     backgroundColor: "#e2e2e2ff",
     padding: 15,

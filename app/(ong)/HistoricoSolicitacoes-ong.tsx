@@ -1,14 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import {Image,ScrollView,StyleSheet,Text,TouchableOpacity,View,} from "react-native";
 
 export default function HistoricoCliente() {
   const router = useRouter();
@@ -59,7 +52,8 @@ export default function HistoricoCliente() {
     <View style={styles.container}>
       {/* HEADER */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.push("seguranca" as any)}>
+ 
+        <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={22} color="#2c6eb9ff" />
         </TouchableOpacity>
 
@@ -132,8 +126,6 @@ export default function HistoricoCliente() {
   );
 }
 
-/* ================== ESTILOS ================== */
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -156,7 +148,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "600",
     color: "#2c6eb9ff",
-   
   },
 
   subtitulo: {
@@ -263,12 +254,10 @@ const styles = StyleSheet.create({
   },
 
   botaoAcompanhamento: {
-    
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 999,
     alignSelf: "flex-start",
-    
   },
 
   textoAcompanhamento: {

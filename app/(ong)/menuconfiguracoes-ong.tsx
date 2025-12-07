@@ -43,7 +43,7 @@ const handleGoBackToProfile = () => {
             <Feather name="chevron-right" size={20} color="#2D68A6" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/(ong)/notificacoes')}>
+          <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/(ong)/notificacoes-ong')}>
             <Ionicons name="notifications-outline" size={22} color="#2D68A6" />
             <Text style={styles.itemText}>Notificação</Text>
             <Feather name="chevron-right" size={20} color="#2D68A6" />
@@ -63,13 +63,13 @@ const handleGoBackToProfile = () => {
 
           <Text style={[styles.sectionTitle, { marginTop: 25 }]}>Ajuda</Text>
 
-          <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/(app)/contateNos')}>
+          <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/(ong)/contateNos-ong')}>
             <MaterialIcons name="support-agent" size={22} color="#2D68A6" />
             <Text style={styles.itemText}>Contate-nos</Text>
             <Feather name="chevron-right" size={20} color="#2D68A6" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/(app)/faq')}>
+          <TouchableOpacity style={styles.item} onPress={() => (router as any).push('/(ong)/faq-ong')}>
             <Ionicons name="help-circle-outline" size={22} color="#2D68A6" />
             <Text style={styles.itemText}>FAQ</Text>
             <Feather name="chevron-right" size={20} color="#2D68A6" />

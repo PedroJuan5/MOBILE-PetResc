@@ -5,15 +5,21 @@ import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View
 
 const screenWidth = Dimensions.get("window").width - 40;
 
-export default function RegistradosScreen() {
+export default function LarTemporarioScreen() {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
 
-      {/* HEADER */}
+      {/* HEADER ATUALIZADO */}
       <View style={styles.header}>
-        <Ionicons name="chevron-back" size={26} color="#1A3C6E" />
-   
-        <Ionicons name="settings-outline" size={24} color="#1A3C6E" />
+        {/* Ícone HOME (Leva para Home ONG) */}
+        <TouchableOpacity onPress={() => router.push('/(ong)/home-ong' as any)}>
+            <Ionicons name="home-outline" size={24} color="#1A3C6E" />
+        </TouchableOpacity>
+        
+        {/* Ícone NOTIFICAÇÃO (Leva para Notificações ONG) */}
+        <TouchableOpacity onPress={() => router.push('/(ong)/notificacao-ong' as any)}>
+            <Ionicons name="notifications-outline" size={24} color="#1A3C6E" />
+        </TouchableOpacity>
       </View>
 
       {/* BANNER DA ONG */}
@@ -26,43 +32,43 @@ export default function RegistradosScreen() {
       </View>
 
       <Text style={styles.ongName}>Nome da ONG</Text>
-       
-             {/* CONTATO E LOCAL */}
-             <View style={styles.infoRow}>
-               <View style={{ flex: 1 }}>
-                 <Text style={styles.label}>Contato</Text>
-                 <Text style={styles.infoText}>username@gmail.com</Text>
-                 <Text style={styles.infoText}>11 96584 2214</Text>
-               </View>
-       
-               <View style={{ flex: 1 }}>
-                 <Text style={styles.label}>Localização</Text>
-                 <Text style={styles.infoText}>SP, Brasil</Text>
-               </View>
-             </View>
-       
+        
+      {/* CONTATO E LOCAL */}
+      <View style={styles.infoRow}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.label}>Contato</Text>
+          <Text style={styles.infoText}>username@gmail.com</Text>
+          <Text style={styles.infoText}>11 96584 2214</Text>
+        </View>
+
+        <View style={{ flex: 1 }}>
+          <Text style={styles.label}>Localização</Text>
+          <Text style={styles.infoText}>SP, Brasil</Text>
+        </View>
+      </View>
+        
       {/* BOTÕES */}
-       <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={false}
-              style={styles.buttonsScrollView}
-            >
-              <TouchableOpacity style={styles.btn} onPress={() => router.push("/perfil-ong")}>
-                <Text style={styles.btnText}>Adotados</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity style={styles.btn} onPress={() => router.push("/registrados")}>
-                <Text style={styles.btnText}>Registrados</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.btn} onPress={() => router.push("/lar-temporario")}>
-                <Text style={styles.btnText}>Lar Temporario</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.btn} onPress={() => router.push("/doacoes-ong")}>
-                <Text style={styles.btnText}>Doações</Text>
-              </TouchableOpacity>
-            </ScrollView>
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        style={styles.buttonsScrollView}
+      >
+        <TouchableOpacity style={styles.btn} onPress={() => router.push("/perfil-ong")}>
+          <Text style={styles.btnText}>Adotados</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.btn} onPress={() => router.push("/registrados")}>
+          <Text style={styles.btnText}>Registrados</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={() => router.push("/lar-temporario")}>
+          <Text style={styles.btnText}>Lar Temporario</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={() => router.push("/doacoes-ong")}>
+          <Text style={styles.btnText}>Doações</Text>
+        </TouchableOpacity>
+      </ScrollView>
       
-      {/* CARD DE PET */}
+      {/* CARD DE PET 1 */}
       <View style={styles.petCard}>
         <Image
           source={require("../../assets/images/pets/branquinho.png")}
@@ -83,7 +89,7 @@ export default function RegistradosScreen() {
         </View>
       </View>
 
-      {/* CARD DE PET */}
+      {/* CARD DE PET 2 */}
       <View style={styles.petCard}>
         <Image
           source={require("../../assets/images/pets/branquinho.png")}
@@ -104,7 +110,7 @@ export default function RegistradosScreen() {
         </View>
       </View>
 
-      {/* CARD DE PET */}
+      {/* CARD DE PET 3 */}
       <View style={styles.petCard}>
         <Image
           source={require("../../assets/images/pets/branquinho.png")}
@@ -125,7 +131,13 @@ export default function RegistradosScreen() {
         </View>
       </View>
 
-      <View style={{ height: 40 }} />
+      {/* FOOTER DE CONFIGURAÇÃO (ADICIONADO) */}
+      <View style={{ alignItems: "flex-end", marginTop: 20, marginBottom: 40 }}>
+        <TouchableOpacity onPress={() => router.push("/(ong)/menuconfiguracoes-ong" as any)}>
+          <Ionicons name="settings-outline" size={28} color="#1A3C6E" />
+        </TouchableOpacity>
+      </View>
+
     </ScrollView>
   );
 }
@@ -142,12 +154,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
-  },
-
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#1A3C6E",
   },
 
   cardOng: {
@@ -249,7 +255,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#1A3C6E",
-    
   },
 
   petSub: {

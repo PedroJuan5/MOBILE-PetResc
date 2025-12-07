@@ -1,14 +1,6 @@
 import { Stack, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import {
-  Alert,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Alert,SafeAreaView,StyleSheet,Text,TextInput,TouchableOpacity,View,} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function AlterarSenhaScreen() {
@@ -17,6 +9,11 @@ export default function AlterarSenhaScreen() {
   const [senhaAtual, setSenhaAtual] = useState('');
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
+
+  //estados de visibilidade 
+  const [secureAtual, setSecureAtual] = useState(true);
+  const [secureNova, setSecureNova] = useState(true);
+  const [secureConfirmar, setSecureConfirmar] = useState(true);
 
   function handleAlterarSenha() {
     if (!senhaAtual || !novaSenha || !confirmarSenha) {
@@ -40,10 +37,10 @@ export default function AlterarSenhaScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ headerShown: true }} />
+      <Stack.Screen options={{ headerShown: false }} />
 
       <SafeAreaView style={styles.container}>
-        {/*CABEÇALHO COM GOBACK FUNCIONAL */}
+     
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color="#225d9bff" />
@@ -55,29 +52,52 @@ export default function AlterarSenhaScreen() {
         </View>
 
         <View style={styles.content}>
-          <TextInput
-            placeholder="Senha atual"
-            secureTextEntry
-            style={styles.input}
-            value={senhaAtual}
-            onChangeText={setSenhaAtual}
-          />
+          
+          {/* Campo Senha Atual */}
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Senha atual"
+              secureTextEntry={secureAtual}
+              style={styles.inputField}
+              value={senhaAtual}
+              onChangeText={setSenhaAtual}
+              placeholderTextColor="#999"
+            />
+            <TouchableOpacity onPress={() => setSecureAtual(!secureAtual)}>
+                <Ionicons name={secureAtual ? "eye-off-outline" : "eye-outline"} size={24} color="#3A5C7A" />
+            </TouchableOpacity>
+          </View>
 
-          <TextInput
-            placeholder="Nova senha"
-            secureTextEntry
-            style={styles.input}
-            value={novaSenha}
-            onChangeText={setNovaSenha}
-          />
+          {/* Campo Nova Senha */}
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Nova senha"
+              secureTextEntry={secureNova}
+              style={styles.inputField}
+              value={novaSenha}
+              onChangeText={setNovaSenha}
+              placeholderTextColor="#999"
+            />
+            <TouchableOpacity onPress={() => setSecureNova(!secureNova)}>
+                <Ionicons name={secureNova ? "eye-off-outline" : "eye-outline"} size={24} color="#3A5C7A" />
+            </TouchableOpacity>
+          </View>
 
-          <TextInput
-            placeholder="Confirmar nova senha"
-            secureTextEntry
-            style={styles.input}
-            value={confirmarSenha}
-            onChangeText={setConfirmarSenha}
-          />
+          {/* Campo Confirmar Senha */}
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Confirmar nova senha"
+              secureTextEntry={secureConfirmar}
+              style={styles.inputField}
+              value={confirmarSenha}
+              onChangeText={setConfirmarSenha}
+              placeholderTextColor="#999"
+            />
+            <TouchableOpacity onPress={() => setSecureConfirmar(!secureConfirmar)}>
+                <Ionicons name={secureConfirmar ? "eye-off-outline" : "eye-outline"} size={24} color="#3A5C7A" />
+            </TouchableOpacity>
+          </View>
+
         </View>
 
         <View style={styles.footer}>
@@ -89,8 +109,6 @@ export default function AlterarSenhaScreen() {
     </>
   );
 }
-
-/* ================= ESTILOS ================= */
 
 const styles = StyleSheet.create({
   container: {
@@ -120,13 +138,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  input: {
-    color: '#000',
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1.4,
     borderColor: '#3A5C7A',
     borderRadius: 10,
-    padding: 12,
+    paddingHorizontal: 12,
     marginBottom: 20,
+    height: 50, 
+  },
+ 
+  inputField: {
+    flex: 1,
+    height: '100%',
+    color: '#000',
   },
 
   footer: {

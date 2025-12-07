@@ -10,11 +10,16 @@ export default function RegistradosScreen() {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
 
-      {/* HEADER */}
       <View style={styles.header}>
-        <Ionicons name="chevron-back" size={26} color="#1A3C6E" />
-   
-        <Ionicons name="settings-outline" size={24} color="#1A3C6E" />
+
+        <TouchableOpacity onPress={() => router.push('/(ong)/home-ong' as any)}>
+            <Ionicons name="home-outline" size={24} color="#1A3C6E" />
+        </TouchableOpacity>
+        
+      
+        <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes-ong' as any)}>
+            <Ionicons name="notifications-outline" size={24} color="#1A3C6E" />
+        </TouchableOpacity>
       </View>
 
       {/* BANNER DA ONG */}
@@ -27,61 +32,62 @@ export default function RegistradosScreen() {
       </View>
 
       <Text style={styles.ongName}>Nome da ONG</Text>
-       
-             {/* CONTATO E LOCAL */}
-             <View style={styles.infoRow}>
-               <View style={{ flex: 1 }}>
-                 <Text style={styles.label}>Contato</Text>
-                 <Text style={styles.infoText}>username@gmail.com</Text>
-                 <Text style={styles.infoText}>11 96584 2214</Text>
-               </View>
-       
-               <View style={{ flex: 1 }}>
-                 <Text style={styles.label}>Localização</Text>
-                 <Text style={styles.infoText}>SP, Brasil</Text>
-               </View>
-             </View>
-       
+        
+      {/* CONTATO E LOCAL */}
+      <View style={styles.infoRow}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.label}>Contato</Text>
+          <Text style={styles.infoText}>username@gmail.com</Text>
+          <Text style={styles.infoText}>11 96584 2214</Text>
+        </View>
+
+        <View style={{ flex: 1 }}>
+          <Text style={styles.label}>Localização</Text>
+          <Text style={styles.infoText}>SP, Brasil</Text>
+        </View>
+      </View>
+        
       {/* CARD DE PET */}
       <View style={styles.petCard}>
-      <Image
-  source={require("../../assets/images/pets/branquinho.png")}
-  style={styles.petImg}
-/>
+        <Image
+          source={require("../../assets/images/pets/branquinho.png")}
+          style={styles.petImg}
+        />
 
         <View style={styles.petInfo}>
             <Text style={styles.petName}>Nome</Text>
-                   <Text style={styles.petSub}>Sem raça definida (SRD) - AD</Text>
-                   <Text style={styles.petDetails}>
-                     Adotado em 00/00/0000 {"\n"}
-                     Status: Visita Agendada
-                   </Text>
-         
-                   <TouchableOpacity style={styles.infoButton} onPress={() => router.push("/detalhes-pet-ong")}>
-                     <Text style={styles.infoButtonText}>Ver informações</Text>
-                   </TouchableOpacity>
+            <Text style={styles.petSub}>Sem raça definida (SRD) - AD</Text>
+            <Text style={styles.petDetails}>
+              Adotado em 00/00/0000 {"\n"}
+              Status: Visita Agendada
+            </Text>
+  
+            <TouchableOpacity style={styles.infoButton} onPress={() => router.push("/detalhes-pet-ong")}>
+              <Text style={styles.infoButtonText}>Ver informações</Text>
+            </TouchableOpacity>
         </View>
       </View>
-       {/* BOTÕES */}
-             <ScrollView 
-                    horizontal 
-                    showsHorizontalScrollIndicator={false}
-                    style={styles.buttonsScrollView}
-                  >
-                    <TouchableOpacity style={styles.btn} onPress={() => router.push("/perfil-ong")}>
-                      <Text style={styles.btnText}>Adotados</Text>
-                    </TouchableOpacity>
-                    
-                    <TouchableOpacity style={styles.btn} onPress={() => router.push("/registrados")}>
-                      <Text style={styles.btnText}>Registrados</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.btn} onPress={() => router.push("/lar-temporario")}>
-                      <Text style={styles.btnText}>Lar Temporario</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.btn} onPress={() => router.push("/doacoes-ong")}>
-                      <Text style={styles.btnText}>Doações</Text>
-                    </TouchableOpacity>
-                  </ScrollView>
+
+      {/* BOTÕES */}
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        style={styles.buttonsScrollView}
+      >
+        <TouchableOpacity style={styles.btn} onPress={() => router.push("/perfil-ong")}>
+          <Text style={styles.btnText}>Adotados</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.btn} onPress={() => router.push("/registrados")}>
+          <Text style={styles.btnText}>Registrados</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={() => router.push("/lar-temporario")}>
+          <Text style={styles.btnText}>Lar Temporario</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={() => router.push("/doacoes-ong")}>
+          <Text style={styles.btnText}>Doações</Text>
+        </TouchableOpacity>
+      </ScrollView>
             
 
       {/* ENTRADAS 6 MESES */}
@@ -197,7 +203,13 @@ export default function RegistradosScreen() {
         />
       </View>
 
-      <View style={{ height: 40 }} />
+      {/* FOOTER DE CONFIGURAÇÃO (ADICIONADO) */}
+      <View style={{ alignItems: "flex-end", marginTop: 20, marginBottom: 40 }}>
+        <TouchableOpacity onPress={() => router.push("/(ong)/menuconfiguracoes-ong" as any)}>
+          <Ionicons name="settings-outline" size={28} color="#1A3C6E" />
+        </TouchableOpacity>
+      </View>
+
     </ScrollView>
   );
 }
@@ -214,12 +226,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
-  },
-
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#1A3C6E",
   },
 
   cardOng: {
@@ -262,8 +268,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 20,
     gap: 10,
-    
-    
   },
 
   label: {
@@ -271,16 +275,13 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#1A3C6E",
     marginBottom: 5,
-    
   },
 
   infoText: {
     fontSize: 14,
     color: "#555",
     marginBottom: 3,
-    
   },
-
 
   buttonsScrollView: {
     marginBottom: 20,
@@ -354,32 +355,6 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     elevation: 2,
     alignItems: "center",
-  },
-
-  statsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 30,
-    elevation: 2,
-  },
-
-  statItem: {
-    alignItems: "center",
-  },
-
-  statNumber: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#1A3C6E",
-  },
-
-  statLabel: {
-    fontSize: 12,
-    color: "#999",
-    marginTop: 5,
   },
 
   infoButton: {

@@ -19,7 +19,7 @@ export default function PerfilOngScreen(): React.ReactElement {
         </TouchableOpacity>
 
         {/* Botão Notificações */}
-        <TouchableOpacity onPress={() => router.push('/(ong)/notificacao-ong' as any)}>
+        <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes-ong' as any)}>
             <Ionicons name="notifications-outline" size={24} color="#1A3C6E" />
         </TouchableOpacity>
       </View>
