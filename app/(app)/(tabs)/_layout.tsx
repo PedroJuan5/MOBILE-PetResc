@@ -1,6 +1,6 @@
-import React from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import { Ionicons, Feather } from '@expo/vector-icons'; 
+import React from 'react';
 export default function TabLayout() {
   return (
     <Tabs
@@ -48,6 +48,7 @@ export default function TabLayout() {
      <Tabs.Screen
             name="perfil"
             options={{
+              tabBarStyle: { display: 'none' },
               title: "Perfil",
               tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
             }}
