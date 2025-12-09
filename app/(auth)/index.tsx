@@ -12,9 +12,6 @@ const FeatureCard = ({ icon, title, description }: { icon: string, title: string
     </View>
     <Text style={styles.featureTitle}>{title}</Text>
     <Text style={styles.featureDescription}>{description}</Text>
-    <TouchableOpacity>
-      <Text style={styles.featureLink}>Saiba mais</Text>
-    </TouchableOpacity>
   </View>
 );
 
@@ -33,7 +30,7 @@ export default function PublicIndex() {
   const { user, isLoading } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && user) { // Troca 'session' por 'user'
+    if (!isLoading && user) { 
       router.replace('/home');
     }
   }, [user, isLoading]);

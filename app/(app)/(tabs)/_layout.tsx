@@ -1,7 +1,6 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-
+import { Ionicons, Feather } from '@expo/vector-icons'; 
 export default function TabLayout() {
   return (
     <Tabs
@@ -45,13 +44,15 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <Ionicons name="heart-outline" size={size} color={color} />,
         }}
       />
-      <Tabs.Screen
-        name="perfil"
-        options={{
-          title: "Perfil",
-          tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
-        }}
-      />
+  
+     <Tabs.Screen
+            name="perfil"
+            options={{
+              title: "Perfil",
+              tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
+            }}
+          />
+
       <Tabs.Screen
         name="registro-animal"
         options={{
@@ -66,6 +67,13 @@ export default function TabLayout() {
         options={{
           href: null, 
         }}
+      />
+      <Tabs.Screen 
+        name="perdidos-achados" 
+        options={{ 
+          href: null,
+          headerShown: false 
+        }} 
       />
     </Tabs>
   );

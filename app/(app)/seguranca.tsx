@@ -1,30 +1,33 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function SegurancaScreen() {
-  const navigation = useNavigation();
   const [visible, setVisible] = useState(false);
 
   const handleDelete = () => {
     console.log("Conta excluída com sucesso!");
     setVisible(false);
+    router.replace('/'); 
   };
 
   const opcoes = [
     { id: 1, titulo: 'Alterar senha', icone: 'key-outline', rota: 'AlterarSenha' },
-    { id: 2, titulo: 'Histórico de solicita..', icone: 'time-outline', rota: 'HistoricoSolicitacoes' },
-    { id: 3, titulo: 'Excluir conta', icone: 'trash-outline', rota: 'ExcluirConta' },
+    { id: 2, titulo: 'Histórico de Solicitações', icone: 'time-outline', rota: 'HistoricoSolicitacoes' },
+    { id: 3, titulo: 'Excluir conta', icone: 'trash-outline', rota: null },
   ];
 
   return (
     <View style={styles.container}>
       {/* Cabeçalho */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        {/* --- CORREÇÃO AQUI --- */}
+        {/* Usamos router.back() para voltar para a tela anterior (Menu) sem criar uma nova */}
+        <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color="#2D68A6" />
         </TouchableOpacity>
+        
         <Text style={styles.headerTitle}>Segurança</Text>
         <View style={{ width: 24 }} />
       </View>
@@ -39,10 +42,11 @@ export default function SegurancaScreen() {
             key={item.id}
             style={styles.option}
             onPress={() => {
-              if (item.titulo === 'Excluir conta') {
+              if (item.id === 3) {
                 setVisible(true);
-              } else {
-                (navigation as any).navigate(item.rota);
+              } else if (item.rota) {
+                // Aqui mantemos push para ir PARA FRENTE (ex: mudar senha)
+                router.push(item.rota as any);
               }
             }}
           >
@@ -129,8 +133,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   optionsContainer: {
-    // 'gap' não é suportado pelo StyleSheet do React Native em muitas versões.
-    // Usaremos marginBottom em cada item (.option) para espaçamento.
   },
   option: {
     flexDirection: 'row',
@@ -179,15 +181,14 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   text: {
-    fontSize: 20,
+    fontSize: 16, 
     color: "#333",
     textAlign: "center",
-    lineHeight: 26,
+    lineHeight: 24,
     marginBottom: 24,
-   
   },
   warning: {
-    fontSize: 20,
+    fontSize: 16, 
     color: "#000",
     textAlign: "center",
     fontWeight: "700",

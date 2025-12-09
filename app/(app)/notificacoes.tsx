@@ -9,7 +9,7 @@ const UNREAD = [
   { id: "2", icon: "gift", text: "Nova campanha de doação iniciada!" },
 ];
 const READ = [
-  { id: "3", icon: "paw", text: "Bem-vindo ao PetCo!" },
+  { id: "3", icon: "paw", text: "Bem-vindo ao PetResc!" },
   { id: "4", icon: "checkmark-circle", text: "Seu cadastro foi concluído." },
 ];
 

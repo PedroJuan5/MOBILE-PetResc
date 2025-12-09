@@ -6,426 +6,541 @@ import {
   TextInput, 
   TouchableOpacity, 
   ScrollView, 
-  SafeAreaView, 
-  Alert,
-  Platform,
-  StatusBar
+  StatusBar,
+  Dimensions,
+  Modal,
+  FlatList,
+  Image,
+  Alert
 } from 'react-native';
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useRouter, Stack } from 'expo-router'; // <--- CORRIGIDO AQUI: Adicionado 'Stack'
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import MaskInput from 'react-native-mask-input';
+import * as ImagePicker from 'expo-image-picker';
 
-// --- TIPOS DE DADOS DO FORMULÁRIO ---
-interface OngPetFormData {
-  nome: string;
-  tipo: string; // Gato, Cachorro, Passaro, Outro
-  raca: string;
-  sexo: string; // Macho, Femea
-  porte: string; // Pequeno, Medio, Grande
-  idade: string; // Filhote, Adulto, Idoso
-  tags: string[]; // Vacinado, Dócil, etc.
-  historia: string;
-  fotos: string[]; // Simulando array de fotos
+// --- CORES PADRÃO ---
+const COLORS = {
+  primary: '#2D68A6',
+  background: '#205A8D',
+  inputBg: '#CFDEE9',
+  textLight: '#FFF',
+  textDark: '#2D68A6',
+  placeholder: '#7E9EB6',
+  border: '#A0B4CC',
+  white: '#FFFFFF',
+};
+
+// --- INTERFACE DOS DADOS ---
+interface AnimalData {
+  nome: string; especie: string; raca: string; sexo: string;
+  idade: string; dataResgate: string;
+  localEncontro: string; condicaoResgate: string; comFilhotes: string; comColeira: string;
+  vermifugado: boolean; dataVermifugo: string;
+  vacinado: boolean; descVacina: string;
+  castrado: boolean; dataCastracao: string;
+  doencas: boolean; descDoencas: string;
+  tratamentos: string;
+  disponivelAdocao: string; motivoIndisponivel: string; localAtual: string;
+  fotoResgate: string | null; fotoAtual: string | null;
+  observacoes: string; historia: string;
 }
 
-export default function RegistroAnimalOngScreen() {
+export default function RegistroAnimalScreen() {
   const router = useRouter();
   const [step, setStep] = useState(1);
-  const totalSteps = 5; 
+  const totalSteps = 7; 
 
-  const [formData, setFormData] = useState<OngPetFormData>({
-    nome: '',
-    tipo: '',
-    raca: '',
-    sexo: '',
-    porte: '',
-    idade: '',
-    tags: [],
-    historia: '',
-    fotos: []
+  // --- ESTADOS DOS MODAIS DE FEEDBACK ---
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+
+  const [formData, setFormData] = useState<AnimalData>({
+    nome: '', especie: '', raca: '', sexo: '',
+    idade: '', dataResgate: '',
+    localEncontro: '', condicaoResgate: '', comFilhotes: '', comColeira: '',
+    vermifugado: false, dataVermifugo: '', vacinado: false, descVacina: '',
+    castrado: false, dataCastracao: '', doencas: false, descDoencas: '', tratamentos: '',
+    disponivelAdocao: '', motivoIndisponivel: '', localAtual: '',
+    fotoResgate: null, fotoAtual: null,
+    observacoes: '', historia: ''
   });
 
-  // Atualiza campos de texto/simples
-  const updateForm = (key: keyof OngPetFormData, value: any) => {
+  // --- LÓGICA GERAL ---
+  const [modalVisible, setModalVisible] = useState(false);
+  const [currentField, setCurrentField] = useState<keyof AnimalData | null>(null);
+  const [optionsList, setOptionsList] = useState<string[]>([]);
+
+  const updateForm = (key: keyof AnimalData, value: any) => {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
-  // Atualiza Tags (Múltipla escolha)
-  const toggleTag = (tag: string) => {
-    setFormData(prev => {
-      const exists = prev.tags.includes(tag);
-      if (exists) return { ...prev, tags: prev.tags.filter(t => t !== tag) };
-      return { ...prev, tags: [...prev.tags, tag] };
+  const openOptionModal = (field: keyof AnimalData, options: string[]) => {
+    setCurrentField(field); setOptionsList(options); setModalVisible(true);
+  };
+
+  const handleSelectOption = (option: string) => {
+    if (currentField) updateForm(currentField, option);
+    setModalVisible(false);
+  };
+
+  const pickImage = async (fieldKey: keyof AnimalData) => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
+    if (!result.canceled) updateForm(fieldKey, result.assets[0].uri);
   };
 
-  // --- NAVEGAÇÃO ---
-  const handleBack = () => {
-    if (step === 1) router.back();
-    else setStep(step - 1);
-  };
-
+  // --- LÓGICA DE NAVEGAÇÃO E VALIDAÇÃO ---
   const handleNext = () => {
-    // Validações básicas
-    if (step === 1 && (!formData.nome || !formData.tipo)) return Alert.alert("Atenção", "Preencha nome e tipo.");
-    if (step === 2 && (!formData.raca || !formData.sexo || !formData.porte || !formData.idade)) return Alert.alert("Atenção", "Preencha as características.");
-    
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
-      // Finalizar
-      Alert.alert("Sucesso", "Pet cadastrado e publicado!", [
-        { text: "OK", onPress: () => router.push('/(ong)/(tabs)/pets' as any) }
-      ]);
+      // VALIDAÇÃO FINAL
+      if (!formData.nome || !formData.especie) {
+        setErrorModalVisible(true);
+      } else {
+        setSuccessModalVisible(true);
+      }
     }
   };
 
-  // --- COMPONENTES VISUAIS AUXILIARES ---
+  const handleBack = () => {
+    if (step > 1) setStep(step - 1);
+    else router.back();
+  };
 
-  // Card de Tipo de Animal (Quadrado com ícone)
-  const AnimalTypeCard = ({ label, icon, selected, onPress }: any) => (
-    <TouchableOpacity 
-      style={[styles.typeCard, selected && styles.typeCardSelected]} 
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
-      <MaterialCommunityIcons 
-        name={icon} 
-        size={32} 
-        color={selected ? "#005A9C" : "#8FA7B8"} 
-      />
-      <Text style={[styles.typeLabel, selected && styles.typeLabelSelected]}>{label}</Text>
-      {selected && (
-        <View style={styles.checkIconBadge}>
-          <Feather name="check" size={12} color="#fff" />
-        </View>
+  // --- COMPONENTES VISUAIS ---
+  
+  const InputField = ({ label, value, fieldKey, placeholder, mask, subLabel, multiline, height }: any) => (
+    <View style={styles.inputWrapper}>
+      <View style={styles.labelRow}>
+        <Text style={styles.labelText}>{label}</Text>
+        {subLabel && <Text style={styles.subLabelText}>{subLabel}</Text>}
+      </View>
+      {mask ? (
+        <MaskInput
+          style={[styles.input, multiline && { height: height || 100, textAlignVertical: 'top', paddingTop: 15 }]}
+          value={value || ''}
+          onChangeText={(text) => updateForm(fieldKey, text)}
+          mask={mask}
+          placeholder={placeholder || ""}
+          placeholderTextColor={COLORS.placeholder}
+          multiline={multiline}
+        />
+      ) : (
+        <TextInput
+          style={[styles.input, multiline && { height: height || 100, textAlignVertical: 'top', paddingTop: 15 }]}
+          value={value || ''}
+          onChangeText={(text) => updateForm(fieldKey, text)}
+          placeholder={placeholder || ""}
+          placeholderTextColor={COLORS.placeholder}
+          multiline={multiline}
+        />
       )}
-    </TouchableOpacity>
-  );
-
-  // Chip de Seleção (Texto simples)
-  const SelectChip = ({ label, selected, onPress }: any) => (
-    <TouchableOpacity 
-      style={[styles.chip, selected && styles.chipSelected]} 
-      onPress={onPress}
-    >
-      <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{label}</Text>
-    </TouchableOpacity>
-  );
-
-  // --- RENDERIZAÇÃO DOS PASSOS ---
-
-  // Passo 1: Informações Básicas
-  const renderStep1 = () => (
-    <View style={styles.stepContent}>
-      <Text style={styles.sectionTitle}>Informações básicas</Text>
-      
-      <Text style={styles.label}>Nome do animal</Text>
-      <TextInput 
-        style={styles.input} 
-        placeholder="Digite o nome" 
-        value={formData.nome}
-        onChangeText={(t) => updateForm('nome', t)}
-      />
-
-      <Text style={styles.label}>Tipo de animal</Text>
-      <View style={styles.gridContainer}>
-        <AnimalTypeCard label="Gato" icon="cat" selected={formData.tipo === 'Gato'} onPress={() => updateForm('tipo', 'Gato')} />
-        <AnimalTypeCard label="Cachorro" icon="dog" selected={formData.tipo === 'Cachorro'} onPress={() => updateForm('tipo', 'Cachorro')} />
-        <AnimalTypeCard label="Pássaros" icon="bird" selected={formData.tipo === 'Passaro'} onPress={() => updateForm('tipo', 'Passaro')} />
-        <AnimalTypeCard label="Outro" icon="paw" selected={formData.tipo === 'Outro'} onPress={() => updateForm('tipo', 'Outro')} />
-      </View>
     </View>
   );
 
-  // Passo 2: Características Físicas
-  const renderStep2 = () => (
-    <View style={styles.stepContent}>
-      <Text style={styles.sectionTitle}>Características físicas</Text>
-
-      <Text style={styles.label}>Raça</Text>
-      <TextInput 
-        style={styles.input} 
-        placeholder="Ex: SRD, Siamês, Poodle..." 
-        value={formData.raca}
-        onChangeText={(t) => updateForm('raca', t)}
-      />
-
-      <Text style={styles.label}>Sexo</Text>
-      <View style={styles.row}>
-        <SelectChip label="Macho" selected={formData.sexo === 'Macho'} onPress={() => updateForm('sexo', 'Macho')} />
-        <SelectChip label="Fêmea" selected={formData.sexo === 'Fêmea'} onPress={() => updateForm('sexo', 'Fêmea')} />
+  const SelectField = ({ label, value, placeholder, subLabel, options, fieldKey }: any) => (
+    <View style={styles.inputWrapper}>
+      <View style={styles.labelRow}>
+        <Text style={styles.labelText}>{label}</Text>
+        {subLabel && <Text style={styles.subLabelText}>{subLabel}</Text>}
       </View>
-
-      <Text style={styles.label}>Porte</Text>
-      <View style={styles.row}>
-        {['Pequeno', 'Médio', 'Grande'].map(p => (
-          <SelectChip key={p} label={p} selected={formData.porte === p} onPress={() => updateForm('porte', p)} />
-        ))}
-      </View>
-
-      <Text style={styles.label}>Idade Aproximada</Text>
-      <View style={styles.row}>
-        {['Filhote', 'Adulto', 'Idoso'].map(i => (
-          <SelectChip key={i} label={i} selected={formData.idade === i} onPress={() => updateForm('idade', i)} />
-        ))}
-      </View>
-    </View>
-  );
-
-  // Passo 3: Saúde e Temperamento
-  const renderStep3 = () => (
-    <View style={styles.stepContent}>
-      <Text style={styles.sectionTitle}>Saúde e Temperamento</Text>
-      <Text style={styles.helperText}>Selecione todas as opções que se aplicam:</Text>
-      
-      <View style={styles.tagsContainer}>
-        {['Vacinado', 'Vermifugado', 'Castrado', 'Necessita Cuidados Especiais', 'Dócil', 'Sociável', 'Calmo', 'Brincalhão', 'Agitado', 'Tímido'].map(tag => (
-          <TouchableOpacity 
-            key={tag} 
-            style={[styles.tagChip, formData.tags.includes(tag) && styles.tagChipSelected]} 
-            onPress={() => toggleTag(tag)}
-          >
-            <Text style={[styles.tagText, formData.tags.includes(tag) && styles.tagTextSelected]}>{tag}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </View>
-  );
-
-  // Passo 4: História
-  const renderStep4 = () => (
-    <View style={styles.stepContent}>
-      <Text style={styles.sectionTitle}>História / Descrição</Text>
-      <Text style={styles.helperText}>Conte um pouco sobre o resgate, a personalidade e o que o pet precisa.</Text>
-      
-      <TextInput 
-        style={styles.textArea} 
-        placeholder="Escreva aqui..." 
-        value={formData.historia}
-        onChangeText={(t) => updateForm('historia', t)}
-        multiline
-        textAlignVertical="top"
-      />
-    </View>
-  );
-
-  // Passo 5: Fotos
-  const renderStep5 = () => (
-    <View style={styles.stepContent}>
-      <Text style={styles.sectionTitle}>Fotos do Animal</Text>
-      <Text style={styles.helperText}>Adicione fotos de boa qualidade para aumentar as chances de adoção.</Text>
-      
-      <TouchableOpacity style={styles.uploadBox} onPress={() => Alert.alert("Upload", "Abrir galeria...")}>
-        <View style={styles.uploadIconCircle}>
-            <Feather name="camera" size={32} color="#005A9C" />
-        </View>
-        <Text style={styles.uploadText}>Adicionar fotos</Text>
+      <TouchableOpacity style={styles.selectButton} activeOpacity={0.8} onPress={() => openOptionModal(fieldKey, options)}>
+        <Text style={[styles.selectValueText, !value && { color: COLORS.placeholder }]}>
+          {value || placeholder}
+        </Text>
+        <Ionicons name="chevron-down" size={24} color={COLORS.primary} />
       </TouchableOpacity>
+    </View>
+  );
 
-      {/* Exemplo de como ficaria uma foto adicionada */}
-      <View style={styles.photosPreviewRow}>
-         {/* Espaço reservado para previews */}
+  const YesNoSelector = ({ label, value, fieldKey }: any) => (
+    <View style={styles.inputWrapper}>
+      <Text style={styles.labelText}>{label}</Text>
+      <View style={styles.yesNoContainer}>
+        <TouchableOpacity 
+          style={[styles.yesNoButton, value === 'sim' && styles.yesNoButtonActive]} 
+          onPress={() => updateForm(fieldKey, 'sim')}
+        >
+            <Text style={[styles.yesNoText, value === 'sim' && styles.yesNoTextActive]}>SIM</Text>
+        </TouchableOpacity>
+        
+        <View style={{ width: 15 }} />
+        
+        <TouchableOpacity 
+          style={[styles.yesNoButton, value === 'nao' && styles.yesNoButtonActive]} 
+          onPress={() => updateForm(fieldKey, 'nao')}
+        >
+            <Text style={[styles.yesNoText, value === 'nao' && styles.yesNoTextActive]}>NÃO</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
+
+  const MedicalCheckbox = ({ label, checkKey, textKey, textPlaceholder, mask }: any) => (
+    <View style={styles.checkboxWrapper}>
+        <TouchableOpacity style={styles.checkboxRow} onPress={() => updateForm(checkKey, !(formData as any)[checkKey])}>
+            <View style={[styles.checkboxBox, (formData as any)[checkKey] && styles.checkboxBoxChecked]}>
+                {(formData as any)[checkKey] && <Ionicons name="checkmark" size={18} color={COLORS.primary} />}
+            </View>
+            <Text style={styles.checkboxText}>{label}</Text>
+        </TouchableOpacity>
+        
+        {(formData as any)[checkKey] && (
+            <MaskInput
+                style={styles.conditionalInput}
+                value={(formData as any)[textKey]}
+                onChangeText={(text) => updateForm(textKey, text)}
+                placeholder={textPlaceholder}
+                placeholderTextColor={COLORS.placeholder}
+                mask={mask}
+            />
+        )}
+    </View>
+  );
+
+  const ImageUploadBox = ({ label, subLabel, fieldKey, imageUri }: any) => (
+    <View style={styles.inputWrapper}>
+        <View style={styles.labelRow}>
+            <Text style={styles.labelText}>{label}</Text>
+            {subLabel && <Text style={styles.subLabelText}>{subLabel}</Text>}
+        </View>
+        <TouchableOpacity style={styles.uploadContainer} onPress={() => pickImage(fieldKey)}>
+            {imageUri ? (
+                <Image source={{ uri: imageUri }} style={styles.uploadImagePreview} />
+            ) : (
+                <>
+                    <Ionicons name="image-outline" size={40} color={COLORS.placeholder} />
+                    <Text style={styles.uploadPlaceholderText}>
+                        Arraste uma imagem nesta área, ou clique para selecionar.
+                    </Text>
+                </>
+            )}
+        </TouchableOpacity>
+    </View>
+  );
+
+  // --- CONTEÚDO DAS ETAPAS ---
+  const renderStepContent = () => {
+    switch(step) {
+        // Etapa 1
+        case 1: return (
+            <>
+                <InputField label="Nome do animal" subLabel="Opcional" value={formData.nome} fieldKey="nome"/>
+                <SelectField label="Espécie" value={formData.especie} fieldKey="especie" placeholder="Selecione" options={['Cachorro', 'Gato', 'Outro']}/>
+                <InputField label="Raça" subLabel="Opcional" value={formData.raca} fieldKey="raca" placeholder="Ex: Poodle"/>
+                <SelectField label="Sexo" value={formData.sexo} fieldKey="sexo" placeholder="Selecione" options={['Macho', 'Fêmea']}/>
+            </>
+        );
+        // Etapa 2
+        case 2: return (
+            <>
+                <InputField label="Idade aproximada" subLabel="Em meses ou anos" value={formData.idade} fieldKey="idade"/>
+                <InputField label="Data de resgate" value={formData.dataResgate} fieldKey="dataResgate" mask={[/\d/,/\d/, '/', /\d/,/\d/, '/', /\d/,/\d/,/\d/,/\d/]} placeholder="00/00/0000"/>
+            </>
+        );
+        // Etapa 3
+        case 3: return (
+            <>
+                <InputField label="Onde foi encontrado" value={formData.localEncontro} fieldKey="localEncontro" placeholder="Rua, bairro, cidade"/>
+                <InputField label="Condição no resgate" value={formData.condicaoResgate} fieldKey="condicaoResgate" placeholder="Desnutrido..."/>
+                <YesNoSelector label="Estava com filhotes?" value={formData.comFilhotes} fieldKey="comFilhotes"/>
+                <YesNoSelector label="Estava com coleira/ID?" value={formData.comColeira} fieldKey="comColeira"/>
+            </>
+        );
+        // Etapa 4
+        case 4: return (
+            <>
+                <Text style={styles.sectionHeaderTitle}>Exames realizados:</Text>
+                <MedicalCheckbox label="Vermifugado" checkKey="vermifugado" textKey="dataVermifugo" textPlaceholder="Data: 00/00/0000" mask={[/\d/,/\d/, '/', /\d/,/\d/, '/', /\d/,/\d/,/\d/,/\d/]} />
+                <MedicalCheckbox label="Vacinado" checkKey="vacinado" textKey="descVacina" textPlaceholder="Quais / Data" />
+                <MedicalCheckbox label="Castrado" checkKey="castrado" textKey="dataCastracao" textPlaceholder="Data: 00/00/0000" mask={[/\d/,/\d/, '/', /\d/,/\d/, '/', /\d/,/\d/,/\d/,/\d/]} />
+                <MedicalCheckbox label="Testado (FIV/FeLV...)" checkKey="doencas" textKey="descDoencas" textPlaceholder="Resultado..." />
+                <View style={{ height: 15 }}/>
+                <InputField label="Tratamentos em andamento:" value={formData.tratamentos} fieldKey="tratamentos" placeholder="Ex. antibióticos..." multiline={true} height={80} />
+            </>
+        );
+        // Etapa 5
+        case 5: return (
+            <>
+                <YesNoSelector label="Disponível para adoção?" value={formData.disponivelAdocao} fieldKey="disponivelAdocao" />
+                <SelectField label="Motivo (se não)" value={formData.motivoIndisponivel} fieldKey="motivoIndisponivel" placeholder="Selecione" options={['Em tratamento', 'Muito jovem', 'Aguardando castração']} />
+                <SelectField label="Local atual" value={formData.localAtual} fieldKey="localAtual" placeholder="Selecione" options={['Lar temporário', 'Abrigo', 'Clínica']} />
+            </>
+        );
+        // Etapa 6
+        case 6: return (
+            <>
+                <ImageUploadBox label="Foto do resgate" subLabel="Opcional" fieldKey="fotoResgate" imageUri={formData.fotoResgate} />
+                <View style={{ height: 15 }}/>
+                <ImageUploadBox label="Foto atual do animal" fieldKey="fotoAtual" imageUri={formData.fotoAtual} />
+            </>
+        );
+        // Etapa 7
+        case 7: return (
+            <>
+                <InputField label="Observações gerais" subLabel="Opcional" value={formData.observacoes} fieldKey="observacoes" placeholder="Ex. dócil..." multiline={true} height={120} />
+                <InputField label="História do pet" subLabel="Opcional" value={formData.historia} fieldKey="historia" placeholder="Conte a história..." multiline={true} height={180} />
+            </>
+        );
+        default: return null;
+    }
+  };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <Stack.Screen options={{ headerShown: false }} />
-
-      {/* HEADER */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.iconBtn}>
-          <Feather name="chevron-left" size={28} color="#005A9C" />
+    <View style={styles.screenContainer}>
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+      
+      {/* MODAL DE SELEÇÃO (DROPDOWN) */}
+      <Modal visible={modalVisible} transparent animationType="fade">
+        <TouchableOpacity style={styles.modalOverlay} onPress={() => setModalVisible(false)} activeOpacity={1}>
+            <View style={styles.modalContent}>
+                <Text style={styles.modalHeaderTitle}>Selecione</Text>
+                <FlatList data={optionsList} keyExtractor={(item) => item} renderItem={({item}) => (
+                    <TouchableOpacity style={styles.modalItem} onPress={() => handleSelectOption(item)}>
+                        <Text style={styles.modalItemText}>{item}</Text>
+                    </TouchableOpacity>
+                )}/>
+            </View>
         </TouchableOpacity>
+      </Modal>
 
-        <View style={styles.progressContainer}>
-          <View style={[styles.progressBar, { width: `${(step / totalSteps) * 100}%` }]} />
+      {/* --- MODAL DE SUCESSO --- */}
+      <Modal visible={successModalVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+            <View style={styles.feedbackCard}>
+                <Text style={styles.feedbackTitle}>Registrado com sucesso!</Text>
+                <Text style={styles.feedbackText}>O animal foi cadastrado em nosso sistema.</Text>
+                <Text style={styles.feedbackText}>Você receberá um e-mail com os detalhes.</Text>
+                
+                <TouchableOpacity 
+                    style={styles.feedbackButton} 
+                    onPress={() => { 
+                        setSuccessModalVisible(false); 
+                        // MANDA PARA A HOME DA ONG
+                        router.navigate('/(ong)/(tabs)/home-ong' as any); 
+                    }}
+                >
+                    <Text style={styles.feedbackButtonText}>OK</Text>
+                </TouchableOpacity>
+            </View>
         </View>
+      </Modal>
 
-        <View style={styles.iconBtn}>
-           <Feather name="user" size={24} color="#005A9C" />
+      {/* --- MODAL DE ERRO / FALTOU ALGO --- */}
+      <Modal visible={errorModalVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+            <View style={styles.feedbackCard}>
+                <Text style={styles.feedbackTitle}>Ei, faltou algo!</Text>
+                <Text style={styles.feedbackText}>Ops! Parece que você esqueceu de preencher alguns campos obrigatórios.</Text>
+                <Text style={styles.feedbackText}>Por favor, revise as informações.</Text>
+                
+                <TouchableOpacity 
+                    style={styles.feedbackButton} 
+                    onPress={() => setErrorModalVisible(false)}
+                >
+                    <Text style={styles.feedbackButtonText}>Voltar</Text>
+                </TouchableOpacity>
+            </View>
         </View>
-      </View>
+      </Modal>
 
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.pageTitle}>Cadastrar animal</Text>
-        <Text style={styles.pageSubtitle}>Preencha as informações para cadastrar um novo pet</Text>
+      {/* --- HEADER --- */}
+      <SafeAreaView edges={['top']} style={styles.headerContainer}>
+        <View style={styles.headerNav}>
+            <TouchableOpacity onPress={handleBack} style={{padding: 5}}>
+                <Ionicons name="arrow-back" size={28} color={COLORS.white} />
+            </TouchableOpacity>
+        </View>
+        <Text style={styles.headerTitle}>Criar registro Pet</Text>
+        <Text style={styles.headerSubtitle}>Crie a conta do pet seguindo suas necessidades</Text>
+      </SafeAreaView>
 
-        {step === 1 && renderStep1()}
-        {step === 2 && renderStep2()}
-        {step === 3 && renderStep3()}
-        {step === 4 && renderStep4()}
-        {step === 5 && renderStep5()}
-
-        <View style={{ height: 100 }} />
+      {/* --- SCROLL CONTENT --- */}
+      <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        {renderStepContent()}
+        <View style={{ height: 130 }} /> 
       </ScrollView>
 
-      {/* FAB NEXT BUTTON */}
-      <TouchableOpacity style={styles.fabNext} onPress={handleNext}>
-        <Feather name={step === totalSteps ? "check" : "chevron-right"} size={32} color="#fff" />
-      </TouchableOpacity>
+      {/* --- FOOTER FIXO --- */}
+      <View style={styles.footerContainer}>
+        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+            <Text style={styles.nextButtonText}>{step === totalSteps ? "Finalizar" : "Prosseguir"}</Text>
+        </TouchableOpacity>
 
-    </SafeAreaView>
+        <View style={styles.paginationContainer}>
+            {Array.from({ length: totalSteps }).map((_, index) => {
+                const isActive = step === (index + 1);
+                return <View key={index} style={[styles.paginationDot, isActive ? styles.paginationDotActive : styles.paginationDotInactive]} />;
+            })}
+        </View>
+      </View>
+    </View>
   );
 }
 
+// --- ESTILOS ORGANIZADOS ---
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#FFFFFF', paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
+  // LAYOUT GERAL
+  screenContainer: { flex: 1, backgroundColor: COLORS.background },
+  headerContainer: { paddingHorizontal: 20, paddingBottom: 20 },
+  headerNav: { marginBottom: 10 },
+  scrollContainer: { paddingHorizontal: 20, paddingTop: 10 },
   
-  // Header
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    marginTop: 10,
-  },
-  iconBtn: { padding: 5 },
-  progressContainer: {
-    flex: 1,
-    height: 8,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 4,
-    marginHorizontal: 15,
-  },
-  progressBar: {
-    height: '100%',
-    backgroundColor: '#005A9C',
-    borderRadius: 4,
-  },
+  // TEXTOS DO HEADER
+  headerTitle: { fontSize: 28, fontWeight: 'bold', color: COLORS.white, marginBottom: 5 },
+  headerSubtitle: { fontSize: 14, color: '#E0E0E0', marginBottom: 10 },
+  sectionHeaderTitle: { fontSize: 18, color: COLORS.white, marginBottom: 15, fontWeight: 'bold' },
 
-  // Conteúdo
-  scrollContainer: { padding: 25 },
-  stepContent: { flex: 1 },
-  pageTitle: { fontSize: 26, fontWeight: 'bold', color: '#005A9C', marginBottom: 5 },
-  pageSubtitle: { fontSize: 14, color: '#666', marginBottom: 25 },
-  sectionTitle: { fontSize: 20, fontWeight: 'bold', color: '#005A9C', marginBottom: 15 },
-  helperText: { fontSize: 14, color: '#666', marginBottom: 15 },
-
-  // Inputs
-  label: { fontSize: 16, color: '#333', marginBottom: 8, marginTop: 15, fontWeight: '600' },
+  // --- INPUTS & LABELS ---
+  inputWrapper: { marginBottom: 20 },
+  labelRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  labelText: { fontSize: 18, color: COLORS.white, fontWeight: '500' },
+  subLabelText: { fontSize: 12, color: COLORS.border, marginLeft: 8 },
+  
   input: {
-    borderWidth: 1,
-    borderColor: '#CCC',
-    backgroundColor: '#FAFAFA',
-    borderRadius: 8,
-    padding: 12,
+    backgroundColor: COLORS.inputBg,
+    borderRadius: 6,
+    height: 55,
+    paddingHorizontal: 15,
     fontSize: 16,
-    color: '#333',
+    color: COLORS.primary,
   },
-  textArea: {
-    borderWidth: 1,
-    borderColor: '#CCC',
-    backgroundColor: '#FAFAFA',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    color: '#333',
-    height: 150,
-  },
-
-  // Grid Tipo de Animal
-  gridContainer: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-  typeCard: {
-    width: '48%',
-    backgroundColor: '#F0F8FF',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 15,
+  
+  // SELECT (DROPDOWN FAKE)
+  selectButton: {
+    backgroundColor: COLORS.inputBg,
+    borderRadius: 6,
+    height: 55,
+    paddingHorizontal: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'transparent',
-    position: 'relative',
   },
-  typeCardSelected: {
-    borderColor: '#005A9C',
-    backgroundColor: '#E6F3FF',
-  },
-  typeLabel: { marginTop: 10, fontSize: 16, color: '#555', fontWeight: '500' },
-  typeLabelSelected: { color: '#005A9C', fontWeight: 'bold' },
-  checkIconBadge: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: '#005A9C',
-    borderRadius: 10,
-    width: 20,
-    height: 20,
+  selectValueText: { fontSize: 16, color: COLORS.primary },
+
+  // INPUT CONDICIONAL (CHECKBOX)
+  checkboxWrapper: { marginBottom: 15 },
+  checkboxRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 5 },
+  checkboxBox: {
+    width: 24, height: 24,
+    backgroundColor: COLORS.inputBg,
+    borderRadius: 4,
+    marginRight: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  checkboxBoxChecked: { backgroundColor: COLORS.white },
+  checkboxText: { fontSize: 16, color: COLORS.white },
+  conditionalInput: {
+    backgroundColor: COLORS.inputBg,
+    borderRadius: 6,
+    height: 45,
+    paddingHorizontal: 10,
+    fontSize: 14,
+    color: COLORS.primary,
+    marginLeft: 34,
+    marginTop: 5,
+  },
 
-  // Chips (Botões de seleção)
-  row: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  chip: {
-    paddingVertical: 10,
+  // YES/NO SELECTOR
+  yesNoContainer: { flexDirection: 'row' },
+  yesNoButton: {
+    backgroundColor: COLORS.inputBg,
+    borderRadius: 6,
+    paddingVertical: 12,
     paddingHorizontal: 20,
-    borderRadius: 25,
-    borderWidth: 1,
-    borderColor: '#DDD',
-    backgroundColor: '#fff',
-    marginBottom: 5,
-  },
-  chipSelected: {
-    backgroundColor: '#005A9C',
-    borderColor: '#005A9C',
-  },
-  chipText: { color: '#555', fontSize: 15 },
-  chipTextSelected: { color: '#fff', fontWeight: 'bold' },
-
-  // Tags
-  tagsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  tagChip: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    backgroundColor: '#F0F0F0',
-    marginBottom: 8,
-  },
-  tagChipSelected: { backgroundColor: '#005A9C' },
-  tagText: { color: '#555', fontSize: 14 },
-  tagTextSelected: { color: '#fff', fontWeight: 'bold' },
-
-  // Upload Area
-  uploadBox: {
+    minWidth: 80,
+    alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#005A9C',
-    borderStyle: 'dashed',
-    borderRadius: 12,
-    height: 150,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F0F8FF',
+    borderColor: 'transparent',
   },
-  uploadIconCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#E6F3FF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  uploadText: { color: '#005A9C', fontWeight: 'bold', fontSize: 16 },
-  photosPreviewRow: { flexDirection: 'row', marginTop: 15 },
+  yesNoButtonActive: { borderColor: COLORS.white },
+  yesNoText: { color: COLORS.primary, fontWeight: 'bold', fontSize: 16, opacity: 0.6 },
+  yesNoTextActive: { opacity: 1 },
 
-  // FAB
-  fabNext: {
-    position: 'absolute',
-    bottom: 30,
-    right: 30,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#005A9C',
+  // UPLOAD
+  uploadContainer: {
+    backgroundColor: COLORS.inputBg,
+    borderRadius: 12,
+    height: 120,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
+    overflow: 'hidden',
+    borderStyle: 'dashed',
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
+  uploadPlaceholderText: {
+    fontSize: 14,
+    color: COLORS.placeholder,
+    textAlign: 'center',
+    marginTop: 10,
+    paddingHorizontal: 20,
+  },
+  uploadImagePreview: { width: '100%', height: '100%', resizeMode: 'cover' },
+
+  // --- FOOTER ---
+  footerContainer: {
+    position: 'absolute',
+    bottom: 0, left: 0, right: 0,
+    backgroundColor: COLORS.white,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingVertical: 30,
+    paddingHorizontal: 30,
+    alignItems: 'center',
+    elevation: 10,
+    shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10,
+  },
+  nextButton: {
+    backgroundColor: COLORS.primary,
+    width: '100%',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  nextButtonText: { color: COLORS.white, fontSize: 18, fontWeight: 'bold' },
+  
+  // PAGINAÇÃO (BOLINHAS)
+  paginationContainer: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  paginationDot: { width: 10, height: 10, borderRadius: 5 },
+  paginationDotActive: { backgroundColor: COLORS.primary, width: 30 },
+  paginationDotInactive: { backgroundColor: COLORS.border },
+
+  // --- MODAIS ---
+  modalOverlay: {
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center', alignItems: 'center', padding: 20,
+  },
+  modalContent: {
+    backgroundColor: COLORS.white,
+    width: '80%', borderRadius: 12, padding: 20, maxHeight: '50%',
+  },
+  modalHeaderTitle: {
+    fontSize: 18, fontWeight: 'bold', color: COLORS.primary,
+    marginBottom: 15, textAlign: 'center',
+  },
+  modalItem: { paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#EEE' },
+  modalItemText: { fontSize: 16, color: '#333', textAlign: 'center' },
+
+  // CARD DE FEEDBACK (SUCESSO/ERRO)
+  feedbackCard: {
+    backgroundColor: COLORS.white,
+    width: '90%', borderRadius: 16, padding: 25, alignItems: 'center',
+  },
+  feedbackTitle: { fontSize: 20, fontWeight: 'bold', color: COLORS.primary, marginBottom: 15, textAlign: 'center' },
+  feedbackText: { fontSize: 14, color: COLORS.primary, textAlign: 'center', marginBottom: 15, lineHeight: 20 },
+  feedbackButton: {
+    backgroundColor: '#94B9D8',
+    paddingVertical: 12, paddingHorizontal: 40,
+    borderRadius: 8, marginTop: 10, width: '100%', alignItems: 'center',
+  },
+  feedbackButtonText: { color: COLORS.primary, fontWeight: 'bold', fontSize: 16 },
 });

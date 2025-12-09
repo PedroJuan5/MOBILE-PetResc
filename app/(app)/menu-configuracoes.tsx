@@ -8,17 +8,19 @@ export default function ConfigScreen() {
   const router = useRouter();
   const { signOut } = useAuth(); 
   
-  // --- CORREÇÃO DO GO BACK ---
+  
   const handleGoBackToProfile = () => {
-    // Força a navegação para a rota da aba de perfil.
-    // O 'as any' evita o erro de TypeScript se o caminho não for reconhecido na hora.
-    router.push('/(tabs)/perfil' as any); 
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(app)/(tabs)/Perfil' as any); 
+    }
   };
 
-  // --- BOTÃO DE SAÍDA ---
+  
   const handleLogout = () => {
-    signOut(); // Limpa sessão
-    router.replace('/'); // Vai para o início
+    signOut(); 
+    router.replace('/'); 
   };
 
   return (

@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
 
 const api = axios.create({
-  baseURL: "https://petresc.onrender.com",
+  baseURL: "https://petresc.onrender.com/api",
   headers: { "Content-Type": "application/json" },
 });
 

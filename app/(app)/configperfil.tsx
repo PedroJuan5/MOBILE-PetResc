@@ -1,28 +1,75 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import React, { useState } from "react";
-import { Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import React, { useState, useEffect } from "react";
+import { Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from "react-native";
+import api from "@/lib/axios"; // Importe seu axios configurado
 
 export default function AccountScreen() {
   const router = useRouter();
-  const [name, setName] = useState("Username");
-  const [username, setUsername] = useState("User00");
-  const [email, setEmail] = useState("username@gmail.com");
+  
+  // Estados dos Campos
+  const [userId, setUserId] = useState<number | null>(null);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefone, setTelefone] = useState("");
+  
+  // Estados de UI
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = () => {
-    alert("Alterações salvas com sucesso!");
+  // 1. CARREGAR DADOS AO ABRIR
+  useEffect(() => {
+    async function fetchUserData() {
+      try {
+        const response = await api.get('/usuarios/me'); // Rota que retorna o usuário logado
+        const user = response.data;
+        
+        setUserId(user.id);
+        setName(user.nome || "");
+        setEmail(user.email || "");
+        setTelefone(user.telefone || "");
+        // Se tiver foto no banco, setar aqui: setAvatarUri(user.fotoUrl);
+
+      } catch (error) {
+        console.error("Erro ao carregar perfil:", error);
+        Alert.alert("Erro", "Não foi possível carregar seus dados.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchUserData();
+  }, []);
+
+  // 2. SALVAR ALTERAÇÕES
+  const handleSave = async () => {
+    if (!userId) return;
+    setSaving(true);
+
+    try {
+      await api.put(`/usuarios/${userId}`, {
+        nome: name,
+        telefone: telefone
+        // Email não é enviado pois não é editável
+      });
+
+      Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+      Alert.alert("Erro", "Falha ao atualizar o perfil.");
+    } finally {
+      setSaving(false);
+    }
   };
 
+  // --- LÓGICA DE IMAGEM (MANTIDA DO SEU CÓDIGO) ---
   const pickAvatar = async () => {
-    // pedir permissão
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permissão necessária', 'Precisamos de acesso às suas fotos para alterar a foto de perfil.');
+      Alert.alert('Permissão necessária', 'Precisamos de acesso às suas fotos.');
       return;
     }
-
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -30,29 +77,19 @@ export default function AccountScreen() {
         aspect: [1, 1],
         quality: 0.7,
       });
-
-      // compatibilidade com diferentes versões do expo-image-picker
-      const wasCancelled = (result as any).cancelled ?? (result as any).canceled ?? false;
-      if (!wasCancelled) {
-        const uri = (result as any).assets?.[0]?.uri ?? (result as any).uri;
-        if (uri) {
-          setAvatarUri(uri);
-          // aqui você pode chamar uma função para enviar a imagem ao servidor
-        }
+      if (!result.canceled) {
+        setAvatarUri(result.assets[0].uri);
+        // Futuro: Implementar upload da foto aqui
       }
-    } catch (err) {
-      console.warn('Erro ao selecionar imagem:', err);
-    }
+    } catch (err) { console.warn(err); }
   };
 
   const pickFromCamera = async () => {
-    // pedir permissão de câmera
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permissão necessária', 'Precisamos de acesso à câmera para tirar a foto.');
+      Alert.alert('Permissão necessária', 'Precisamos de acesso à câmera.');
       return;
     }
-
     try {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -60,43 +97,45 @@ export default function AccountScreen() {
         aspect: [1, 1],
         quality: 0.7,
       });
-
-      const wasCancelled = (result as any).cancelled ?? (result as any).canceled ?? false;
-      if (!wasCancelled) {
-        const uri = (result as any).assets?.[0]?.uri ?? (result as any).uri;
-        if (uri) {
-          setAvatarUri(uri);
-        }
+      if (!result.canceled) {
+        setAvatarUri(result.assets[0].uri);
       }
-    } catch (err) {
-      console.warn('Erro ao tirar foto:', err);
-    }
+    } catch (err) { console.warn(err); }
   };
 
   const pickAvatarMenu = () => {
     Alert.alert('Alterar foto', 'Escolha a fonte da imagem', [
       { text: 'Cancelar', style: 'cancel' },
-      { text: 'Galeria', onPress: () => pickAvatar() },
-      { text: 'Câmera', onPress: () => pickFromCamera() },
+      { text: 'Galeria', onPress: pickAvatar },
+      { text: 'Câmera', onPress: pickFromCamera },
     ]);
   };
 
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center' }]}>
+        <ActivityIndicator size="large" color="#2D68A6" />
+      </View>
+    );
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      
+      {/* HEADER */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           activeOpacity={0.7}
-          accessibilityRole="button"
-          accessibilityLabel="Voltar"
         >
           <Ionicons name="arrow-back" size={26} color="#2D68A6" />
         </TouchableOpacity>
-        <Text style={styles.title}>Conta</Text>
+        <Text style={styles.title}>Minha Conta</Text>
         <View style={{ width: 26 }} />
       </View>
 
+      {/* CAPA E AVATAR */}
       <View style={styles.coverContainer}>
         <View style={styles.cover}>
           <TouchableOpacity style={styles.editIconCover}>
@@ -111,43 +150,59 @@ export default function AccountScreen() {
                 <Ionicons name="person-outline" size={40} color="#a0bcd5" />
               )}
           </View>
-            <TouchableOpacity style={styles.editIconAvatar} onPress={pickAvatarMenu} accessibilityRole="button" accessibilityLabel="Alterar foto de perfil">
+            <TouchableOpacity style={styles.editIconAvatar} onPress={pickAvatarMenu}>
               <Ionicons name="create-outline" size={18} color="#2D68A6" />
             </TouchableOpacity>
         </View>
       </View>
 
-      <Text style={styles.userName}>{name}</Text>
+      <Text style={styles.userName}>{name || "Usuário"}</Text>
 
+      {/* FORMULÁRIO DE EDIÇÃO */}
       <View style={styles.form}>
-        <Text style={styles.label}>Nome</Text>
+        
+        <Text style={styles.label}>Nome Completo</Text>
         <TextInput
           style={styles.input}
           value={name}
           onChangeText={setName}
-          placeholder="Username"
+          placeholder="Seu nome"
+          placeholderTextColor="#999"
         />
 
-        <Text style={styles.label}>Nome de usuário</Text>
+        {/* CAMPO NOVO: TELEFONE */}
+        <Text style={styles.label}>Telefone</Text>
         <TextInput
           style={styles.input}
-          value={username}
-          onChangeText={setUsername}
-          placeholder="User00"
+          value={telefone}
+          onChangeText={setTelefone}
+          placeholder="(00) 00000-0000"
+          placeholderTextColor="#999"
+          keyboardType="phone-pad"
         />
 
-        <Text style={styles.label}>E-mail</Text>
+        {/* EMAIL (NÃO EDITÁVEL) */}
+        <Text style={styles.label}>E-mail (Não editável)</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: '#F0F0F0', color: '#666' }]} // Estilo visual de disabled
           value={email}
-          onChangeText={setEmail}
-          placeholder="username@gmail.com"
+          editable={false} // Bloqueado
         />
+
       </View>
       
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveText}>Salvar alterações</Text>
+      <TouchableOpacity 
+        style={styles.saveButton} 
+        onPress={handleSave}
+        disabled={saving}
+      >
+        {saving ? (
+           <ActivityIndicator color="#FFF" />
+        ) : (
+           <Text style={styles.saveText}>Salvar alterações</Text>
+        )}
       </TouchableOpacity>
+
     </ScrollView>
   );
 }
@@ -157,8 +212,7 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: "center",
     backgroundColor: "#fff",
-    width:"100%",
-    height: "100%",
+    flexGrow: 1, // Garante scroll se precisar
   },
   header: {
     width: "100%",
@@ -166,6 +220,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 20,
+    marginTop: 10
   },
   title: {
     fontSize: 22,
@@ -175,10 +230,11 @@ const styles = StyleSheet.create({
   coverContainer: {
     width: "100%",
     alignItems: "center",
+    marginBottom: 40 // Espaço para o avatar não sobrepor o nome
   },
   cover: {
     width: "100%",
-    height: 100,
+    height: 120,
     borderRadius: 10,
     backgroundColor: "#d6e6f7",
     justifyContent: "center",
@@ -199,56 +255,64 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   avatar: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     backgroundColor: "#e3edf8",
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: "#fff",
   },
   editIconAvatar: {
     position: "absolute",
     bottom: 0,
-    right: -10,
+    right: -5,
     backgroundColor: "#fff",
-    padding: 5,
+    padding: 6,
     borderRadius: 20,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: '#eee'
   },
   userName: {
-    marginTop: 50,
-    fontSize: 18,
-    fontWeight: "600",
+    marginTop: 10,
+    marginBottom: 10,
+    fontSize: 20,
+    fontWeight: "700",
     color: "#2D68A6",
   },
   form: {
     width: "100%",
-    marginTop: 20,
+    marginTop: 10,
   },
   label: {
     fontSize: 14,
     color: "#2D68A6",
-    marginBottom: 6,
+    marginBottom: 8,
+    fontWeight: '500'
   },
   input: {
     borderWidth: 1,
     borderColor: "#a0bcd5",
     borderRadius: 10,
-    padding: 20,
-    marginBottom: 25,
+    padding: 16, // Padding vertical ajustado
+    marginBottom: 20,
+    fontSize: 16,
+    color: '#333'
   },
   saveButton: {
     backgroundColor: "#2D68A6",
     borderRadius: 10,
     paddingVertical: 16,
     paddingHorizontal: 30,
-    marginTop: 20,
+    marginTop: 10,
+    width: '100%',
+    alignItems: 'center'
   },
   saveText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
   },
 });

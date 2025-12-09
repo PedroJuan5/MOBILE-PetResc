@@ -4,14 +4,19 @@ import React, { useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { DenuncieModal } from "../../../components/denuncieModal"; 
 
+// --- IMPORTAÇÃO DOS SEUS COMPONENTES DE CABEÇALHO ---
+import CustomHeaderRight from '../../../components/elementosDireita';
+import CustomHeaderLeft from '../../../components/elementosEsquerda';
+
 export default function HomeScreen(): React.ReactElement {
   const [denuncieVisible, setDenuncieVisible] = useState<boolean>(false);
   const router = useRouter();
 
-  const animalCard = (name: string, race: string, status?: string): React.ReactElement => (
+  // ATUALIZAÇÃO: Adicionei o parâmetro imageSource
+  const animalCard = (name: string, race: string, status: string, imageSource: any): React.ReactElement => (
     <View style={styles.animalCard}>
       <Image
-        source={require("../../../assets/images/pets/branquinho.png")}
+        source={imageSource} // Usa a imagem passada por parâmetro
         style={styles.petImage}
       />
       <View style={{ flex: 1 }}>
@@ -27,34 +32,32 @@ export default function HomeScreen(): React.ReactElement {
   return (
     <View style={styles.container}>
       
-      {/* ScrollView com pouco padding no final para não sobrar espaço branco */}
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
 
         {/* TOP HEADER */}
         <View style={styles.headerContainer}>
           
-          {/* Ícones do Topo (Alerta e Notificação) */}
           <View style={styles.headerIcons}>
-            <TouchableOpacity onPress={() => setDenuncieVisible(true)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <Ionicons name="alert-circle-outline" size={26} color="#D9534F" />
-            </TouchableOpacity>
             
-            <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes' as any)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <Ionicons name="notifications-outline" size={26} color="#2D68A6" />
-            </TouchableOpacity>
+            {/* Esquerda: Alerta */}
+            <CustomHeaderLeft onDenunciePress={() => setDenuncieVisible(true)} />
+            
+            {/* Direita: Notificação */}
+            <CustomHeaderRight 
+                onNotificationPress={() => router.push('/(ong)/notificacoes-ong' as any)} 
+            />
+          
           </View>
 
-          {/* --- TÍTULO COM AS PATINHAS (IGUAL AO USUÁRIO) --- */}
+          {/* TÍTULO COM AS PATINHAS */}
           <View style={styles.titleContainer}>
             <Text style={styles.pageTitle}>Conheça seu novo{"\n"}melhor amigo!</Text>
 
-            {/* Pata 1 */}
             <Image 
               source={require("../../../assets/images/ui/pata.png")} 
               style={[styles.paw, styles.paw1]} 
               resizeMode="contain"
             />
-            {/* Pata 2 */}
             <Image 
               source={require("../../../assets/images/ui/pata.png")} 
               style={[styles.paw, styles.paw2]} 
@@ -67,22 +70,30 @@ export default function HomeScreen(): React.ReactElement {
           </TouchableOpacity>
         </View>
 
-        {/* SEÇÕES DE ANIMAIS */}
+        {/* SEÇÕES DE ANIMAIS (COM FOTOS DIFERENTES AGORA) */}
         <Section title="Pedidos de Adoção" subtitle="Pedidos de adoção pendentes: 5">
-          {animalCard("Não possui nome", "Sem raça definida (SRD)   AD", "Em tratamento")}
-          {animalCard("Amendoim", "Sem raça definida (SRD)   FL", "")}
+          {/* Pet 1 - Branquinho */}
+          {animalCard("Não possui nome", "Sem raça definida (SRD)   AD", "Em tratamento", require("../../../assets/images/pets/branquinho.png"))}
+          
+          {/* Pet 2 - Neguinho (Exemplo de outra foto) */}
+          {animalCard("Amendoim", "Sem raça definida (SRD)   FL", "", require("../../../assets/images/pets/neguinho.png"))}
+          
           <TouchableOpacity style={styles.verMaisBtn}><Text style={styles.verMaisText}>Ver mais</Text></TouchableOpacity>
         </Section>
 
         <Section title="Animais em Lares Temporários" subtitle="Animais em lares temporários ativos: 6">
-          {animalCard("Não possui nome", "Sem raça definida (SRD)   AD", "Em tratamento")}
-          {animalCard("Amendoim", "Sem raça definida (SRD)   FL", "")}
+          {/* Pet 3 - Caramelo */}
+          {animalCard("Rex", "Pastor Alemão", "Em tratamento", require("../../../assets/images/pets/caramelo.png"))}
+          
+          {/* Pet 4 - Shanti */}
+          {animalCard("Luna", "Vira-lata", "Disponível", require("../../../assets/images/pets/shanti.png"))}
+          
           <TouchableOpacity style={styles.verMaisBtn}><Text style={styles.verMaisText}>Ver mais</Text></TouchableOpacity>
         </Section>
 
         <Section title="Animais registrados recentemente" subtitle="Animais aguardando vaga: 8">
-          {animalCard("Não possui nome", "Sem raça definida (SRD)   AD", "Em tratamento")}
-          {animalCard("Amendoim", "Sem raça definida (SRD)   FL", "")}
+          {animalCard("Bob", "Poodle", "Aguardando", require("../../../assets/images/pets/neguinho.png"))}
+          {animalCard("Mel", "Labrador", "Em análise", require("../../../assets/images/pets/branquinho.png"))}
           <TouchableOpacity style={styles.verMaisBtn}><Text style={styles.verMaisText}>Ver mais</Text></TouchableOpacity>
         </Section>
 
@@ -139,7 +150,15 @@ function Section({ title, subtitle, children }: { title: string; subtitle?: stri
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F0F2F5" },
   headerContainer: { paddingTop: 40, paddingHorizontal: 20, paddingBottom: 15 },
-  headerIcons: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
+  
+  // Header Icons alinhados
+  headerIcons: { 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    marginBottom: 10,
+    alignItems: 'center' 
+  },
+  
   titleContainer: {
     position: 'relative',
     marginBottom: 15,
@@ -148,7 +167,7 @@ const styles = StyleSheet.create({
     fontSize: 24, 
     fontWeight: "700", 
     color: "#2D68A6", 
-    width: "70%", // Limita a largura para o texto não ficar em cima da pata
+    width: "70%", 
     marginTop: 5, 
   },
   paw: {
@@ -183,7 +202,6 @@ const styles = StyleSheet.create({
   verMaisBtn: { alignSelf: "flex-end", marginTop: 5 },
   verMaisText: { color: "#2D68A6", fontWeight: "600" },
 
-  // --- ÁREA DE CAMPANHAS ---
   campanhasContainer: {
     marginTop: 20,
     paddingHorizontal: 20,
