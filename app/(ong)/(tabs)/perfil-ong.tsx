@@ -1,169 +1,297 @@
 import { Ionicons } from "@expo/vector-icons";
-import { router, Stack } from "expo-router"; // Importei Stack
-import React from "react";
-import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { router, Stack, useFocusEffect } from "expo-router";
+import React, { useState, useCallback } from "react";
+import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from "react-native";
 import { BarChart, LineChart } from "react-native-chart-kit";
+import api from '@/lib/axios';
 
 const screenWidth = Dimensions.get("window").width - 40;
 
+// Tipos para o Estado
+interface ProfileData {
+  nomeDisplay: string;
+  email: string;
+  telefone: string;
+  local: string;
+}
+
+interface StatsData {
+  adotados: number;
+  processo: number;
+  aguardando: number;
+}
+
+interface LastPet {
+  nome: string;
+  raca: string;
+  status: string;
+  data: string;
+  foto: string | null;
+}
+
 export default function PerfilOngScreen(): React.ReactElement {
+  const [loading, setLoading] = useState(true);
+  
+  // Estado do Perfil (Inicia vazio)
+  const [perfil, setPerfil] = useState<ProfileData>({
+    nomeDisplay: "",
+    email: "",
+    telefone: "",
+    local: ""
+  });
+
+  // Estado das Estatísticas (Calculado a partir das listas reais)
+  const [stats, setStats] = useState<StatsData>({ adotados: 0, processo: 0, aguardando: 0 });
+  
+  // Estado do último pet (Card de atividade)
+  const [lastPet, setLastPet] = useState<LastPet | null>(null);
+
+  // Recarrega sempre que a tela ganha foco
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [])
+  );
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      // --- 1. PUXAR DADOS DO PERFIL (IGUAL AO USUÁRIO COMUM) ---
+      const resUser = await api.get('/usuarios/me');
+      const user = resUser.data;
+
+      // Lógica de prioridade: Tenta pegar dados específicos da ONG, senão usa da Conta
+      // Isso garante que funcione mesmo se o cadastro tiver salvado em lugares diferentes
+      const nomeReal = user.ong?.nome || user.nome || "ONG Sem Nome";
+      const telefoneReal = user.telefone || user.ong?.telefone || "Não informado";
+      
+      const cidade = user.ong?.cidade || user.cidade;
+      const estado = user.ong?.estado || user.estado;
+      const localReal = (cidade && estado) ? `${cidade} - ${estado}` : "Localização não inf.";
+
+      setPerfil({
+        nomeDisplay: nomeReal,
+        email: user.email,
+        telefone: telefoneReal,
+        local: localReal
+      });
+
+      // --- 2. PUXAR DADOS PARA ESTATÍSTICAS (OPCIONAL, MAS RECOMENDADO) ---
+      // Se der erro aqui, não trava o perfil (por isso o try/catch interno é uma boa prática, 
+      // mas vou manter simples aqui assumindo que as rotas existem)
+      
+      const [resAnimais, resPedidos] = await Promise.all([
+        api.get('/animais/meus'),
+        api.get('/pedidos-adocao/gerenciar')
+      ]);
+
+      const animais = resAnimais.data || [];
+      const pedidos = resPedidos.data || [];
+
+      // Cálculos Simples
+      setStats({
+        aguardando: animais.filter((a: any) => a.status === 'DISPONIVEL').length,
+        adotados: animais.filter((a: any) => a.status === 'ADOTADO').length,
+        processo: pedidos.filter((p: any) => p.status === 'PENDENTE').length
+      });
+
+      // Define o card de "Última Atividade"
+      if (pedidos.length > 0) {
+        const p = pedidos[0];
+        setLastPet({
+            nome: p.animal.nome,
+            raca: p.animal.raca || "SRD",
+            status: "Novo Pedido",
+            data: new Date(p.dataPedido).toLocaleDateString(),
+            foto: p.animal.photoURL
+        });
+      } else if (animais.length > 0) {
+        const a = animais[0];
+        setLastPet({
+            nome: a.nome,
+            raca: a.raca || "SRD",
+            status: "Cadastrado",
+            data: "Recente",
+            foto: a.photoURL
+        });
+      }
+
+    } catch (error) {
+      console.error("Erro ao carregar perfil ONG:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+            <ActivityIndicator size="large" color="#1A3C6E" />
+        </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       
       <Stack.Screen options={{ headerShown: false }} />
 
+      {/* HEADER */}
       <View style={styles.header}>
-        {/* Botão Home */}
         <TouchableOpacity onPress={() => router.push('/(ong)/home-ong' as any)}>
             <Ionicons name="home-outline" size={24} color="#1A3C6E" />
         </TouchableOpacity>
 
-        {/* Botão Notificações */}
         <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes-ong' as any)}>
             <Ionicons name="notifications-outline" size={24} color="#1A3C6E" />
         </TouchableOpacity>
       </View>
 
+      {/* CARD PERFIL */}
       <View style={styles.cardOng}>
         <Image
           source={require("../../../assets/images/ui/institutoCaramelo.png")}
           style={styles.ongImage}
         />
-        <View style={styles.ongProfileCircle} />
+        <View style={styles.ongProfileCircle}>
+            <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+                 <Text style={{color:'#fff', fontSize: 32, fontWeight:'bold'}}>
+                    {perfil.nomeDisplay.charAt(0).toUpperCase()}
+                 </Text>
+            </View>
+        </View>
       </View>
 
-      <Text style={styles.ongName}>Nome da ONG</Text>
+      {/* NOME DA ONG (VINDO DO BANCO) */}
+      <Text style={styles.ongName}>{perfil.nomeDisplay}</Text>
 
-      {/* CONTATO E LOCAL */}
+      {/* CONTATO E LOCAL (VINDO DO BANCO) */}
       <View style={styles.infoRow}>
         <View style={{ flex: 1 }}>
           <Text style={styles.label}>Contato</Text>
-          <Text style={styles.infoText}>username@gmail.com</Text>
-          <Text style={styles.infoText}>11 96584 2214</Text>
+          <Text style={styles.infoText}>{perfil.email}</Text>
+          <Text style={styles.infoText}>{perfil.telefone}</Text>
         </View>
 
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, alignItems: 'flex-end' }}>
           <Text style={styles.label}>Localização</Text>
-          <Text style={styles.infoText}>SP, Brasil</Text>
+          <Text style={styles.infoText}>{perfil.local}</Text>
         </View>
       </View>
 
-      {/* BOTÕES */}
+      {/* BOTÕES DE NAVEGAÇÃO */}
        <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={false}
-              style={styles.buttonsScrollView}
-            >
-              <TouchableOpacity style={styles.btn} onPress={() => router.push("/perfil-ong")}>
-                <Text style={styles.btnText}>Adotados</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity style={styles.btn} onPress={() => router.push("/registrados")}>
-                <Text style={styles.btnText}>Registrados</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.btn} onPress={() => router.push("/lar-temporario")}>
-                <Text style={styles.btnText}>Lar Temporario</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.btn} onPress={() => router.push("/doacoes-ong")}>
-                <Text style={styles.btnText}>Doações</Text>
-              </TouchableOpacity>
-            </ScrollView>
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          style={styles.buttonsScrollView}
+        >
+          <TouchableOpacity style={styles.btn} onPress={() => router.push("/(ong)/adotados-lista" as any)}>
+            <Text style={styles.btnText}>Adotados</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.btn} onPress={() => router.push("/(ong)/(tabs)/meusAnimais-ong" as any)}>
+            <Text style={styles.btnText}>Registrados</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.btn} onPress={() => router.push("/(ong)/voluntarios-lista" as any)}>
+            <Text style={styles.btnText}>Lar Temporário</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.btn} onPress={() => router.push("/(ong)/doacoes-ong" as any)}>
+            <Text style={styles.btnText}>Doações</Text>
+          </TouchableOpacity>
+        </ScrollView>
       
 
-      {/* CARD PET */}
-      <View style={styles.petCard}>
-        <Image
-          source={require("../../../assets/images/pets/branquinho.png")}
-          style={styles.petImg}
-        />
-        <View style={styles.petInfo}>
-          <Text style={styles.petName}>Nome</Text>
-          <Text style={styles.petSub}>Sem raça definida (SRD) - AD</Text>
-          <Text style={styles.petDetails}>
-            Adotado em 00/00/0000 {"\n"}
-            Status: Visita Agendada
-          </Text>
+      {/* CARD PET (Dinâmico: Mostra o último pet que teve interação) */}
+      {lastPet && (
+        <View style={styles.petCard}>
+            <Image
+              source={lastPet.foto ? { uri: lastPet.foto } : require("../../../assets/images/pets/branquinho.png")}
+              style={styles.petImg}
+            />
+            <View style={styles.petInfo}>
+              <Text style={styles.petName}>{lastPet.nome}</Text>
+              <Text style={styles.petSub}>{lastPet.raca}</Text>
+              <Text style={styles.petDetails}>
+                  Data: {lastPet.data} {"\n"}
+                  Status: <Text style={{fontWeight:'bold', color: '#2D68A6'}}>{lastPet.status}</Text>
+              </Text>
 
-          <TouchableOpacity style={styles.infoButton} onPress={() => router.push("/detalhes-pet-ong")}>
-            <Text style={styles.infoButtonText}>Ver informações</Text>
-          </TouchableOpacity>
+              <TouchableOpacity style={styles.infoButton} onPress={() => router.push("/(ong)/pedidos-lista" as any)}>
+                  <Text style={styles.infoButtonText}>Ver detalhes</Text>
+              </TouchableOpacity>
+            </View>
         </View>
+      )}
+
+      {/* --- GRÁFICOS (DADOS MOCKADOS/ESTÁTICOS) --- */}
+      
+      <Text style={styles.graphTitle}>Processos de adoção (6 meses)</Text>
+      <View style={styles.chartCard}>
+        <BarChart
+            data={{
+              labels: ["Mai", "Jun", "Jul", "Ago", "Set", "Out"],
+              datasets: [{ data: [23, 12, 25, 16, 22, 7] }] 
+            }}
+            width={screenWidth}
+            height={220}
+            yAxisLabel=""  
+            yAxisSuffix="" 
+            fromZero
+            chartConfig={{
+              backgroundGradientFrom: "#fff",
+              backgroundGradientTo: "#fff",
+              decimalPlaces: 0,
+              color: () => "#1A3C6E",
+              labelColor: () => "#1A3C6E",
+              barPercentage: 0.55,
+            }}
+            style={{ borderRadius: 12 }}
+        />
       </View>
 
-      {/* GRÁFICO 6 MESES */}
-      <Text style={styles.graphTitle}>Processos de adoção (6 meses)</Text>
-
-   <View style={styles.chartCard}>
-  <BarChart
-    data={{
-      labels: ["Mai", "Jun", "Jul", "Ago", "Set", "Out"],
-      datasets: [{ data: [23, 12, 25, 16, 22, 7] }]
-    }}
-    width={screenWidth}
-    height={220}
-    yAxisLabel=""  
-    yAxisSuffix="" 
-    fromZero
-    chartConfig={{
-      backgroundGradientFrom: "#fff",
-      backgroundGradientTo: "#fff",
-      decimalPlaces: 0,
-      color: () => "#1A3C6E",
-      labelColor: () => "#1A3C6E",
-      barPercentage: 0.55,
-    }}
-    style={{ borderRadius: 12 }}
-  />
-</View>
-
-      {/* GRÁFICO 1 SEMANA */}
-      <Text style={styles.graphTitle}>Processos de adoção (1 semana) - (05/10 - 11/10)</Text>
-
+      <Text style={styles.graphTitle}>Atividade Recente (Semana)</Text>
       <View style={styles.chartCard}>
         <LineChart
-
-          data={{
-            labels: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
-            datasets: [{ data: [1, 2, 1, 1, 2, 3, 2] }]
-          }}
-          width={screenWidth} 
-          height={250}
-          fromZero
-          bezier
-          chartConfig={{
-            backgroundGradientFrom: "#fff",
-            backgroundGradientTo: "#fff",
-            decimalPlaces: 0,
-            color: () => "#1A3C6E",
-            labelColor: () => "#1A3C6E",
-            propsForDots: {
-              r: "5",
-              strokeWidth: "2",
-              stroke: "#1A3C6E"
-            },
-          }}
-          style={{ borderRadius: 12 }}
+            data={{
+              labels: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+              datasets: [{ data: [1, 2, 1, 1, 2, 3, 2] }]
+            }}
+            width={screenWidth} 
+            height={250}
+            fromZero
+            bezier
+            chartConfig={{
+              backgroundGradientFrom: "#fff",
+              backgroundGradientTo: "#fff",
+              decimalPlaces: 0,
+              color: () => "#1A3C6E",
+              labelColor: () => "#1A3C6E",
+              propsForDots: { r: "5", strokeWidth: "2", stroke: "#1A3C6E" },
+            }}
+            style={{ borderRadius: 12 }}
         />
       </View>
 
-      {/* ESTATÍSTICAS SIMPLES */}
-      <Text style={styles.graphTitle}>Estatísticas (6 meses)</Text>
+      {/* --- ESTATÍSTICAS (DADOS REAIS DO BANCO) --- */}
+      <Text style={styles.graphTitle}>Estatísticas Gerais</Text>
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
-          <Text style={styles.statNumber}>42</Text>
+          <Text style={styles.statNumber}>{stats.adotados}</Text>
           <Text style={styles.statLabel}>Adotados</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={styles.statNumber}>18</Text>
+          <Text style={styles.statNumber}>{stats.processo}</Text>
           <Text style={styles.statLabel}>Em processo</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={styles.statNumber}>7</Text>
+          <Text style={styles.statNumber}>{stats.aguardando}</Text>
           <Text style={styles.statLabel}>Aguardando</Text>
         </View>
       </View>
 
-      {/* FOOTER */}
       <View style={{ alignItems: "flex-end", marginTop: 20, marginBottom: 40 }}>
         <TouchableOpacity onPress={() => router.push("/(ong)/menuconfiguracoes-ong" as any)}>
           <Ionicons name="settings-outline" size={28} color="#1A3C6E" />
@@ -179,14 +307,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffffff",
     padding: 15,
   },
-
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 15,
     marginTop: 10, 
   },
-
   cardOng: {
     width: "100%",
     height: 140,
@@ -195,17 +321,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
-    
   },
-
   ongImage: {
     width: "100%",
     height: "100%",
     borderRadius: 20,
     opacity: 0.5,
-    
   },
-
   ongProfileCircle: {
     width: 80,
     height: 80,
@@ -213,8 +335,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#1A3C6E",
     position: "absolute",
     top: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 4,
+    borderColor: '#fff'
   },
-
   ongName: {
     fontSize: 20,
     fontWeight: "bold",
@@ -223,35 +348,27 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: "center",
   },
-
   infoRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 20,
     gap: 10,
-    
-    
+    paddingHorizontal: 10
   },
-
   label: {
     fontSize: 12,
     fontWeight: "600",
     color: "#1A3C6E",
     marginBottom: 5,
-    
   },
-
   infoText: {
     fontSize: 14,
     color: "#555",
     marginBottom: 3,
-    
   },
-
   buttonsScrollView: {
     marginBottom: 20,
   },
-
   btn: {
     minWidth: 140,
     backgroundColor: "#87b0ceff",
@@ -261,13 +378,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 10,
   },
-
   btnText: {
     color: "#1A3C6E",
     fontWeight: "600",
     fontSize: 14,
   },
-
   petCard: {
     flexDirection: "row",
     backgroundColor: "#87b0ceff",
@@ -277,52 +392,45 @@ const styles = StyleSheet.create({
     gap: 15,
     elevation: 2,
   },
-
   petImg: {
     width: 80,
     height: 80,
     borderRadius: 8,
+    backgroundColor: '#eee'
   },
-
   petInfo: {
     flex: 1,
     justifyContent: "space-between",
   },
-
   petName: {
     fontSize: 16,
     fontWeight: "bold",
     color: "#1A3C6E",
   },
-
   petSub: {
     fontSize: 14,
     color: "#1A3C6E",
     marginTop: 2,
-    fontWeight: "semibold"
+    fontWeight: "600"
   },
-
   petDetails: {
-    fontSize: 14,
+    fontSize: 13,
     color: "#1A3C6E",
     marginTop: 5,
   },
-
   infoButton: {
-  
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 6,
     alignSelf: "flex-end",
     marginTop: 8,
+    backgroundColor: 'rgba(255,255,255,0.3)'
   },
-
   infoButtonText: {
     color: "#1A3C6E",
-    fontWeight: "600",
+    fontWeight: "bold",
     fontSize: 12,
   },
-
   graphTitle: {
     fontSize: 16,
     fontWeight: "bold",
@@ -330,7 +438,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginTop: 10,
   },
-
   chartCard: {
     backgroundColor: "#fff",
     paddingVertical: 20,
@@ -339,7 +446,6 @@ const styles = StyleSheet.create({
     elevation: 2,
     alignItems: "center",
   },
-
   statsContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -349,17 +455,14 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     elevation: 2,
   },
-
   statItem: {
     alignItems: "center",
   },
-
   statNumber: {
     fontSize: 28,
     fontWeight: "bold",
     color: "#1A3C6E",
   },
-
   statLabel: {
     fontSize: 12,
     color: "#999",

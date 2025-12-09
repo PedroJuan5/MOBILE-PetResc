@@ -1,6 +1,7 @@
-import api, { AxiosError } from '@/lib/axios';
+import api from '@/lib/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { Platform } from "react-native";
 
 interface SignInCredentials {
   email: string;
@@ -26,60 +27,61 @@ interface AuthContextData {
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  async function storageGet(key: string) {
+    if (Platform.OS === "web") return localStorage.getItem(key);
+    return await AsyncStorage.getItem(key);
+  }
+
+  async function storageSet(key: string, value: string) {
+    if (Platform.OS === "web") return localStorage.setItem(key, value);
+    return await AsyncStorage.setItem(key, value);
+  }
+
+  async function storageRemove(key: string) {
+    if (Platform.OS === "web") return localStorage.removeItem(key);
+    return await AsyncStorage.removeItem(key);
+  }
+
   useEffect(() => {
-    async function loadUserFromStorage() {
-      const token = await AsyncStorage.getItem('@PetResc:token');
-      const storedUser = await AsyncStorage.getItem('@PetResc:user');
+    async function loadUser() {
+      const token = await storageGet('@PetResc:token');
+      const storedUser = await storageGet('@PetResc:user');
 
       if (token && storedUser) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         try {
-          const response = await api.get('/api/auth/me');
+          const response = await api.get('/auth/me');
           setUser(response.data);
         } catch {
-          await AsyncStorage.removeItem('@PetResc:token');
-          await AsyncStorage.removeItem('@PetResc:user');
+          await storageRemove('@PetResc:token');
+          await storageRemove('@PetResc:user');
         }
       }
-
       setIsLoading(false);
     }
-    loadUserFromStorage();
+
+    loadUser();
   }, []);
 
   const signIn = async ({ email, password }: SignInCredentials) => {
-    try {
-      const response = await api.post('/auth/login', { email, password });
+    const response = await api.post('/auth/login', { email, password });
 
-      const { token, usuario } = response.data;
+    const { token, usuario } = response.data;
 
-      await AsyncStorage.setItem('@PetResc:token', token);
-      await AsyncStorage.setItem('@PetResc:user', JSON.stringify(usuario));
+    await storageSet('@PetResc:token', token);
+    await storageSet('@PetResc:user', JSON.stringify(usuario));
 
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-      setUser(usuario);
-
-    } catch (error: any) {
-      if (error instanceof AxiosError && error.response) {
-        throw new Error(error.response.data.error || 'Erro ao fazer login');
-      }
-      throw new Error('Não foi possível se conectar ao servidor.');
-    }
+    setUser(usuario);
   };
 
   const signOut = async () => {
-    await AsyncStorage.removeItem('@PetResc:token');
-    await AsyncStorage.removeItem('@PetResc:user');
-    delete api.defaults.headers.common['Authorization'];
+    await storageRemove('@PetResc:token');
+    await storageRemove('@PetResc:user');
     setUser(null);
   };
 
