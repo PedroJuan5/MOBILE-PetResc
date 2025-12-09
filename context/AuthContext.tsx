@@ -4,14 +4,16 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Platform } from "react-native";
 
 interface SignInCredentials {
-  email: string;
+  email?: string; 
+  cnpj?: string;
   password: string;
+  type: 'PUBLICO' | 'ONG';
 }
 
 interface User {
   id: number;
   nome: string;
-  email: string;
+  email?: string;
   role: 'PUBLICO' | 'ONG' | 'ADMIN';
   publico?: any;
   ong?: any;
@@ -26,7 +28,6 @@ interface AuthContextData {
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
-
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -34,47 +35,61 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   async function storageGet(key: string) {
-    if (Platform.OS === "web") return localStorage.getItem(key);
-    return await AsyncStorage.getItem(key);
+    return Platform.OS === "web"
+      ? localStorage.getItem(key)
+      : AsyncStorage.getItem(key);
   }
 
   async function storageSet(key: string, value: string) {
-    if (Platform.OS === "web") return localStorage.setItem(key, value);
-    return await AsyncStorage.setItem(key, value);
+    return Platform.OS === "web"
+      ? localStorage.setItem(key, value)
+      : AsyncStorage.setItem(key, value);
   }
 
   async function storageRemove(key: string) {
-    if (Platform.OS === "web") return localStorage.removeItem(key);
-    return await AsyncStorage.removeItem(key);
+    return Platform.OS === "web"
+      ? localStorage.removeItem(key)
+      : AsyncStorage.removeItem(key);
   }
 
   useEffect(() => {
-    async function loadUser() {
-      const token = await storageGet('@PetResc:token');
-      const storedUser = await storageGet('@PetResc:user');
+    async function loadUserFromStorage() {
+      try {
+        const token = await storageGet('@PetResc:token');
+        const storedUser = await storageGet('@PetResc:user');
 
-      if (token && storedUser) {
-        try {
+        if (token && storedUser) {
+          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
           const response = await api.get('/auth/me');
           setUser(response.data);
-        } catch {
-          await storageRemove('@PetResc:token');
-          await storageRemove('@PetResc:user');
         }
+      } catch (e) {
+        await storageRemove('@PetResc:token');
+        await storageRemove('@PetResc:user');
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     }
 
-    loadUser();
+    loadUserFromStorage();
   }, []);
 
-  const signIn = async ({ email, password }: SignInCredentials) => {
-    const response = await api.post('/auth/login', { email, password });
+  const signIn = async ({ email, cnpj, password, type }: SignInCredentials) => {
+    const route = type === 'ONG' ? '/auth/login-ong' : '/auth/login';
+
+    const payload: any = { password };
+    if (type === 'ONG') payload.cnpj = cnpj!.replace(/\D/g, '');
+    else payload.email = email;
+
+    const response = await api.post(route, payload);
 
     const { token, usuario } = response.data;
 
     await storageSet('@PetResc:token', token);
     await storageSet('@PetResc:user', JSON.stringify(usuario));
+
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
     setUser(usuario);
   };
@@ -82,6 +97,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     await storageRemove('@PetResc:token');
     await storageRemove('@PetResc:user');
+    delete api.defaults.headers.common['Authorization'];
     setUser(null);
   };
 
