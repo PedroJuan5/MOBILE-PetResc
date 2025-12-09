@@ -1,18 +1,5 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  ScrollView, 
-  StatusBar,
-  Image,
-  ImageBackground,
-  Dimensions,
-  TextInput,
-  Modal,
-  Alert
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar,Image,ImageBackground,Dimensions,TextInput,Modal,Alert} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -34,50 +21,43 @@ const COLORS = {
 
 export default function DoacoesOngScreen() {
   const router = useRouter();
+  
+  //ESTADOS DE CONTROLE
   const [step, setStep] = useState(1);
   const [denunciaVisivel, setDenunciaVisivel] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // Estados Formulário e Campanha
+  //ESTADOS DO FORMULÁRIO DE DOAÇÃO
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const [customValue, setCustomValue] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [totalArrecadado, setTotalArrecadado] = useState(7813);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  //ESTADOS DA NOVA CAMPANHA
   const [campanhaNome, setCampanhaNome] = useState('');
   const [campanhaData, setCampanhaData] = useState('');
   const [campanhaMeta, setCampanhaMeta] = useState('');
   const [campanhaDesc, setCampanhaDesc] = useState('');
   const [campanhaImagem, setCampanhaImagem] = useState<string | null>(null);
 
-  // --- LÓGICA ---
-  const handleFinalizarDoacao = () => {
-    // ... (sua lógica original mantida)
-    let valorDoado = 0;
-    if (selectedValue === 'custom') {
-        valorDoado = parseFloat(customValue.replace(',', '.'));
-    } else if (selectedValue) {
-        valorDoado = parseFloat(selectedValue);
+  const handleDateChange = (text: string) => {
+    // 1. Remove tudo que não for número
+    const cleaned = text.replace(/[^0-9]/g, '');
+    let formatted = cleaned;
+
+    // 2. Adiciona a primeira barra após o dia (2 chars)
+    if (cleaned.length > 2) {
+      formatted = `${cleaned.slice(0, 2)}/${cleaned.slice(2)}`;
     }
-    if (!valorDoado || isNaN(valorDoado) || valorDoado <= 0) {
-        Alert.alert("Erro", "Selecione um valor válido.");
-        return;
+    // 3. Adiciona a segunda barra após o mês (4 chars no total)
+    if (cleaned.length > 4) {
+      formatted = `${cleaned.slice(0, 2)}/${cleaned.slice(2, 4)}/${cleaned.slice(4, 8)}`;
     }
-    if (!paymentMethod) {
-        Alert.alert("Erro", "Selecione uma forma de pagamento.");
-        return;
-    }
-    setTotalArrecadado(prev => prev + valorDoado);
-    setShowSuccessModal(true);
+
+    setCampanhaData(formatted);
   };
 
-  const handleCloseSuccess = () => {
-    setShowSuccessModal(false);
-    setStep(1); 
-    setSelectedValue(null);
-    setCustomValue('');
-    setPaymentMethod(null);
-  };
-
+  //LOGICA: IMAGEM
   const pickImageCampanha = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -88,14 +68,52 @@ export default function DoacoesOngScreen() {
     if (!result.canceled) setCampanhaImagem(result.assets[0].uri);
   };
 
+  // --- LÓGICA: CRIAR CAMPANHA ---
   const handleCriarCampanha = () => {
     if (!campanhaNome || !campanhaMeta) {
         Alert.alert("Atenção", "Preencha pelo menos o nome e a meta.");
         return;
     }
-    Alert.alert("Sucesso", "Campanha criada com sucesso!", [
-        { text: "OK", onPress: () => setStep(1) }
-    ]);
+    
+    router.push({
+        pathname: "/(ong)/detalhes-campanha",
+        params: {
+            nome: campanhaNome,
+            meta: campanhaMeta,
+            descricao: campanhaDesc,
+            imagem: campanhaImagem 
+        }
+    });
+  };
+
+  //LOGICA: FINALIZAR DOAÇÃO 
+  const handleFinalizarDoacao = () => {
+    let valorDoado = 0;
+    if (selectedValue === 'custom') {
+        valorDoado = parseFloat(customValue.replace(',', '.'));
+    } else if (selectedValue) {
+        valorDoado = parseFloat(selectedValue);
+    }
+
+    if (!valorDoado || isNaN(valorDoado) || valorDoado <= 0) {
+        Alert.alert("Erro", "Selecione um valor válido.");
+        return;
+    }
+    if (!paymentMethod) {
+        Alert.alert("Erro", "Selecione uma forma de pagamento.");
+        return;
+    }
+
+    setTotalArrecadado(prev => prev + valorDoado);
+    setShowSuccessModal(true);
+  };
+
+  const handleCloseSuccess = () => {
+    setShowSuccessModal(false);
+    setStep(1); 
+    setSelectedValue(null);
+    setCustomValue('');
+    setPaymentMethod(null);
   };
 
   const formatCurrency = (value: number) => {
@@ -116,7 +134,7 @@ export default function DoacoesOngScreen() {
     </TouchableOpacity>
   );
 
-  // --- CONTEÚDOS ---
+  //RENDERIZADORES
   const renderDashboardContent = () => (
     <View style={{ paddingBottom: 100 }}>
       <View style={styles.introSection}>
@@ -172,10 +190,20 @@ export default function DoacoesOngScreen() {
             <Text style={styles.ncLabel}>Nome da campanha:</Text>
             <TextInput style={styles.ncInput} placeholder="Ex. Resgate de animais" placeholderTextColor="#A0B4CC" value={campanhaNome} onChangeText={setCampanhaNome}/>
         </View>
+        
         <View style={styles.ncInputGroup}>
             <Text style={styles.ncLabel}>Data limite:</Text>
-            <TextInput style={styles.ncInput} placeholder="Ex. Duração de 5 a 7 meses" placeholderTextColor="#A0B4CC" value={campanhaData} onChangeText={setCampanhaData}/>
+            <TextInput 
+                style={styles.ncInput} 
+                placeholder="DD/MM/AAAA" 
+                placeholderTextColor="#A0B4CC" 
+                value={campanhaData} 
+                onChangeText={handleDateChange} 
+                keyboardType="numeric"
+                maxLength={10}
+            />
         </View>
+
         <View style={styles.ncInputGroup}>
             <Text style={styles.ncLabel}>Meta financeira:</Text>
             <TextInput style={styles.ncInput} placeholder="Ex. 20.000,00" placeholderTextColor="#A0B4CC" keyboardType="numeric" value={campanhaMeta} onChangeText={setCampanhaMeta}/>
@@ -258,52 +286,49 @@ export default function DoacoesOngScreen() {
     </View>
   );
 
-  // --- RETURN PRINCIPAL ---
   return (
     <SafeAreaView style={[styles.container, step === 2 && { backgroundColor: COLORS.primary }]} edges={['top', 'left', 'right']}>
       <StatusBar barStyle={step === 2 ? "light-content" : "dark-content"} backgroundColor={step === 2 ? COLORS.primary : "#FFF"} />
       <DenuncieModal visible={denunciaVisivel} onClose={() => setDenunciaVisivel(false)} />
 
-      {/* --- HEADER FIXO - BLOCO 1 --- */}
-      {/* Esse View é irmão do ScrollView, logo ele não rola */}
+      {/*HEADER FIXO: DASHBOARD*/}
       {step === 1 && (
         <View style={styles.headerBlock}>
             <CustomHeaderLeft onDenunciePress={() => setDenunciaVisivel(true)} />
-            <CustomHeaderRight onNotificationPress={() => router.push('/(ong)/notificacoes-ong' as any)} />
+            <CustomHeaderRight onNotificationPress={() => router.push('/(ong)/notificacao-ong' as any)} />
         </View>
       )}
 
-      {/* --- HEADER FIXO - BLOCO 2 (NOVA CAMPANHA) --- */}
+      {/*HEADER FIXO: NOVA CAMPANHA*/}
       {step === 2 && (
         <View style={styles.ncHeaderBlock}>
             <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
                 <TouchableOpacity onPress={() => setStep(1)} style={{paddingRight: 10}}>
                     <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
                 </TouchableOpacity>
-                
                 <View>
                     <View style={{flexDirection:'row', alignItems:'center'}}>
-                    
+                        <Ionicons name="alert-circle" size={20} color={COLORS.primary} style={{marginRight:5}}/>
                         <Text style={styles.ncTitle}>Nova Campanha</Text>
                     </View>
-                
+                    <Text style={{color: COLORS.primary, fontSize: 12}}>Preencha os dados abaixo</Text>
                 </View>
             </View>
             
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <CustomHeaderRight onNotificationPress={() => router.push('/(ong)/notificacoes-ong' as any)} />
+                <CustomHeaderRight onNotificationPress={() => router.push('/(ong)/notificacao-ong' as any)} />
             </View>
         </View>
       )}
 
-      {/* --- CONTEÚDO SCROLLÁVEL --- */}
+      {/*CONTEÚDO*/}
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
         {step === 1 && renderDashboardContent()}
         {step === 2 && renderNewCampaignContent()}
         {step === 3 && renderDonationFormContent()}
       </ScrollView>
 
-      {/* MODAL SUCESSO */}
+      {/*MODAL SUCESSO*/}
       <Modal visible={showSuccessModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
@@ -323,7 +348,7 @@ export default function DoacoesOngScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFF' },
   
-  // HEADER FIXO SIMPLES (DASHBOARD)
+  //HEADERS
   headerBlock: { 
     flexDirection: 'row', 
     justifyContent: 'space-between', 
@@ -334,8 +359,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, 
     borderBottomColor: '#F0F0F0',
   },
-  
-  // HEADER FIXO SIMPLES (NOVA CAMPANHA)
   ncHeaderBlock: { 
     backgroundColor: '#FFF', 
     paddingHorizontal: 20, 
@@ -344,20 +367,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderBottomRightRadius: 30, 
-    // Sem absolute, sem zindex maluco, apenas um bloco.
   },
   ncTitle: { 
     fontSize: 18, 
     fontWeight: 'bold', 
     color: COLORS.primary 
   },
-
-  // Back Button no Step 3
   backHeaderContainer: { paddingHorizontal: 20, paddingTop: 15, paddingBottom: 5 },
   backButton: { flexDirection: 'row', alignItems: 'center' },
   backButtonText: { fontSize: 16, color: COLORS.primary, fontWeight: 'bold', marginLeft: 5 },
 
-  // DASHBOARD
+  //DASHBOARD
   introSection: { padding: 25 },
   titleRow: { flexDirection: 'row', marginBottom: 20, width: '80%', justifyContent: 'center' },
   pageTitle: { fontSize: 24, fontWeight: 'bold', color: COLORS.primary, textAlign: 'center', lineHeight: 32 },
@@ -378,7 +398,7 @@ const styles = StyleSheet.create({
   donateSection: { padding: 30, alignItems: 'center' },
   footerText: { fontSize: 15, color: COLORS.primary, textAlign: 'center', marginTop: 15, lineHeight: 22 },
 
-  // NOVA CAMPANHA
+  //NOVA CAMPANHA 
   ncIntroText: { color: '#FFF', fontSize: 16, textAlign: 'center', marginBottom: 25, lineHeight: 22 },
   ncInputGroup: { marginBottom: 20 },
   ncLabel: { color: '#FFF', fontSize: 16, marginBottom: 8 },
@@ -389,7 +409,7 @@ const styles = StyleSheet.create({
   ncSubmitButton: { backgroundColor: '#FFF', paddingVertical: 15, borderRadius: 30, alignItems: 'center', marginTop: 20, marginBottom: 40 },
   ncSubmitText: { color: COLORS.primary, fontWeight: 'bold', fontSize: 18 },
 
-  // FORMULARIO
+  //FORMULARIO DE DOAÇÃO 
   formContent: { padding: 25 },
   blueTitle: { fontSize: 20, color: COLORS.primary, textAlign: 'center', marginBottom: 5 },
   blueSubtitle: { fontSize: 18, color: COLORS.primary, textAlign: 'center', marginBottom: 15 },
@@ -404,10 +424,10 @@ const styles = StyleSheet.create({
   radioLabel: { fontSize: 14, color: '#333', fontWeight: '500', flex: 1 },
   radioInputRow: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   inlineInput: { borderBottomWidth: 1, borderBottomColor: '#999', width: 100, padding: 0, height: 20, fontSize: 14 },
-  
   botaoFinalizar: { backgroundColor: '#2D68A6', width: 180, paddingVertical: 15, borderRadius: 30, alignItems: 'center', alignSelf: 'center', marginTop: 30 },
   textoBotaoFinalizar: { color: '#FFF', fontSize: 18, fontWeight: 'bold', textTransform: 'uppercase' },
 
+  //FOOTER ARRECADADO
   footerInfoBox: { backgroundColor: '#F0F6FA', padding: 20, marginTop: 20, borderTopWidth: 1, borderTopColor: '#E0E0E0' },
   footerContentRow: { flexDirection: 'row', alignItems: 'center' },
   footerTexts: { flex: 1, marginLeft: 15 },
@@ -420,6 +440,7 @@ const styles = StyleSheet.create({
   chartInnerCircle: { justifyContent: 'center', alignItems: 'center' },
   chartPercentage: { fontSize: 14, fontWeight: 'bold', color: '#333' },
 
+  //MODAL
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   modalContent: { backgroundColor: '#FFF', borderRadius: 16, padding: 25, width: '90%', alignItems: 'center', elevation: 5 },
   modalTitle: { fontSize: 22, fontWeight: 'bold', color: '#003366', marginBottom: 15 },
