@@ -2,7 +2,6 @@ import { useAuth } from '@/context/AuthContext';
 import { SplashScreen, Stack, useRouter, useSegments } from 'expo-router';
 import React, { useEffect } from 'react';
 
-SplashScreen.preventAutoHideAsync();
 //SplashScreen.preventAutoHideAsync();
 
 //lógica de navegação e autenticação
