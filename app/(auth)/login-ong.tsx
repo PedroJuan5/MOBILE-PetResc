@@ -27,31 +27,24 @@ export default function LoginOngScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async () => {
-    // 1. Validação simples
+ const { signIn } = useAuth();
+const handleLogin = async () => {
     if (!cnpj || !senha) {
       Alert.alert("Atenção", "Preencha CNPJ e senha.");
       return;
     }
-
+  
     setIsLoading(true);
-
+  
     try {
-      console.log("Iniciando simulação de login...");
-      
-      // Delay falso para simular carregamento da API e não dar erro de conexão
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const cnpjSoNumeros = cnpj.replace(/\D/g, ''); 
 
-      // --- SUCESSO ---
-      console.log("Redirecionando para área da ONG...");
-      
-      // Tenta navegar para o arquivo home-ong.tsx
-      // O 'as any' evita erro de TypeScript
-    router.replace('/(ong)/(tabs)/home-ong' as any);
-
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Erro", "Falha ao entrar.");
+      await signIn({ email: cnpjSoNumeros, password: senha });
+  
+      router.replace('/(ong)/(tabs)/home-ong' as any);
+  
+    } catch (error: any) {
+      Alert.alert("Erro", error.message || "Falha ao entrar.");
     } finally {
       setIsLoading(false);
     }

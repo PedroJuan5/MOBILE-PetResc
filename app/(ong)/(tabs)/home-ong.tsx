@@ -1,33 +1,141 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from 'expo-router';
-import React, { useState } from "react";
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useRouter, useFocusEffect } from 'expo-router';
+import React, { useState, useCallback } from "react";
+import { 
+  Image, ScrollView, StyleSheet, Text, TouchableOpacity, 
+  View, ActivityIndicator, Alert 
+} from "react-native";
 import { DenuncieModal } from "../../../components/denuncieModal"; 
 
-// --- IMPORTAÇÃO DOS SEUS COMPONENTES DE CABEÇALHO ---
+// API
+import api from '@/lib/axios';
+
+// Componentes
 import CustomHeaderRight from '../../../components/elementosDireita';
 import CustomHeaderLeft from '../../../components/elementosEsquerda';
 
-export default function HomeScreen(): React.ReactElement {
-  const [denuncieVisible, setDenuncieVisible] = useState<boolean>(false);
-  const router = useRouter();
+// Interfaces para tipagem
+interface Animal {
+  id: number;
+  nome: string;
+  raca: string | null;
+  status: string;
+  photoURL: string | null;
+}
 
-  // ATUALIZAÇÃO: Adicionei o parâmetro imageSource
-  const animalCard = (name: string, race: string, status: string, imageSource: any): React.ReactElement => (
-    <View style={styles.animalCard}>
-      <Image
-        source={imageSource} // Usa a imagem passada por parâmetro
-        style={styles.petImage}
-      />
-      <View style={{ flex: 1 }}>
-        <Text style={styles.animalName}>{name}</Text>
-        <Text style={styles.animalRace}>{race}</Text>
-        <Text style={styles.animalStatus}>
-          Status: <Text style={{ fontWeight: "600" }}>{status}</Text>
-        </Text>
-      </View>
-    </View>
+interface Pedido {
+  id: number;
+  status: string;
+  animal: {
+    id: number;
+    nome: string;
+    raca: string | null;
+    photoURL: string | null;
+  };
+  candidato: {
+    nome: string;
+  };
+}
+
+export default function HomeScreen(): React.ReactElement {
+  const router = useRouter();
+  const [denuncieVisible, setDenuncieVisible] = useState<boolean>(false);
+  
+  // Estados de Dados
+  const [loading, setLoading] = useState(true);
+  const [animaisRecentes, setAnimaisRecentes] = useState<Animal[]>([]);
+  const [pedidosPendentes, setPedidosPendentes] = useState<Pedido[]>([]);
+
+  // Carrega dados toda vez que a tela ganha foco
+  useFocusEffect(
+    useCallback(() => {
+      fetchDashboardData();
+    }, [])
   );
+
+  const fetchDashboardData = async () => {
+    try {
+      // 1. Buscar Animais da ONG (Endpoint que já criamos ou similar)
+      const resAnimais = await api.get('/animais'); // Rota que lista animais da ONG logada
+      setAnimaisRecentes(resAnimais.data);
+
+      // 2. Buscar Pedidos de Adoção recebidos (Novo endpoint sugerido)
+      const resPedidos = await api.get('/pedidos-adocao/gerenciar');
+      setPedidosPendentes(resPedidos.data);
+
+    } catch (error) {
+      console.log("Erro ao carregar dashboard:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Helper para renderizar card
+  const animalCard = (
+    id: number, 
+    title: string, 
+    subtitle: string, 
+    status: string, 
+    photoURL: string | null,
+    tipo: 'animal' | 'pedido'
+  ): React.ReactElement => {
+    
+    // Imagem: Se tiver URL usa ela, senão usa placeholder
+    const imageSource = photoURL 
+      ? { uri: photoURL } 
+      : require("../../../assets/images/pets/branquinho.png"); // Fallback
+
+    return (
+      <TouchableOpacity 
+        key={`${tipo}-${id}`} 
+        style={styles.animalCard}
+        onPress={() => {
+          if (tipo === 'animal') {
+             // Ir para detalhes do animal (Visão da ONG)
+             router.push({ pathname: '/(ong)/detalhes-pet-ong', params: { id } } as any);
+          } else {
+             // Ir para detalhes do pedido
+             router.push({ pathname: '/(ong)/detalhes-pedido', params: { id } } as any);
+          }
+        }}
+      >
+        <Image
+          source={imageSource}
+          style={styles.petImage}
+        />
+        <View style={{ flex: 1 }}>
+          <Text style={styles.animalName} numberOfLines={1}>{title}</Text>
+          <Text style={styles.animalRace} numberOfLines={1}>{subtitle}</Text>
+          <Text style={styles.animalStatus}>
+            Status: <Text style={{ fontWeight: "600", color: getStatusColor(status) }}>{status}</Text>
+          </Text>
+        </View>
+        <Ionicons name="chevron-forward" size={20} color="#ccc" style={{ alignSelf: 'center' }} />
+      </TouchableOpacity>
+    );
+  };
+
+  // Helper de cores para status
+  const getStatusColor = (status: string) => {
+    if (status === 'PENDENTE') return '#F59E0B'; // Laranja
+    if (status === 'DISPONIVEL') return '#10B981'; // Verde
+    if (status === 'ADOTADO') return '#2D68A6'; // Azul
+    return '#666';
+  };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#2D68A6" />
+      </View>
+    );
+  }
+
+  // Filtra apenas os pendentes para exibir no topo
+  const pedidosDisplay = pedidosPendentes.filter(p => p.status === 'PENDENTE').slice(0, 3); // Mostra max 3
+  
+  // Filtra animais recentes (pega os últimos 3)
+  const animaisDisplay = animaisRecentes.slice(0, 3);
 
   return (
     <View style={styles.container}>
@@ -38,7 +146,6 @@ export default function HomeScreen(): React.ReactElement {
         <View style={styles.headerContainer}>
           
           <View style={styles.headerIcons}>
-            
             {/* Esquerda: Alerta */}
             <CustomHeaderLeft onDenunciePress={() => setDenuncieVisible(true)} />
             
@@ -46,7 +153,6 @@ export default function HomeScreen(): React.ReactElement {
             <CustomHeaderRight 
                 onNotificationPress={() => router.push('/(ong)/notificacoes-ong' as any)} 
             />
-          
           </View>
 
           {/* TÍTULO COM AS PATINHAS */}
@@ -70,34 +176,58 @@ export default function HomeScreen(): React.ReactElement {
           </TouchableOpacity>
         </View>
 
-        {/* SEÇÕES DE ANIMAIS (COM FOTOS DIFERENTES AGORA) */}
-        <Section title="Pedidos de Adoção" subtitle="Pedidos de adoção pendentes: 5">
-          {/* Pet 1 - Branquinho */}
-          {animalCard("Não possui nome", "Sem raça definida (SRD)   AD", "Em tratamento", require("../../../assets/images/pets/branquinho.png"))}
+        {/* SEÇÃO 1: PEDIDOS DE ADOÇÃO */}
+        <Section 
+            title="Pedidos de Adoção" 
+            subtitle={`Pedidos pendentes: ${pedidosPendentes.filter(p => p.status === 'PENDENTE').length}`}
+        >
+          {pedidosDisplay.length > 0 ? (
+            pedidosDisplay.map(pedido => (
+                animalCard(
+                    pedido.id, 
+                    pedido.animal.nome, 
+                    `Candidato: ${pedido.candidato.nome}`, 
+                    pedido.status, 
+                    pedido.animal.photoURL,
+                    'pedido'
+                )
+            ))
+          ) : (
+             <Text style={styles.emptyText}>Nenhum pedido pendente no momento.</Text>
+          )}
           
-          {/* Pet 2 - Neguinho (Exemplo de outra foto) */}
-          {animalCard("Amendoim", "Sem raça definida (SRD)   FL", "", require("../../../assets/images/pets/neguinho.png"))}
-          
-          <TouchableOpacity style={styles.verMaisBtn}><Text style={styles.verMaisText}>Ver mais</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.verMaisBtn} onPress={() => router.push('/(ong)/pedidos-lista' as any)}>
+            <Text style={styles.verMaisText}>Ver todos os pedidos</Text>
+          </TouchableOpacity>
         </Section>
 
-        <Section title="Animais em Lares Temporários" subtitle="Animais em lares temporários ativos: 6">
-          {/* Pet 3 - Caramelo */}
-          {animalCard("Rex", "Pastor Alemão", "Em tratamento", require("../../../assets/images/pets/caramelo.png"))}
-          
-          {/* Pet 4 - Shanti */}
-          {animalCard("Luna", "Vira-lata", "Disponível", require("../../../assets/images/pets/shanti.png"))}
-          
-          <TouchableOpacity style={styles.verMaisBtn}><Text style={styles.verMaisText}>Ver mais</Text></TouchableOpacity>
+
+        {/* SEÇÃO 2: ANIMAIS REGISTRADOS */}
+        <Section 
+            title="Animais registrados recentemente" 
+            subtitle={`Total de animais: ${animaisRecentes.length}`}
+        >
+          {animaisDisplay.length > 0 ? (
+            animaisDisplay.map(animal => (
+                animalCard(
+                    animal.id,
+                    animal.nome,
+                    animal.raca || "SRD",
+                    animal.status,
+                    animal.photoURL,
+                    'animal'
+                )
+            ))
+          ) : (
+            <Text style={styles.emptyText}>Nenhum animal cadastrado.</Text>
+          )}
+
+          <TouchableOpacity style={styles.verMaisBtn} onPress={() => router.push('/(ong)/(tabs)/meusAnimais-ong' as any)}>
+            <Text style={styles.verMaisText}>Gerenciar meus animais</Text>
+          </TouchableOpacity>
         </Section>
 
-        <Section title="Animais registrados recentemente" subtitle="Animais aguardando vaga: 8">
-          {animalCard("Bob", "Poodle", "Aguardando", require("../../../assets/images/pets/neguinho.png"))}
-          {animalCard("Mel", "Labrador", "Em análise", require("../../../assets/images/pets/branquinho.png"))}
-          <TouchableOpacity style={styles.verMaisBtn}><Text style={styles.verMaisText}>Ver mais</Text></TouchableOpacity>
-        </Section>
-
-        {/* ÁREA DE CAMPANHAS */}
+        {/* ÁREA DE CAMPANHAS (Mantida Estática por enquanto ou pode integrar depois) */}
         <View style={styles.campanhasContainer}>
           <Text style={styles.campanhasTitle}>Minhas campanhas</Text>
 
@@ -107,7 +237,7 @@ export default function HomeScreen(): React.ReactElement {
               <Text style={styles.campanhasText}>
                 Crie novas campanhas para arrecadar doações e ajude a transformar a vida de mais animais.
                 {"\n\n"}
-                Aqui você também encontra todas as suas campanhas anteriores, com relatórios e histórico.
+                Aqui você também encontra todas as suas campanhas anteriores.
               </Text>
               
               <TouchableOpacity style={styles.btnCampanhasAnteriores}>
@@ -150,43 +280,17 @@ function Section({ title, subtitle, children }: { title: string; subtitle?: stri
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F0F2F5" },
   headerContainer: { paddingTop: 40, paddingHorizontal: 20, paddingBottom: 15 },
-  
-  // Header Icons alinhados
   headerIcons: { 
     flexDirection: "row", 
     justifyContent: "space-between", 
     marginBottom: 10,
     alignItems: 'center' 
   },
-  
-  titleContainer: {
-    position: 'relative',
-    marginBottom: 15,
-  },
-  pageTitle: { 
-    fontSize: 24, 
-    fontWeight: "700", 
-    color: "#2D68A6", 
-    width: "70%", 
-    marginTop: 5, 
-  },
-  paw: {
-    position: 'absolute',
-    width: 150,
-    height: 150,
-    opacity: 0.5,
-  },
-  paw1: {
-    top: -20,
-    right: 15, 
-    transform: [{ rotate: '15deg' }],
-  },
-  paw2: {
-    top: 50, 
-    right: -1, 
-    transform: [{ rotate: '-20deg' }],
-  },
-
+  titleContainer: { position: 'relative', marginBottom: 15 },
+  pageTitle: { fontSize: 24, fontWeight: "700", color: "#2D68A6", width: "70%", marginTop: 5 },
+  paw: { position: 'absolute', width: 150, height: 150, opacity: 0.5 },
+  paw1: { top: -20, right: 15, transform: [{ rotate: '15deg' }] },
+  paw2: { top: 50, right: -1, transform: [{ rotate: '-20deg' }] },
   btnCadastrar: { backgroundColor: "#5DA9F6", paddingVertical: 10, borderRadius: 20, alignItems: "center", width: 150 },
   btnCadastrarText: { color: "#fff", fontWeight: "700" },
   section: { marginTop: 15, paddingHorizontal: 15 },
@@ -194,68 +298,22 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 16, fontWeight: "700", color: "#2D68A6" },
   sectionSubtitle: { backgroundColor: "#DCE9FA", padding: 8, fontSize: 14, fontWeight: "600", color: "#2D68A6" },
   sectionContent: { backgroundColor: "#fff", padding: 10, borderBottomLeftRadius: 12, borderBottomRightRadius: 12 },
-  animalCard: { backgroundColor: "#E7F1FC", borderRadius: 12, padding: 10, marginBottom: 10, flexDirection: "row", gap: 10 },
-  petImage: { width: 80, height: 80, borderRadius: 12 },
+  animalCard: { backgroundColor: "#E7F1FC", borderRadius: 12, padding: 10, marginBottom: 10, flexDirection: "row", gap: 10, alignItems: 'center' },
+  petImage: { width: 60, height: 60, borderRadius: 12, backgroundColor: '#ddd' },
   animalName: { fontSize: 16, fontWeight: "700", color: "#333" },
   animalRace: { fontSize: 13, marginTop: 2, color: "#666" },
-  animalStatus: { marginTop: 5, fontSize: 13, color: "#666" },
-  verMaisBtn: { alignSelf: "flex-end", marginTop: 5 },
-  verMaisText: { color: "#2D68A6", fontWeight: "600" },
-
-  campanhasContainer: {
-    marginTop: 20,
-    paddingHorizontal: 20,
-    paddingBottom: 10,
-  },
-  campanhasTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#2D68A6",
-    marginBottom: 10,
-  },
-  campanhasRow: {
-    flexDirection: "row",
-    alignItems: "flex-end", 
-  },
-  campanhasLeftCol: {
-    flex: 1, 
-    paddingRight: 5, 
-    justifyContent: 'space-between' 
-  },
-  campanhasRightCol: {
-    width: 140,
-    alignItems: "center",
-  },
-  campanhasText: {
-    color: "#2D68A6",
-    fontSize: 13,
-    lineHeight: 18,
-    textAlign: 'left',
-  },
-  gatoImage: {
-    width: 135,
-    height: 145,
-    marginBottom: -8,
-  },
-  btnNovaCampanha: {
-    backgroundColor: "#BFD6F5",
-    borderRadius: 20,
-    paddingVertical: 10,
-    width: '100%',
-    alignItems: 'center',
-    marginTop: 1,
-  },
-  btnCampanhasAnteriores: {
-    backgroundColor: "#BFD6F5",
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    alignSelf: 'flex-start',
-    marginTop: 10,
-  },
-  btnTextBlue: {
-    color: "#2D68A6",
-    fontWeight: "bold",
-    fontSize: 13,
-  },
+  animalStatus: { marginTop: 2, fontSize: 12, color: "#666" },
+  verMaisBtn: { alignSelf: "center", marginTop: 10, padding: 5 },
+  verMaisText: { color: "#2D68A6", fontWeight: "600", fontSize: 14 },
+  emptyText: { color: "#999", fontStyle: "italic", textAlign: "center", marginVertical: 10 },
+  campanhasContainer: { marginTop: 20, paddingHorizontal: 20, paddingBottom: 10 },
+  campanhasTitle: { fontSize: 20, fontWeight: "bold", color: "#2D68A6", marginBottom: 10 },
+  campanhasRow: { flexDirection: "row", alignItems: "flex-end" },
+  campanhasLeftCol: { flex: 1, paddingRight: 5, justifyContent: 'space-between' },
+  campanhasRightCol: { width: 140, alignItems: "center" },
+  campanhasText: { color: "#2D68A6", fontSize: 13, lineHeight: 18, textAlign: 'left' },
+  gatoImage: { width: 135, height: 145, marginBottom: -8 },
+  btnNovaCampanha: { backgroundColor: "#BFD6F5", borderRadius: 20, paddingVertical: 10, width: '100%', alignItems: 'center', marginTop: 1 },
+  btnCampanhasAnteriores: { backgroundColor: "#BFD6F5", borderRadius: 20, paddingVertical: 10, paddingHorizontal: 15, alignSelf: 'flex-start', marginTop: 10 },
+  btnTextBlue: { color: "#2D68A6", fontWeight: "bold", fontSize: 13 },
 });
