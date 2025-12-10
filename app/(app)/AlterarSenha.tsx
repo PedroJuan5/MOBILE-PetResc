@@ -9,7 +9,7 @@ import {
   View, 
   Alert, 
   ActivityIndicator,
-  ScrollView // <--- Adicionado para permitir rolar até o botão
+  ScrollView 
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import api from '@/lib/axios';

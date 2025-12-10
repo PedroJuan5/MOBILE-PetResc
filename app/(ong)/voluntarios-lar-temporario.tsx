@@ -1,20 +1,11 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  ScrollView, 
-  StatusBar,
-  Dimensions
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar,Dimensions} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack, useNavigation } from 'expo-router'; // 1. Importe useNavigation
 
 const { width } = Dimensions.get('window');
 
-// Dados Mockados (Simulando a lista da imagem)
 const VOLUNTARIOS = [
   { id: '0001', nome: '' }, 
   { id: '0011', nome: '' },
@@ -29,8 +20,7 @@ const VOLUNTARIOS = [
 
 export default function VoluntariosLarTemporarioScreen() {
   const router = useRouter();
-  
-  // Estado para controlar quais checkboxes estão marcados
+  const navigation = useNavigation(); // 2. Instancie a navegação nativa
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const toggleSelection = (id: string) => {
@@ -42,8 +32,6 @@ export default function VoluntariosLarTemporarioScreen() {
   };
 
   const renderRow = (item: { id: string; nome: string }, index: number) => {
-    // Alterna a cor da linha (Ímpar: Branco, Par: Cinza Claro)
-    // O Header é o primeiro, então começamos a lógica a partir do index 0 dos dados
     const isEven = index % 2 === 0; 
     const rowColor = isEven ? '#FFF' : '#E6E6E6'; 
     const isSelected = selectedIds.includes(item.id);
@@ -62,7 +50,6 @@ export default function VoluntariosLarTemporarioScreen() {
           style={{ marginRight: 15 }}
         />
         <Text style={styles.cellTextId}>{item.id}</Text>
-        {/* Adicionei o nome caso queira preencher futuramente, igual ao header */}
         <Text style={styles.cellTextNome}>{item.nome}</Text> 
       </TouchableOpacity>
     );
@@ -72,17 +59,19 @@ export default function VoluntariosLarTemporarioScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
       
-      {/* === PARTE SUPERIOR (BRANCA) === */}
+      <Stack.Screen options={{ headerShown: false }} />
+      
+      {/*PARTE SUPERIOR (BRANCA)*/}
       <SafeAreaView edges={['top']} style={styles.whiteHeader}>
         
         {/* Header de Navegação */}
         <View style={styles.navBar}>
-          <TouchableOpacity onPress={() => router.back()}>
+          
+          <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color="#2D68A6" />
           </TouchableOpacity>
           
-          <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes-ong' as any)}>
-             {/* Ícone com bolinha vermelha */}
+          <TouchableOpacity onPress={() => router.push('/(ong)/notificacao-ong' as any)}>
              <View>
                 <Ionicons name="notifications" size={24} color="#5D8AB5" />
                 <View style={styles.notificationDot} />
@@ -94,14 +83,13 @@ export default function VoluntariosLarTemporarioScreen() {
         <View style={styles.titleContainer}>
             <Text style={styles.pageTitle}>Voluntários para Lar{'\n'}temporário</Text>
             
-            {/* Decoração de Patinhas (Posicionamento absoluto para imitar a imagem) */}
             <FontAwesome5 name="paw" size={24} color="#B4CDE3" style={[styles.paw, {top: -40, right: 60}]} />
             <FontAwesome5 name="paw" size={20} color="#B4CDE3" style={[styles.paw, {top: 0, right: 10}]} />
             <FontAwesome5 name="paw" size={22} color="#B4CDE3" style={[styles.paw, {bottom: -10, left: '60%'}]} />
         </View>
       </SafeAreaView>
 
-      {/* === PARTE INFERIOR (AZUL) === */}
+      {/*PARTE INFERIOR (AZUL)*/}
       <View style={styles.blueBody}>
         
         <Text style={styles.subtitle}>
@@ -125,7 +113,6 @@ export default function VoluntariosLarTemporarioScreen() {
             <View style={{height: 40}} />
         </ScrollView>
 
-        {/* Patinha decorativa de fundo no azul (canto inferior direito) */}
         <FontAwesome5 name="paw" size={100} color="rgba(255,255,255,0.05)" style={styles.bigPaw} />
       </View>
 
@@ -136,7 +123,6 @@ export default function VoluntariosLarTemporarioScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFF' },
   
-  // --- HEADER BRANCO ---
   whiteHeader: {
     backgroundColor: '#FFF',
     paddingHorizontal: 20,
@@ -156,7 +142,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#FF6B6B', // Cor avermelhada da bolinha
+    backgroundColor: '#FF6B6B', 
   },
   titleContainer: {
     position: 'relative',
@@ -165,7 +151,7 @@ const styles = StyleSheet.create({
   },
   pageTitle: {
     fontSize: 26,
-    fontWeight: '400', // Fonte mais fina como na imagem
+    fontWeight: '400', 
     color: '#2D68A6',
     lineHeight: 34,
   },
@@ -175,7 +161,6 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '25deg' }]
   },
 
-  // --- CORPO AZUL ---
   blueBody: {
     flex: 1,
     backgroundColor: '#2D68A6',
@@ -191,7 +176,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   
-  // --- LISTA/TABELA ---
   listContainer: {
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -205,6 +189,7 @@ const styles = StyleSheet.create({
     marginBottom: 10, 
     height: 50,
   },
+  
   tableHeader: {
     backgroundColor: '#E6E6E6', 
     marginBottom: 10,
@@ -225,6 +210,7 @@ const styles = StyleSheet.create({
     color: '#5D8AB5',
     fontWeight: 'normal',
   },
+
   cellTextId: {
     fontSize: 16,
     color: '#5D8AB5',
@@ -236,6 +222,7 @@ const styles = StyleSheet.create({
     color: '#5D8AB5',
     flex: 1,
   },
+
   bigPaw: {
     position: 'absolute',
     bottom: -20,

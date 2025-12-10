@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { 
   View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, 
-  ActivityIndicator, Alert, Share, Dimensions 
+  ActivityIndicator, Alert, Share, Dimensions, Modal 
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -33,7 +33,9 @@ export default function DetalhesPetScreen() {
   
   const [pet, setPet] = useState<AnimalDetalhado | null>(null);
   const [loading, setLoading] = useState(true);
-  const [sending, setSending] = useState(false);
+  
+  // Estado para controlar a visibilidade do Modal
+  const [modalVisible, setModalVisible] = useState(false);
 
   // 1. BUSCA OS DETALHES
   useEffect(() => {
@@ -43,7 +45,6 @@ export default function DetalhesPetScreen() {
         const response = await api.get(`/animais/${id}`);
         setPet(response.data);
       } catch (error) {
-        // Se der erro, volta silenciosamente ou avisa
         console.log("Erro fetch pet:", error);
         Alert.alert("Atenção", "Não foi possível carregar os dados.");
         router.back();
@@ -54,100 +55,21 @@ export default function DetalhesPetScreen() {
     fetchPet();
   }, [id]);
 
-  // 2. LÓGICA INTELIGENTE DO BOTÃO "TENHO INTERESSE"
-  const handleInterest = async () => {
+  // 2. FUNÇÃO PARA ABRIR O MODAL
+  const handleInterest = () => {
     if (!pet) return;
-    setSending(true);
-
-    try {
-        const userRes = await api.get('/usuarios/me');
-        const user = userRes.data;
-
-        if (!user.tipoMoradia || !user.pessoasNaCasa) {
-            setSending(false);
-            router.push({
-                pathname: '/(app)/formulario-interesse',
-                params: { animalId: pet.id }
-            } as any);
-            return;
-        }
-
-        Alert.alert(
-            "Confirmar Interesse",
-            `Você já possui um perfil preenchido. Deseja usar seus dados atuais para solicitar a adoção de ${pet.nome}?`,
-            [
-                { 
-                    text: "Revisar dados", 
-                    style: "cancel", 
-                    onPress: () => {
-                        setSending(false);
-                        router.push({
-                            pathname: '/(app)/formulario-interesse',
-                            params: { animalId: pet.id }
-                        } as any);
-                    }
-                },
-                { 
-                    text: "Sim, enviar pedido", 
-                    onPress: () => enviarPedidoDireto(user) 
-                }
-            ]
-        );
-
-    } catch (error) {
-        console.error(error);
-        setSending(false);
-        // Se der erro ao buscar usuário, manda pro form por segurança
-        router.push({
-            pathname: '/(app)/formulario-interesse',
-            params: { animalId: pet.id }
-        } as any);
-    }
+    setModalVisible(true);
   };
 
-  const enviarPedidoDireto = async (user: any) => {
-    try {
-        const payload = {
-            animalId: pet!.id,
-            respostasFormulario: {
-                tipoMoradia: user.tipoMoradia,
-                pessoasNaCasa: user.pessoasNaCasa,
-                alergias: user.alergias || "nao",
-                possuiOutrosAnimais: "nao", 
-                historicoAnimais: "{}",
-                quintalTelado: "Não informado",
-                janelasTeladas: "Não informado",
-                moradiaPropria: "Não informado",
-                todosConcordam: "Sim",
-                criancasEmCasa: "Não informado",
-                horasSozinho: "0",
-                rotinaPasseios: "Não informado",
-                quemCuidara: "Eu mesmo",
-                teveAnimaisAntes: "Não informado",
-                temVeterinario: "Não informado",
-                cienteCustos: "Sim",
-                motivoAdocao: "Interesse via botão rápido",
-                observacoes: "",
-                portesAceitos: "[]",
-                animaisAceitos: "[]",
-                tipoPetInteresse: "[]",
-                preferenciaSexo: "Indiferente",
-                idAnimalInteresse: pet!.id
-            }
-        };
-
-        await api.post('/pedidos-adocao', payload);
-        
-        Alert.alert("Sucesso!", "Sua solicitação foi enviada!", [
-            { text: "OK", onPress: () => router.back() }
-        ]);
-
-    } catch (error) {
-        console.error(error);
-        Alert.alert("Erro", "Não foi possível enviar a solicitação.");
-    } finally {
-        setSending(false);
-    }
+  // 3. FUNÇÃO PARA IR PARA O FORMULÁRIO (CORRIGIDA)
+  const handleConfirmInterest = () => {
+    setModalVisible(false);
+    
+    // Redireciona para o formulário na raiz de 'app/'
+    router.push({
+        pathname: '/formulario-interesse', // <--- CAMINHO CORRIGIDO
+        params: { animalId: pet?.id }
+    } as any);
   };
 
   const handleShare = async () => {
@@ -162,8 +84,6 @@ export default function DetalhesPetScreen() {
   const nomeDono = pet.account?.ong?.nome || pet.account?.nome || "ONG Parceira";
   const localizacao = pet.account?.ong?.cidade ? `${pet.account.ong.cidade} - ${pet.account.ong.estado}` : "Local não informado";
   
-  // --- CORREÇÃO DO ERRO AQUI ---
-  // Se tiver fotoURL, usa ela. Se não, usa uma imagem genérica da web para não quebrar.
   const imagemSource = pet.photoURL 
     ? { uri: pet.photoURL } 
     : { uri: 'https://placehold.co/400x400/png?text=Sem+Foto&font=roboto' }; 
@@ -178,6 +98,36 @@ export default function DetalhesPetScreen() {
 
   return (
     <View style={styles.container}>
+      
+      {/* --- MODAL DE CONFIRMAÇÃO --- */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+                <Ionicons name="paw" size={40} color="#2D68A6" />
+            </View>
+            <Text style={styles.modalTitle}>Oba! Vamos adotar?</Text>
+            <Text style={styles.modalText}>
+              Você será redirecionado para um breve formulário de interesse para adotar o(a) <Text style={{fontWeight: 'bold'}}>{pet.nome}</Text>.
+            </Text>
+            
+            <TouchableOpacity style={styles.modalButtonConfirm} onPress={handleConfirmInterest}>
+              <Text style={styles.modalButtonText}>Preencher Formulário</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.modalButtonCancel} onPress={() => setModalVisible(false)}>
+              <Text style={styles.modalButtonCancelText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      {/* --------------------------- */}
+
       <View style={styles.imageContainer}>
         <Image source={imagemSource} style={styles.petImage} resizeMode="cover" />
         <View style={styles.headerButtons}>
@@ -221,18 +171,11 @@ export default function DetalhesPetScreen() {
       {/* BOTÃO FIXO */}
       <View style={styles.footerAction}>
         <TouchableOpacity 
-            style={[styles.adoptButton, sending && {backgroundColor: '#ccc'}]} 
+            style={styles.adoptButton} 
             onPress={handleInterest}
-            disabled={sending}
         >
-            {sending ? (
-                <ActivityIndicator color="#FFF" />
-            ) : (
-                <>
-                    <Text style={styles.adoptButtonText}>TENHO INTERESSE</Text>
-                    <Ionicons name="paw" size={20} color="#FFF" style={{marginLeft: 10}} />
-                </>
-            )}
+            <Text style={styles.adoptButtonText}>TENHO INTERESSE</Text>
+            <Ionicons name="paw" size={20} color="#FFF" style={{marginLeft: 10}} />
         </TouchableOpacity>
       </View>
     </View>
@@ -267,5 +210,65 @@ const styles = StyleSheet.create({
   tagText: { color: '#2D68A6', fontWeight: 'bold', fontSize: 12 },
   footerAction: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#FFF', paddingHorizontal: 25, paddingVertical: 20, borderTopWidth: 1, borderTopColor: '#EEE' },
   adoptButton: { backgroundColor: '#2D68A6', borderRadius: 15, paddingVertical: 16, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', elevation: 5 },
-  adoptButtonText: { color: '#FFF', fontSize: 16, fontWeight: 'bold' }
+  adoptButtonText: { color: '#FFF', fontSize: 16, fontWeight: 'bold' },
+
+  // --- ESTILOS DO MODAL ---
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalHeader: {
+    marginBottom: 15,
+    backgroundColor: '#E3F2FD',
+    padding: 15,
+    borderRadius: 50,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#2D68A6',
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#555',
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 22,
+  },
+  modalButtonConfirm: {
+    backgroundColor: '#2D68A6',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  modalButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  modalButtonCancel: {
+    paddingVertical: 10,
+  },
+  modalButtonCancelText: {
+    color: '#999',
+    fontSize: 16,
+  },
 });

@@ -62,7 +62,6 @@ export default function PerfilOngScreen(): React.ReactElement {
       const user = resUser.data;
 
       // Lógica de prioridade: Tenta pegar dados específicos da ONG, senão usa da Conta
-      // Isso garante que funcione mesmo se o cadastro tiver salvado em lugares diferentes
       const nomeReal = user.ong?.nome || user.nome || "ONG Sem Nome";
       const telefoneReal = user.telefone || user.ong?.telefone || "Não informado";
       
@@ -77,10 +76,7 @@ export default function PerfilOngScreen(): React.ReactElement {
         local: localReal
       });
 
-      // --- 2. PUXAR DADOS PARA ESTATÍSTICAS (OPCIONAL, MAS RECOMENDADO) ---
-      // Se der erro aqui, não trava o perfil (por isso o try/catch interno é uma boa prática, 
-      // mas vou manter simples aqui assumindo que as rotas existem)
-      
+      // --- 2. PUXAR DADOS PARA ESTATÍSTICAS ---
       const [resAnimais, resPedidos] = await Promise.all([
         api.get('/animais/meus'),
         api.get('/pedidos-adocao/gerenciar')
@@ -163,10 +159,10 @@ export default function PerfilOngScreen(): React.ReactElement {
         </View>
       </View>
 
-      {/* NOME DA ONG (VINDO DO BANCO) */}
+      {/* NOME DA ONG */}
       <Text style={styles.ongName}>{perfil.nomeDisplay}</Text>
 
-      {/* CONTATO E LOCAL (VINDO DO BANCO) */}
+      {/* CONTATO E LOCAL */}
       <View style={styles.infoRow}>
         <View style={{ flex: 1 }}>
           <Text style={styles.label}>Contato</Text>
@@ -190,11 +186,11 @@ export default function PerfilOngScreen(): React.ReactElement {
             <Text style={styles.btnText}>Adotados</Text>
           </TouchableOpacity>
           
-          <TouchableOpacity style={styles.btn} onPress={() => router.push("/(ong)/(tabs)/meusAnimais-ong" as any)}>
+          <TouchableOpacity style={styles.btn} onPress={() => router.push("/(ong)/registrados" as any)}>
             <Text style={styles.btnText}>Registrados</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.btn} onPress={() => router.push("/(ong)/voluntarios-lista" as any)}>
+          <TouchableOpacity style={styles.btn} onPress={() => router.push("/(ong)/lar-temporario" as any)}>
             <Text style={styles.btnText}>Lar Temporário</Text>
           </TouchableOpacity>
 
@@ -203,8 +199,14 @@ export default function PerfilOngScreen(): React.ReactElement {
           </TouchableOpacity>
         </ScrollView>
       
+      {/* --- NOVO ÍCONE DE VOLUNTÁRIOS --- */}
+      <View style={styles.volunteersIconContainer}>
+        <TouchableOpacity onPress={() => router.push('/(ong)/voluntarios-lar-temporario' as any)}>
+            <Ionicons name="people" size={28} color="#1A3C6E" />
+        </TouchableOpacity>
+      </View>
 
-      {/* CARD PET (Dinâmico: Mostra o último pet que teve interação) */}
+      {/* CARD PET (Dinâmico) */}
       {lastPet && (
         <View style={styles.petCard}>
             <Image
@@ -226,7 +228,7 @@ export default function PerfilOngScreen(): React.ReactElement {
         </View>
       )}
 
-      {/* --- GRÁFICOS (DADOS MOCKADOS/ESTÁTICOS) --- */}
+      {/* --- GRÁFICOS --- */}
       
       <Text style={styles.graphTitle}>Processos de adoção (6 meses)</Text>
       <View style={styles.chartCard}>
@@ -275,7 +277,7 @@ export default function PerfilOngScreen(): React.ReactElement {
         />
       </View>
 
-      {/* --- ESTATÍSTICAS (DADOS REAIS DO BANCO) --- */}
+      {/* --- ESTATÍSTICAS --- */}
       <Text style={styles.graphTitle}>Estatísticas Gerais</Text>
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
@@ -367,7 +369,7 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   buttonsScrollView: {
-    marginBottom: 20,
+    marginBottom: 10, // Reduzido um pouco para aproximar o ícone
   },
   btn: {
     minWidth: 140,
@@ -383,6 +385,15 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 14,
   },
+  
+  // --- ESTILO DO NOVO ÍCONE ---
+  volunteersIconContainer: {
+    alignItems: 'flex-start', 
+    marginBottom: 10,
+    marginTop: 5,
+    marginLeft: 5
+  },
+
   petCard: {
     flexDirection: "row",
     backgroundColor: "#87b0ceff",

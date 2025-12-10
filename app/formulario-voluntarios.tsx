@@ -15,7 +15,7 @@ import {
   Keyboard,
 } from 'react-native';
 import MaskInput from 'react-native-mask-input';
-import api from '@/lib/axios'; // <--- IMPORTANTE: Import do Axios
+import api from '@/lib/axios';
 
 //Definição de Tipos 
 interface FormDataState {
