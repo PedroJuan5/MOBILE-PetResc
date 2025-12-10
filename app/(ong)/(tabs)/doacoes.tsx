@@ -11,7 +11,8 @@ import {
   Dimensions,
   TextInput,
   Modal,
-  Alert
+  Alert,
+  ActivityIndicator   // <-- ADICIONE ISTO
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,6 +22,8 @@ import { DenuncieModal } from "../../../components/denuncieModal";
 import CustomHeaderRight from '../../../components/elementosDireita';
 import CustomHeaderLeft from '../../../components/elementosEsquerda';
 import api from '@/lib/axios'; // Seu axios configurado
+import { Platform } from 'react-native';
+
 
 const { width } = Dimensions.get('window');
 
