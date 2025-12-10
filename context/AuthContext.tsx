@@ -21,7 +21,7 @@ interface User {
 }
 
 interface AuthContextData {
-  signIn(credentials: SignInCredentials): Promise<User>; // <--- MUDOU AQUI (retorna User)
+  signIn(credentials: SignInCredentials): Promise<User>; 
   signOut(): void;
   user: User | null;
   isLoading: boolean;

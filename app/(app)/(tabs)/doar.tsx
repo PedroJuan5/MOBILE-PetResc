@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {   View, Text, StyleSheet, TouchableOpacity, ScrollView, Image,  TextInput, Modal, Alert, Dimensions, ActivityIndicator } from 'react-native';
+import {  View, Text, StyleSheet, TouchableOpacity, ScrollView, Image,  TextInput, Modal, Alert, Dimensions, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -17,7 +17,6 @@ const COLORS = {
   white: '#FFFFFF',
   grayBg: '#F0F6FA'      
 };
-
 
 interface Campanha {
   id: number;
@@ -55,7 +54,7 @@ export default function DoarUsuarioScreen() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [loadingDoacao, setLoadingDoacao] = useState(false);
 
-  // --- 1. CARREGAR LISTA ---
+  //CARREGAR LISTA
   useEffect(() => {
     async function fetchCampanhas() {
       try {
@@ -118,7 +117,7 @@ export default function DoarUsuarioScreen() {
             metodoPagamento: paymentMethod
         });
 
-        // Conversão segura para soma
+        //Conversão segura para soma
         const valorAtualNum = Number(campanhaSelecionada.valorArrecadado) || 0;
         const novoTotal = valorAtualNum + valorDoado;
         
@@ -154,7 +153,6 @@ export default function DoarUsuarioScreen() {
   };
 
   const getMeta = (c: Campanha) => {
-
     // Verifica qual campo tem valor.
     return Number(c.metaFinanceira || c.metaValor || 1);
   };
@@ -198,7 +196,22 @@ export default function DoarUsuarioScreen() {
   //1.DASHBOARD
   const renderDashboard = () => (
     <View style={{ paddingBottom: 100, paddingHorizontal: 20 }}>
-        <Text style={styles.tituloDePagina}>Veja a diferença que você pode fazer!</Text>
+        {/* TÍTULO ATUALIZADO COM A FONTE E PATINHAS */}
+        <View style={styles.titleContainer}>
+            <Text style={styles.tituloDePagina}>Veja a diferença que você pode fazer!</Text>
+            
+            <Image 
+                source={require("../../../assets/images/ui/pata.png")} 
+                style={[styles.paw, styles.paw1]} 
+                resizeMode="contain"
+            />
+            <Image 
+                source={require("../../../assets/images/ui/pata.png")} 
+                style={[styles.paw, styles.paw2]} 
+                resizeMode="contain"
+            />
+        </View>
+
         <Text style={styles.paragraph}>
           No PetResc, você apoia campanhas reais. Cada contribuição ajuda a oferecer alimentação e cuidados.
         </Text>
@@ -223,8 +236,7 @@ export default function DoarUsuarioScreen() {
                 const info = getOngInfo(campanha);
                 const meta = getMeta(campanha);
 
-                // --- ALTERAÇÃO 2: Usar imagemUrl ---
-                // Se campanha.imagemUrl existir, usa ela. Senão, usa o placeholder.
+                //Usar imagemUrl
                 const imageSource = campanha.imagemUrl 
                     ? { uri: campanha.imagemUrl } 
                     : require('../../../assets/images/ui/institutoCaramelo.png');
@@ -268,13 +280,13 @@ export default function DoarUsuarioScreen() {
     </View>
   );
 
-  // --- RENDER FORMULÁRIO (DETALHES) ---
+  //RENDER FORMULÁRIO (DETALHES)
   const renderDonationForm = () => {
     if (!campanhaSelecionada) return null;
     const info = getOngInfo(campanhaSelecionada);
     const meta = getMeta(campanhaSelecionada);
 
-    // --- ALTERAÇÃO 2 (Detalhes): Usar imagemUrl ---
+    //(Detalhes): Usar imagemUrl
     const imageSource = campanhaSelecionada.imagemUrl 
         ? { uri: campanhaSelecionada.imagemUrl } 
         : require('../../../assets/images/ui/institutoCaramelo.png');
@@ -375,11 +387,28 @@ export default function DoarUsuarioScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#FFFFFF" },
   
+  // Título e Patinhas
+  titleContainer: { position: 'relative', marginBottom: 20, marginTop: 10 },
+  tituloDePagina: { 
+    fontSize: 26, 
+    fontWeight: "800", 
+    color: "#2D68A6", 
+    width: "80%", 
+    fontFamily: 'MoreSugar',
+    lineHeight: 32,
+  },
+  paw: {
+    position: 'absolute',
+    width: 90,
+    height: 90,
+    opacity: 0.5,
+  },
+  paw1: { top: -30, right: 40, transform: [{ rotate: '15deg' }] },
+  paw2: { top: 60, right: 10, transform: [{ rotate: '-20deg' }] },
 
-  tituloDePagina: { fontSize: 26, fontWeight: "700", color: "#2D68A6", width: "80%", marginBottom: 20, marginTop: 10 },
   paragraph: { fontSize: 18, lineHeight: 28, color: '#333', textAlign: 'left', marginBottom: 20 },
   cartao: { flexDirection: 'row', backgroundColor: '#fff', marginVertical: 10 },
-  imagemCima: { width: '50%', height: 180, resizeMode: 'cover' }, // <--- Ajuste aqui se a imagem ficar cortada
+  imagemCima: { width: '50%', height: 180, resizeMode: 'cover' }, 
   caixaTexto: { width: '50%', backgroundColor: '#bcd0e8', alignItems: 'center', justifyContent: 'center', padding: 10 },
   numero: { fontSize: 40, fontWeight: 'bold', color: '#4a6a8a' },
   texto: { fontSize: 18, textAlign: 'center', color: '#4a6a8a' },
@@ -387,7 +416,7 @@ const styles = StyleSheet.create({
 
 
   cardOng: { backgroundColor: '#fff', borderRadius: 14, padding: 14, marginBottom: 35, borderWidth: 1, borderColor: '#E5ECF3', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 2, elevation: 1 },
-  cardOngImage: { width: '100%', height: 150, borderRadius: 10, backgroundColor: '#eee' }, // Adicionado bg color
+  cardOngImage: { width: '100%', height: 150, borderRadius: 10, backgroundColor: '#eee' }, 
   cardOngTitle: { fontSize: 15, fontWeight: '600', marginTop: 8, color: '#000' },
   cardOngAddress: { fontSize: 12, color: '#444', flex: 1 },
 

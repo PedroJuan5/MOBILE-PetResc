@@ -9,7 +9,7 @@ import api from '@/lib/axios';
 import { SafeAreaView } from "react-native";
 
 
-// --- Função Auxiliar Maps ---
+// Função Auxiliar Maps
 const handleOpenMaps = async (endereco: string) => {
   const encodedAddress = encodeURIComponent(endereco);
   const url = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
@@ -24,11 +24,10 @@ const handleOpenMaps = async (endereco: string) => {
 interface Animal {
   id: number;
   nome: string;
-  photoURL: string | null; // URL do banco
+  photoURL: string | null; 
   especie: string;
   sexo: string | null;
   status: string;
-  //larTemporario não vem por padrão no listagem simples, adapte se necessário
 }
 
 interface Ong {
@@ -47,7 +46,6 @@ interface Ong {
 
 //Componentes 
 const CartaoAnimal = ({ animal }: { animal: Animal }) => {
-  // Lógica da imagem: Se tiver URL, usa URI. Se não, usa imagem local.
   const imageSource = animal.photoURL 
     ? { uri: animal.photoURL } 
     : require("../../../assets/images/pets/caramelo.png");
@@ -61,40 +59,11 @@ const CartaoAnimal = ({ animal }: { animal: Animal }) => {
           {animal.especie} {animal.sexo ? `• ${animal.sexo}` : ''}
         </Text>
         <Text style={styles.detalheAnimal}>
-          {/* Campo estático ou vindo do banco se tiver */}
           Abrigo / Lar
         </Text>
         <Text style={[styles.detalheAnimal, { fontWeight: "700", color: "#2D68A6" }]}>
           Status: {animal.status}
         </Text>
-      </View>
-    </View>
-  );
-};
-
-const CartaoOng = ({ ong }: { ong: Ong }) => {
-  // Formata endereço
-  const dadosOng = ong.ong || {};
-  const enderecoCompleto = dadosOng.rua 
-    ? `${dadosOng.rua}, ${dadosOng.numero || ''} - ${dadosOng.bairro || ''}, ${dadosOng.cidade || ''} - ${dadosOng.estado || ''}`
-    : "Endereço não informado";
-  
-  const nomeExibicao = dadosOng.nome || ong.nome;
-
-  return (
-    <View style={styles.cartaoOng}>
-      <Image source={require("../../../assets/images/ui/maps1.png")} style={styles.imagemOng} />
-      <View style={styles.infoOng}>
-        <Text style={styles.nomeOng}>{nomeExibicao}</Text>
-        <Text style={styles.enderecoOng} numberOfLines={2}>{enderecoCompleto}</Text>
-        
-        <TouchableOpacity 
-          style={styles.botaoMaps}
-          onPress={() => handleOpenMaps(enderecoCompleto)} 
-        >
-          <Text style={styles.textoBotaoMaps}>Abrir no MAPS</Text>
-          <Ionicons name="location" size={16} color="#2D68A6" style={{ marginLeft: 6 }} />
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -107,15 +76,12 @@ export default function HomeScreen() {
 
   // Estados dos Dados
   const [meusAnimais, setMeusAnimais] = useState<Animal[]>([]);
-  const [ongs, setOngs] = useState<Ong[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Função de Busca
   const fetchDados = async () => {
     try {
-      // 1. Busca Meus Animais (Rota específica do usuário logado)
       const resAnimais = await api.get('/usuarios/me/animais');      
-
       setMeusAnimais(resAnimais.data);
     } catch (error) {
       console.error("Erro ao buscar dados da home:", error);
@@ -124,7 +90,6 @@ export default function HomeScreen() {
     }
   };
 
-  // useFocusEffect recarrega os dados toda vez que a tela ganha foco
   useFocusEffect(
     useCallback(() => {
       fetchDados();
@@ -136,7 +101,7 @@ export default function HomeScreen() {
       
       <DenuncieModal visible={modalVisible} onClose={() => setModalVisible(false)} />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
         <View style={styles.container}>
           
           <View style={styles.iconHeaderContainer}>
@@ -144,34 +109,33 @@ export default function HomeScreen() {
             <CustomHeaderRight />
           </View>
 
+          {/* TÍTULO DA PÁGINA (Aumentado) */}
           <View style={styles.titleContainer}>
             <Text style={styles.tituloDePagina}>Conheça seu novo melhor amigo!</Text>
             <Image source={require("../../../assets/images/ui/pata.png")} style={[styles.paw, styles.paw1]} resizeMode="contain"/>
             <Image source={require("../../../assets/images/ui/pata.png")} style={[styles.paw, styles.paw2]} resizeMode="contain"/>
           </View>        
 
-          {/* SESSÃO: MEUS ANIMAIS (Listar apenas animais do usuário) */}
-          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 15, marginBottom: 15}}>
+          {/* SESSÃO: MEUS ANIMAIS */}
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 25, marginBottom: 20}}>
              <Text style={styles.subTituloSemMargem}>Meus animais</Text>
-             {/* Botão para adicionar pet */}
              <TouchableOpacity onPress={() => router.push('/(app)/(tabs)/registro-animal')}>
-                <Text style={{color: '#2D68A6', fontWeight: '600'}}>+ Adicionar</Text>
+                <Text style={{color: '#2D68A6', fontWeight: '700', fontSize: 16}}>+ Adicionar</Text>
              </TouchableOpacity>
           </View>
 
           {loading ? (
             <ActivityIndicator size="small" color="#2D68A6" />
           ) : meusAnimais.length === 0 ? (
-            <View style={{padding: 20, backgroundColor: '#f0f4f8', borderRadius: 10, alignItems: 'center'}}>
-                <Text style={{color: '#666', marginBottom: 5}}>Você ainda não cadastrou animais.</Text>
+            <View style={{padding: 30, backgroundColor: '#f0f4f8', borderRadius: 15, alignItems: 'center', marginVertical: 10}}>
+                <Text style={{color: '#666', marginBottom: 10, fontSize: 16}}>Você ainda não cadastrou animais.</Text>
                 <TouchableOpacity onPress={() => router.push('/(app)/(tabs)/registro-animal')}>
-                    <Text style={{color: '#2D68A6', fontWeight: 'bold'}}>Cadastrar agora</Text>
+                    <Text style={{color: '#2D68A6', fontWeight: 'bold', fontSize: 16}}>Cadastrar agora</Text>
                 </TouchableOpacity>
             </View>
           ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{paddingBottom: 10}}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{paddingBottom: 15}}>
               {meusAnimais.map((a) => (
-                // --- AQUI ESTÁ A IMPLEMENTAÇÃO DO LINK ---
                 <TouchableOpacity 
                     key={a.id} 
                     activeOpacity={0.9} 
@@ -186,7 +150,7 @@ export default function HomeScreen() {
             </ScrollView>
           )}
 
-          {/* SESSÃO: DOAÇÃO */}
+          {/* SESSÃO: DOAÇÃO (Aumentada para preencher a tela) */}
           <Text style={styles.subTitulo}>Sua contribuição salva vidas</Text>
           <View style={styles.boxContribuicao}>
             <View style={styles.textoContribuicao}>
@@ -215,87 +179,97 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#FFFFFF" },
-  container: { padding: 20, paddingTop: 10 }, 
+  container: { padding: 20, paddingTop: 20 }, 
+  
   iconHeaderContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 20,
     marginTop: 10,
   }, 
+  
   titleContainer: {
     position: 'relative',
-    marginBottom: 20,
+    marginBottom: 30, 
+    marginTop: 10,
   },
-  pageTitle: { 
-    fontSize: 24, 
-    color: "#2D68A6", 
-    width: "70%", 
-    marginTop: 5,
-    fontFamily: 'MoreSugar', 
-  },
+  
+  // Título Principal 
   tituloDePagina: {
-    fontSize: 26,
-    fontWeight: "700",
+    fontSize: 32, 
+    fontWeight: "800",
     color: "#2D68A6",
-    width: "70%",
+    width: "80%", 
+    lineHeight: 40, 
+    fontFamily: 'MoreSugar',
   },
+  
   paw: {
     position: 'absolute',
-    width: 100,
-    height: 100,
+    width: 110,
+    height: 110,
     opacity: 0.5,
   },
-  paw1: { top: -30, right: 50, transform: [{ rotate: '15deg' }] },
-  paw2: { top: 60, right: 20, transform: [{ rotate: '-20deg' }] },
+  paw1: { top: -40, right: 40, transform: [{ rotate: '15deg' }] },
+  paw2: { top: 70, right: 10, transform: [{ rotate: '-20deg' }] },
   
+  // Subtítulos
   subTitulo: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 22, 
+    fontWeight: "700",
     color: "#3A5C7A",
-    marginBottom: 20,
-    marginTop: 15,
+    marginBottom: 25,
+    marginTop: 35,
   },
   subTituloSemMargem: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 22, 
+    fontWeight: "700",
     color: "#3A5C7A",
   },
+
   cartaoAnimal: {
-    width: 280, 
-    height: 110,
+    width: 300, 
+    height: 120,
     backgroundColor: "#E6F0FA",
-    borderRadius: 15,
+    borderRadius: 18,
     flexDirection: "row",
-    marginRight: 15,
+    marginRight: 20,
     overflow: "hidden",
   },
-  imagemAnimal: { width: 100, height: "100%", resizeMode: "cover" },
-  infoAnimal: { flex: 1, padding: 10, justifyContent: "center" },
-  nomeAnimal: { fontSize: 16, fontWeight: "700", color: "#2D68A6", marginBottom: 2 },
-  detalheAnimal: { fontSize: 13, color: "#3A5C7A", marginTop: 2},
+  imagemAnimal: { width: 110, height: "100%", resizeMode: "cover" },
+  infoAnimal: { flex: 1, padding: 15, justifyContent: "center" },
+  nomeAnimal: { fontSize: 18, fontWeight: "700", color: "#2D68A6", marginBottom: 4 },
+  detalheAnimal: { fontSize: 14, color: "#3A5C7A", marginTop: 2},
+  
+  // Box de Doação
   boxContribuicao: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
-    marginBottom: 30,
+    marginBottom: 50,
   },
-  textoContribuicao: { flex: 1, marginRight: 10 },
+  textoContribuicao: { flex: 1, marginRight: 15 },
+  
+  // Texto de doação
   paragrafoContribuicao: {
-    fontSize: 14,
+    fontSize: 19, 
     color: "#3A5C7A",
-    lineHeight: 20,
-    marginBottom: 20,
+    lineHeight: 24, 
+    marginBottom: 25,
   },
+  
   botaoDoar: {
     backgroundColor: "#BFE1F7",
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    borderRadius: 25,
+    paddingVertical: 14,
+    paddingHorizontal: 30, 
     alignSelf: "flex-start",
   },
-  textoBotaoDoar: { color: "#2D68A6", fontWeight: "700" },
-  imagemContribuicao: { width: 130, height: 180, resizeMode: "contain" },
+  textoBotaoDoar: { color: "#2D68A6", fontWeight: "700", fontSize: 16 },
+  
+  imagemContribuicao: { width: 150, height: 200, resizeMode: "contain" },
+  
   cartaoOng: {
     backgroundColor: "#E6F0FA",
     borderRadius: 15,

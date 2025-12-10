@@ -19,7 +19,7 @@ function RootLayoutNav() {
     const hideSplashAndNavigate = async () => {
       try {
         if (user && inAuthGroup) {
-          // --- CORREÇÃO DO REDIRECIONAMENTO ---
+        
           await SplashScreen.hideAsync();
           
           if (user.role === 'ONG') {
