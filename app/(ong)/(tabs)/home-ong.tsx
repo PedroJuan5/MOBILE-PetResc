@@ -20,6 +20,7 @@ interface Animal {
   photoURL: string | null;
 }
 
+// CORREÇÃO NA INTERFACE: O backend retorna 'account', não 'candidato'
 interface Pedido {
   id: number;
   status: string;
@@ -29,7 +30,7 @@ interface Pedido {
     raca: string | null;
     photoURL: string | null;
   };
-  candidato: {
+  account: { // <--- CORRIGIDO AQUI
     nome: string;
   };
 }
@@ -57,6 +58,7 @@ export default function HomeOngScreen(): React.ReactElement {
       setAnimaisRecentes(resAnimais.data);
 
       // 2. Buscar Pedidos de Adoção recebidos
+      // Certifique-se que a rota no adocoes.js é '/gerenciar' e está acessível
       const resPedidos = await api.get('/pedidos-adocao/gerenciar');
       setPedidosPendentes(resPedidos.data);
 
@@ -77,6 +79,7 @@ export default function HomeOngScreen(): React.ReactElement {
     tipo: 'animal' | 'pedido'
   ): React.ReactElement => {
     
+    // Tratamento de imagem com fallback
     const imageSource = photoURL 
       ? { uri: photoURL } 
       : require("../../../assets/images/pets/branquinho.png"); 
@@ -87,15 +90,22 @@ export default function HomeOngScreen(): React.ReactElement {
         style={styles.animalCard}
         onPress={() => {
           if (tipo === 'animal') {
+             // Vai para gerenciamento do PET específico
              router.push({
                 pathname: '/(ong)/gerenciar-adocao-ong',
-                params: { petId: id }
+                params: { animalId: id } // Padronizado para animalId
              } as any);
           } else {
-             router.push({
-                pathname: '/(ong)/gerenciar-adocao-ong',
-                params: { pedidoId: id } 
-             } as any);
+             // No caso de pedido, precisamos passar o ID do ANIMAL relacionado ao pedido
+             // pois a tela 'gerenciar-adocao-ong' carrega com base no animal
+             // Mas como seu card de pedido tem o ID do pedido, precisamos achar o animalId
+             // A lógica ideal seria extrair o animalId aqui.
+             
+             // NOTA: Baseado no seu 'gerenciar-adocao-ong.tsx', ele espera 'animalId'.
+             // Se clicamos num pedido, queremos ir ver os pedidos DAQUELE ANIMAL.
+             
+             // Vamos passar o animalId que está dentro do objeto pedido (se disponível na lógica de chamada)
+             // *Ajustado na chamada abaixo*
           }
         }}
       >
@@ -148,7 +158,7 @@ export default function HomeOngScreen(): React.ReactElement {
             />
           </View>
 
-          {/* TÍTULO COM AS PATINHAS (FONTE MORE SUGAR) */}
+          {/* TÍTULO COM AS PATINHAS */}
           <View style={styles.titleContainer}>
             <Text style={styles.pageTitle}>Conheça seu novo{"\n"}melhor amigo!</Text>
 
@@ -176,14 +186,31 @@ export default function HomeOngScreen(): React.ReactElement {
         >
           {pedidosDisplay.length > 0 ? (
             pedidosDisplay.map(pedido => (
-                animalCard(
-                    pedido.id, 
-                    pedido.animal.nome, 
-                    `Candidato: ${pedido.candidato.nome}`, 
-                    pedido.status, 
-                    pedido.animal.photoURL,
-                    'pedido'
-                )
+                // Aqui ajustamos o onPress para passar o animalId corretamente
+                <TouchableOpacity 
+                    key={`pedido-${pedido.id}`} 
+                    style={styles.animalCard}
+                    onPress={() => {
+                         router.push({
+                            pathname: '/(ong)/gerenciar-adocao-ong',
+                            params: { animalId: pedido.animal.id } // Passa o ID do Animal para gerenciar
+                         } as any);
+                    }}
+                >
+                    <Image
+                      source={pedido.animal.photoURL ? { uri: pedido.animal.photoURL } : require("../../../assets/images/pets/branquinho.png")}
+                      style={styles.petImage}
+                    />
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.animalName} numberOfLines={1}>{pedido.animal.nome}</Text>
+                      {/* CORREÇÃO AQUI: pedido.account.nome em vez de pedido.candidato.nome */}
+                      <Text style={styles.animalRace} numberOfLines={1}>Candidato: {pedido.account?.nome || "Nome não disp."}</Text>
+                      <Text style={styles.animalStatus}>
+                        Status: <Text style={{ fontWeight: "600", color: getStatusColor(pedido.status) }}>{pedido.status}</Text>
+                      </Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color="#ccc" style={{ alignSelf: 'center' }} />
+                </TouchableOpacity>
             ))
           ) : (
              <Text style={styles.emptyText}>Nenhum pedido pendente no momento.</Text>
@@ -311,31 +338,13 @@ const styles = StyleSheet.create({
   emptyText: { color: "#999", fontStyle: "italic", textAlign: "center", marginVertical: 10 },
   
   campanhasContainer: { marginTop: 20, paddingHorizontal: 20, paddingBottom: 10 },
-  
-  // TÍTULO DA SEÇÃO DE CAMPANHAS AUMENTADO
-  campanhasTitle: { 
-    fontSize: 22, 
-    fontWeight: "bold", 
-    color: "#2D68A6", 
-    marginBottom: 15 
-  },
-  
+  campanhasTitle: { fontSize: 22, fontWeight: "bold", color: "#2D68A6", marginBottom: 15 },
   campanhasRow: { flexDirection: "row", alignItems: "flex-end" },
   campanhasLeftCol: { flex: 1, paddingRight: 5, justifyContent: 'space-between' },
   campanhasRightCol: { width: 140, alignItems: "center" },
-  
-  // TEXTO DA SEÇÃO DE CAMPANHAS
-  campanhasText: { 
-    color: "#2D68A6", 
-    fontSize: 19, 
-    lineHeight: 22, 
-    textAlign: 'left' 
-  },
-  
+  campanhasText: { color: "#2D68A6", fontSize: 19, lineHeight: 22, textAlign: 'left' },
   gatoImage: { width: 135, height: 145, marginBottom: -8 },
   btnNovaCampanha: { backgroundColor: "#BFD6F5", borderRadius: 20, paddingVertical: 10, width: '100%', alignItems: 'center', marginTop: 1 },
   btnCampanhasAnteriores: { backgroundColor: "#BFD6F5", borderRadius: 20, paddingVertical: 10, paddingHorizontal: 15, alignSelf: 'flex-start', marginTop: 10 },
-  
-  // TEXTO DOS BOTÕES DE CAMPANHA LEVEMENTE AUMENTADO
   btnTextBlue: { color: "#2D68A6", fontWeight: "bold", fontSize: 14 },
 });
