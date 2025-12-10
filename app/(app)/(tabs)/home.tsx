@@ -114,8 +114,7 @@ export default function HomeScreen() {
   const fetchDados = async () => {
     try {
       // 1. Busca Meus Animais (Rota específica do usuário logado)
-      // Ajuste a rota '/usuarios/meus-animais' conforme seu arquivo de rotas
-     const resAnimais = await api.get('/usuarios/me/animais');      
+      const resAnimais = await api.get('/usuarios/me/animais');      
 
       setMeusAnimais(resAnimais.data);
     } catch (error) {
@@ -125,7 +124,7 @@ export default function HomeScreen() {
     }
   };
 
-  // useFocusEffect recarrega os dados toda vez que a tela ganha foco (útil se você acabou de adicionar um pet)
+  // useFocusEffect recarrega os dados toda vez que a tela ganha foco
   useFocusEffect(
     useCallback(() => {
       fetchDados();
@@ -154,7 +153,7 @@ export default function HomeScreen() {
           {/* SESSÃO: MEUS ANIMAIS (Listar apenas animais do usuário) */}
           <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 15, marginBottom: 15}}>
              <Text style={styles.subTituloSemMargem}>Meus animais</Text>
-             {/* Botão opcional para adicionar pet rapidamente */}
+             {/* Botão para adicionar pet */}
              <TouchableOpacity onPress={() => router.push('/(app)/(tabs)/registro-animal')}>
                 <Text style={{color: '#2D68A6', fontWeight: '600'}}>+ Adicionar</Text>
              </TouchableOpacity>
@@ -172,7 +171,17 @@ export default function HomeScreen() {
           ) : (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{paddingBottom: 10}}>
               {meusAnimais.map((a) => (
-                <CartaoAnimal key={a.id} animal={a} />
+                // --- AQUI ESTÁ A IMPLEMENTAÇÃO DO LINK ---
+                <TouchableOpacity 
+                    key={a.id} 
+                    activeOpacity={0.9} 
+                    onPress={() => router.push({
+                        pathname: '/(app)/gerenciar-adocao',
+                        params: { petId: a.id }
+                    } as any)}
+                >
+                    <CartaoAnimal animal={a} />
+                </TouchableOpacity>
               ))}
             </ScrollView>
           )}
@@ -196,7 +205,7 @@ export default function HomeScreen() {
               source={require("../../../assets/images/ui/gatoHome.png")}
               style={styles.imagemContribuicao}
             />
-          </View>     
+          </View>    
 
         </View>
       </ScrollView>
@@ -217,7 +226,13 @@ const styles = StyleSheet.create({
   titleContainer: {
     position: 'relative',
     marginBottom: 20,
-    marginTop: 10,
+  },
+  pageTitle: { 
+    fontSize: 24, 
+    color: "#2D68A6", 
+    width: "70%", 
+    marginTop: 5,
+    fontFamily: 'MoreSugar', 
   },
   tituloDePagina: {
     fontSize: 26,
@@ -247,7 +262,7 @@ const styles = StyleSheet.create({
     color: "#3A5C7A",
   },
   cartaoAnimal: {
-    width: 280, // Ajustado para não quebrar layout
+    width: 280, 
     height: 110,
     backgroundColor: "#E6F0FA",
     borderRadius: 15,
@@ -295,7 +310,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginRight: 15,
     resizeMode: "cover",
-    backgroundColor: '#ccc' // Placeholder color
+    backgroundColor: '#ccc' 
   },
   infoOng: { flex: 1 },
   nomeOng: { fontSize: 16, fontWeight: "700", color: "#2D68A6" },

@@ -15,7 +15,7 @@ if (!global.setImmediate) {
 const voluntarioSlides = [
   {
     key: 'interesse',
-    title: 'Formulário de interesse',
+    title: 'Formulário de Voluntários',
     description:
       'Faça o formulário de inscrição que disponibilizamos aqui que a ONG entrará em contato com você em até 48h.',
     iconName: 'clipboard-list',
