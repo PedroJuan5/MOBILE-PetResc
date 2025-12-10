@@ -19,7 +19,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 // Import da API configurada
 import api from '@/lib/axios';
 
-// --- TIPOS (Adaptados ao retorno do Backend) ---
+// TIPOS (Adaptados ao retorno do Backend)
 interface Animal {
   id: number;
   nome: string;
@@ -64,8 +64,11 @@ const AnimalGridCard = ({ item }: { item: Animal }) => {
     <TouchableOpacity 
       style={styles.cardContainer} 
       activeOpacity={0.9}
-      // Passa o ID para a tela de detalhes
-      onPress={() => router.push({ pathname: '/(ong)/detalhes-pet-ong', params: { id: item.id } } as any)}
+      // --- ALTERAÇÃO AQUI: Link para Gerenciar Adoção ONG ---
+      onPress={() => router.push({ 
+          pathname: '/(ong)/gerenciar-adocao-ong', 
+          params: { petId: item.id } 
+      } as any)}
     >
       <Image source={imageSource} style={styles.cardImage} resizeMode="cover" />
       <View style={styles.cardInfo}>
