@@ -53,13 +53,14 @@ export default function AdotarScreen() {
       
       <DenuncieModal visible={modalVisible} onClose={() => setModalVisible(false)} />
 
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         
         <View style={styles.iconHeaderContainer}>
             <CustomHeaderLeft onDenunciePress={handleDenunciePress} />
             <CustomHeaderRight />
         </View>
 
+  
         <View style={styles.titleContainer}>
           <Text style={styles.tituloDePagina}>Conheça seu novo melhor amigo!</Text>
    
@@ -143,7 +144,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 20, 
     marginTop: 10,
   },
 
@@ -151,39 +152,44 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#FFFFFF',
     paddingTop: 10,
+    paddingBottom: 40,
   },
+  
   titleContainer: {
     position: 'relative', 
-    marginBottom: 20,
+    marginBottom: 30, 
     marginTop: 10,
   },
+  
+  //ESTILO DO TÍTULO ATUALIZADO
   tituloDePagina: { 
-    fontSize: 26,
-    fontWeight: "700",
+    fontSize: 32, // Aumentado
+    fontWeight: "800",
     color: "#2D68A6",
-    width: "70%", 
+    width: "80%", 
+    marginTop: 5,
+    fontFamily: 'MoreSugar', 
+    lineHeight: 40,
   },
-   paw: {
+  
+  
+  paw: {
     position: 'absolute',
-    width: 100,
-    height: 100,
+    width: 110,
+    height: 110, 
     opacity: 0.5,
   },
   paw1: {
-    top: -30,
-    right: 50, 
+    top: -40,
+    right: 40, 
     transform: [{ rotate: '15deg' }],
   },
   paw2: {
-    top: 60, 
-    right: 20, 
+    top: 70, 
+    right: 10, 
     transform: [{ rotate: '-20deg' }],
   },
-  paw3: {
-    top: 100, 
-    right: 60, 
-    transform: [{ rotate: '30deg' }],
-  },
+  
   mainImage: {
     width: '100%',
     height: 250,
