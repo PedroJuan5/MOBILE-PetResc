@@ -58,7 +58,7 @@ export default function PerfilOngScreen(): React.ReactElement {
       setLoading(true);
 
       // --- 1. PUXAR DADOS DO PERFIL (IGUAL AO USUÁRIO COMUM) ---
-      const resUser = await api.get('/usuarios/me');
+      const resUser = await api.get('/me');
       const user = resUser.data;
 
       // Lógica de prioridade: Tenta pegar dados específicos da ONG, senão usa da Conta

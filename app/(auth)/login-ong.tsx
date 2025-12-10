@@ -27,8 +27,9 @@ export default function LoginOngScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
- const { signIn } = useAuth();
-const handleLogin = async () => {
+ const { signIn } = useAuth(); // Já importado corretamente
+
+  const handleLogin = async () => {
     if (!cnpj || !senha) {
       Alert.alert("Atenção", "Preencha CNPJ e senha.");
       return;
@@ -37,26 +38,28 @@ const handleLogin = async () => {
     setIsLoading(true);
   
     try {
-      console.log("Iniciando simulação de login...");
+      console.log("Tentando logar como ONG...");
       
-      // Delay falso para simular carregamento da API e não dar erro de conexão oioiu
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // CHAMA O CONTEXTO PARA LOGAR DE VERDADE
+      await signIn({
+        cnpj: cnpj, 
+        password: senha, 
+        type: 'ONG' 
+      });
 
-      // --- SUCESSO ---
-      console.log("Redirecionando para área da ONG só um minuto...");
+      console.log("Login Realizado! Redirecionando...");
       
-      // Tenta navegar para o arquivo home-ong.tsx
-      // O 'as any' evita erro de TypeScript
-    router.replace('/(ong)/(tabs)/home-ong' as any);
+      // Redireciona para a home da ONG
+      router.replace('/(ong)/(tabs)/home-ong' as any);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      Alert.alert("Erro", "Falha ao entrar.");
+      const msg = error.response?.data?.error || "Verifique suas credenciais.";
+      Alert.alert("Falha ao entrar", msg);
     } finally {
       setIsLoading(false);
     }
   };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
