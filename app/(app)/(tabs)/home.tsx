@@ -196,19 +196,7 @@ export default function HomeScreen() {
               source={require("../../../assets/images/ui/gatoHome.png")}
               style={styles.imagemContribuicao}
             />
-          </View>
-
-          {/* SESSÃO: ONGS PRÓXIMAS */}
-          <Text style={styles.subTitulo}>ONGs próximas a você</Text>
-          {loading ? (
-             <ActivityIndicator size="small" color="#2D68A6" />
-          ) : ongs.length === 0 ? (
-             <Text style={{color: '#999'}}>Nenhuma ONG encontrada.</Text>
-          ) : (
-             ongs.map((o) => (
-               <CartaoOng key={o.id} ong={o} />
-             ))
-          )}
+          </View>     
 
         </View>
       </ScrollView>

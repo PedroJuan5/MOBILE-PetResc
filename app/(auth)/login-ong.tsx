@@ -39,11 +39,11 @@ export default function LoginOngScreen() {
     try {
       console.log("Iniciando simulação de login...");
       
-      // Delay falso para simular carregamento da API e não dar erro de conexão
+      // Delay falso para simular carregamento da API e não dar erro de conexão oioiu
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       // --- SUCESSO ---
-      console.log("Redirecionando para área da ONG...");
+      console.log("Redirecionando para área da ONG só um minuto...");
       
       // Tenta navegar para o arquivo home-ong.tsx
       // O 'as any' evita erro de TypeScript

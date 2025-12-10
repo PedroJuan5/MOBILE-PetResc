@@ -131,15 +131,15 @@ export default function SignupOngScreen() {
 
     setIsLoading(true);
     try {
-      // 1. Limpeza de máscaras (importante para o backend)
+      // 1. Limpeza de máscaras
       const cpfLimpo = form.cpf.replace(/\D/g, '');
       const cnpjLimpo = form.cnpj.replace(/\D/g, '');
       const telefoneLimpo = form.telefone.replace(/\D/g, '');
       const cepLimpo = form.cep.replace(/\D/g, '');
 
-      // 2. Payload com nomes corretos para o Backend
+      // 2. Payload
       const payload = {
-        name: form.nomeResponsavel, // Backend espera 'name', não 'nomeResponsavel'
+        name: form.nomeResponsavel,
         cpf: cpfLimpo,
         nomeOng: form.nomeOng,      
         email: form.email,
@@ -161,7 +161,6 @@ export default function SignupOngScreen() {
       await api.post('/auth/register-ong', payload); 
 
       // 3. Sucesso e Redirecionamento CORRETO
-      // O router.replace só roda quando o usuário clica em "OK"
       Alert.alert(
         "Sucesso", 
         "Cadastro realizado com sucesso! Faça login para continuar.",
@@ -170,6 +169,7 @@ export default function SignupOngScreen() {
             text: "OK", 
             onPress: () => {
               console.log("Redirecionando para Login...");
+              // CORREÇÃO AQUI: Adicionado /(auth) para igualar ao seu arquivo
               router.replace('/(auth)/login-ong');
             } 
           }

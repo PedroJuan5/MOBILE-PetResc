@@ -118,7 +118,7 @@ export default function PerfilScreen() {
 
   const handlePetPress = (petId: number) => {
       // Ajuste aqui para a rota correta de detalhes do seu app
-      router.push({ pathname: '/(tabs)/adocao', params: { screen: 'detalhes', id: petId } } as any);
+      router.push({ pathname: 'detalhes-pet', params: { screen: 'detalhes', id: petId } } as any);
   };
 
   const listaExibida = abaAtiva === 'perfil' ? meusPets : petsSalvos;
