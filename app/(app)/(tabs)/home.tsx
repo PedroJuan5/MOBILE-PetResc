@@ -20,7 +20,7 @@ const handleOpenMaps = async (endereco: string) => {
   }
 };
 
-// --- Tipagens ---
+//Tipagens
 interface Animal {
   id: number;
   nome: string;
@@ -28,7 +28,7 @@ interface Animal {
   especie: string;
   sexo: string | null;
   status: string;
-  // larTemporario não vem por padrão no listagem simples, adapte se necessário
+  //larTemporario não vem por padrão no listagem simples, adapte se necessário
 }
 
 interface Ong {
@@ -45,7 +45,7 @@ interface Ong {
   }
 }
 
-// --- Componentes ---
+//Componentes 
 const CartaoAnimal = ({ animal }: { animal: Animal }) => {
   // Lógica da imagem: Se tiver URL, usa URI. Se não, usa imagem local.
   const imageSource = animal.photoURL 

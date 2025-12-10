@@ -27,15 +27,15 @@ export default function LoginOngScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async () => {
-    // 1. Validação simples
+ const { signIn } = useAuth();
+const handleLogin = async () => {
     if (!cnpj || !senha) {
       Alert.alert("Atenção", "Preencha CNPJ e senha.");
       return;
     }
-
+  
     setIsLoading(true);
-
+  
     try {
       console.log("Iniciando simulação de login...");
       

@@ -1,16 +1,19 @@
-import api, { AxiosError } from '@/lib/axios';
+import api from '@/lib/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { Platform } from "react-native";
 
 interface SignInCredentials {
-  email: string;
+  email?: string; 
+  cnpj?: string;
   password: string;
+  type: 'PUBLICO' | 'ONG';
 }
 
 interface User {
   id: number;
   nome: string;
-  email: string;
+  email?: string;
   role: 'PUBLICO' | 'ONG' | 'ADMIN';
   publico?: any;
   ong?: any;
@@ -25,60 +28,75 @@ interface AuthContextData {
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
+export const useAuth = () => useContext(AuthContext);
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
-
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  async function storageGet(key: string) {
+    return Platform.OS === "web"
+      ? localStorage.getItem(key)
+      : AsyncStorage.getItem(key);
+  }
+
+  async function storageSet(key: string, value: string) {
+    return Platform.OS === "web"
+      ? localStorage.setItem(key, value)
+      : AsyncStorage.setItem(key, value);
+  }
+
+  async function storageRemove(key: string) {
+    return Platform.OS === "web"
+      ? localStorage.removeItem(key)
+      : AsyncStorage.removeItem(key);
+  }
+
   useEffect(() => {
     async function loadUserFromStorage() {
-      const token = await AsyncStorage.getItem('@PetResc:token');
-      const storedUser = await AsyncStorage.getItem('@PetResc:user');
+      try {
+        const token = await storageGet('@PetResc:token');
+        const storedUser = await storageGet('@PetResc:user');
 
-      if (token && storedUser) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        try {
-          const response = await api.get('/api/auth/me');
+        if (token && storedUser) {
+          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+          const response = await api.get('/auth/me');
           setUser(response.data);
-        } catch {
-          await AsyncStorage.removeItem('@PetResc:token');
-          await AsyncStorage.removeItem('@PetResc:user');
         }
+      } catch (e) {
+        await storageRemove('@PetResc:token');
+        await storageRemove('@PetResc:user');
+      } finally {
+        setIsLoading(false);
       }
-
-      setIsLoading(false);
     }
+
     loadUserFromStorage();
   }, []);
 
-  const signIn = async ({ email, password }: SignInCredentials) => {
-    try {
-      const response = await api.post('/auth/login', { email, password });
+  const signIn = async ({ email, cnpj, password, type }: SignInCredentials) => {
+    const route = type === 'ONG' ? '/auth/login-ong' : '/auth/login';
 
-      const { token, usuario } = response.data;
+    const payload: any = { password };
+    if (type === 'ONG') payload.cnpj = cnpj!.replace(/\D/g, '');
+    else payload.email = email;
 
-      await AsyncStorage.setItem('@PetResc:token', token);
-      await AsyncStorage.setItem('@PetResc:user', JSON.stringify(usuario));
+    const response = await api.post(route, payload);
 
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    const { token, usuario } = response.data;
 
-      setUser(usuario);
+    await storageSet('@PetResc:token', token);
+    await storageSet('@PetResc:user', JSON.stringify(usuario));
 
-    } catch (error: any) {
-      if (error instanceof AxiosError && error.response) {
-        throw new Error(error.response.data.error || 'Erro ao fazer login');
-      }
-      throw new Error('Não foi possível se conectar ao servidor.');
-    }
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+    setUser(usuario);
   };
 
   const signOut = async () => {
-    await AsyncStorage.removeItem('@PetResc:token');
-    await AsyncStorage.removeItem('@PetResc:user');
+    await storageRemove('@PetResc:token');
+    await storageRemove('@PetResc:user');
     delete api.defaults.headers.common['Authorization'];
     setUser(null);
   };

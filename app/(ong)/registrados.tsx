@@ -11,12 +11,10 @@ export default function RegistradosScreen() {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
 
       <View style={styles.header}>
-
         <TouchableOpacity onPress={() => router.push('/(ong)/home-ong' as any)}>
             <Ionicons name="home-outline" size={24} color="#1A3C6E" />
         </TouchableOpacity>
         
-      
         <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes-ong' as any)}>
             <Ionicons name="notifications-outline" size={24} color="#1A3C6E" />
         </TouchableOpacity>
@@ -47,27 +45,6 @@ export default function RegistradosScreen() {
         </View>
       </View>
         
-      {/* CARD DE PET */}
-      <View style={styles.petCard}>
-        <Image
-          source={require("../../assets/images/pets/branquinho.png")}
-          style={styles.petImg}
-        />
-
-        <View style={styles.petInfo}>
-            <Text style={styles.petName}>Nome</Text>
-            <Text style={styles.petSub}>Sem raça definida (SRD) - AD</Text>
-            <Text style={styles.petDetails}>
-              Adotado em 00/00/0000 {"\n"}
-              Status: Visita Agendada
-            </Text>
-  
-            <TouchableOpacity style={styles.infoButton} onPress={() => router.push("/detalhes-pet-ong")}>
-              <Text style={styles.infoButtonText}>Ver informações</Text>
-            </TouchableOpacity>
-        </View>
-      </View>
-
       {/* BOTÕES */}
       <ScrollView 
         horizontal 
@@ -88,7 +65,34 @@ export default function RegistradosScreen() {
           <Text style={styles.btnText}>Doações</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* --- ÍCONE DE VOLUNTÁRIOS (IMPLEMENTADO) --- */}
+      <View style={styles.volunteersIconContainer}>
+        <TouchableOpacity onPress={() => router.push('/(ong)/voluntarios-lar-temporario' as any)}>
+            <Ionicons name="people" size={28} color="#1A3C6E" />
+        </TouchableOpacity>
+      </View>
             
+      {/* CARD DE PET */}
+      <View style={styles.petCard}>
+        <Image
+          source={require("../../assets/images/pets/branquinho.png")}
+          style={styles.petImg}
+        />
+
+        <View style={styles.petInfo}>
+            <Text style={styles.petName}>Nome</Text>
+            <Text style={styles.petSub}>Sem raça definida (SRD) - AD</Text>
+            <Text style={styles.petDetails}>
+              Adotado em 00/00/0000 {"\n"}
+              Status: Visita Agendada
+            </Text>
+  
+            <TouchableOpacity style={styles.infoButton} onPress={() => router.push("/detalhes-pet-ong")}>
+              <Text style={styles.infoButtonText}>Ver informações</Text>
+            </TouchableOpacity>
+        </View>
+      </View>
 
       {/* ENTRADAS 6 MESES */}
       <Text style={styles.graphTitle}>Entradas de animais (6 meses)</Text>
@@ -203,7 +207,7 @@ export default function RegistradosScreen() {
         />
       </View>
 
-      {/* FOOTER DE CONFIGURAÇÃO (ADICIONADO) */}
+      {/* FOOTER CONFIGURAÇÃO */}
       <View style={{ alignItems: "flex-end", marginTop: 20, marginBottom: 40 }}>
         <TouchableOpacity onPress={() => router.push("/(ong)/menuconfiguracoes-ong" as any)}>
           <Ionicons name="settings-outline" size={28} color="#1A3C6E" />
@@ -284,7 +288,15 @@ const styles = StyleSheet.create({
   },
 
   buttonsScrollView: {
-    marginBottom: 20,
+    marginBottom: 10, // Reduzido
+  },
+
+  // ESTILO DO NOVO ÍCONE
+  volunteersIconContainer: {
+    alignItems: 'flex-start',
+    marginBottom: 10,
+    marginTop: 5,
+    marginLeft: 5,
   },
 
   btn: {

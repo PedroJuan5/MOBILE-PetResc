@@ -1,9 +1,10 @@
+import { DenuncieModal } from '@/components/denuncieModal';
+import { useAuth } from '@/context/AuthContext';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRouter } from 'expo-router';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Modal, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { DenuncieModal } from '@/components/denuncieModal';
-import { useAuth } from '../../context/AuthContext';
+
 
 const FeatureCard = ({ icon, title, description }: { icon: string, title: string, description: string }) => (
   <View style={styles.featureCard}>

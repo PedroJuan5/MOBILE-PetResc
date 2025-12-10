@@ -67,6 +67,13 @@ export default function LarTemporarioScreen() {
           <Text style={styles.btnText}>Doações</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* --- ÍCONE DE VOLUNTÁRIOS (ADICIONADO AQUI) --- */}
+      <View style={styles.volunteersIconContainer}>
+        <TouchableOpacity onPress={() => router.push('/(ong)/voluntarios-lar-temporario' as any)}>
+            <Ionicons name="people" size={28} color="#1A3C6E" />
+        </TouchableOpacity>
+      </View>
       
       {/* CARD DE PET 1 */}
       <View style={styles.petCard}>
@@ -131,7 +138,7 @@ export default function LarTemporarioScreen() {
         </View>
       </View>
 
-      {/* FOOTER DE CONFIGURAÇÃO (ADICIONADO) */}
+      {/* FOOTER DE CONFIGURAÇÃO */}
       <View style={{ alignItems: "flex-end", marginTop: 20, marginBottom: 40 }}>
         <TouchableOpacity onPress={() => router.push("/(ong)/menuconfiguracoes-ong" as any)}>
           <Ionicons name="settings-outline" size={28} color="#1A3C6E" />
@@ -212,7 +219,15 @@ const styles = StyleSheet.create({
   },
 
   buttonsScrollView: {
-    marginBottom: 20,
+    marginBottom: 10, // Reduzido para aproximar o ícone
+  },
+
+  // ESTILO DO NOVO ÍCONE DE VOLUNTÁRIOS
+  volunteersIconContainer: {
+    alignItems: 'flex-start',
+    marginBottom: 10,
+    marginTop: 5,
+    marginLeft: 5,
   },
 
   btn: {

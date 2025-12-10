@@ -12,7 +12,6 @@ export default function RootLayout() {
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="(app)" />
           <Stack.Screen name="(ong)" />
-          <Stack.Screen name="index" />
         </Stack>
       </AuthProvider>
     </StrictMode>

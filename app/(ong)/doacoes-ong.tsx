@@ -9,13 +9,13 @@ export default function DoacoesOngScreen() {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
 
+      {/* HEADER */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push('/(ong)/home-ong' as any)}>
             <Ionicons name="home-outline" size={24} color="#1A3C6E" />
         </TouchableOpacity>
         
-
-        <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes-ong' as any)}>
+        <TouchableOpacity onPress={() => router.push('/(ong)/notificacao-ong' as any)}>
             <Ionicons name="notifications-outline" size={24} color="#1A3C6E" />
         </TouchableOpacity>
       </View>
@@ -66,6 +66,13 @@ export default function DoacoesOngScreen() {
         </TouchableOpacity>
       </ScrollView>
 
+      {/* --- ÍCONE DE VOLUNTÁRIOS (ADICIONADO AQUI) --- */}
+      <View style={styles.volunteersIconContainer}>
+        <TouchableOpacity onPress={() => router.push('/(ong)/voluntarios-lar-temporario' as any)}>
+            <Ionicons name="people" size={28} color="#1A3C6E" />
+        </TouchableOpacity>
+      </View>
+
        {/* MENSAGEM INFORMATIVA */}
       <View style={styles.infoContainer}>
         <Text style={styles.infoContainerText}>
@@ -73,6 +80,7 @@ export default function DoacoesOngScreen() {
         </Text>
       </View>
 
+      {/* FOOTER CONFIGURAÇÃO */}
       <View style={{ alignItems: "flex-end", marginTop: 20, marginBottom: 40 }}>
         <TouchableOpacity onPress={() => router.push("/(ong)/menuconfiguracoes-ong" as any)}>
           <Ionicons name="settings-outline" size={28} color="#1A3C6E" />
@@ -159,7 +167,14 @@ const styles = StyleSheet.create({
   },
 
   buttonsScrollView: {
-    marginBottom: 20,
+    marginBottom: 10, 
+  },
+  
+  volunteersIconContainer: {
+    alignItems: 'flex-start',
+    marginBottom: 10,
+    marginTop: 5,
+    marginLeft: 5,
   },
 
   btn: {

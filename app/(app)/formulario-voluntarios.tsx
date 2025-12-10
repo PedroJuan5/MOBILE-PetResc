@@ -15,6 +15,7 @@ import {
   Keyboard,
 } from 'react-native';
 import MaskInput from 'react-native-mask-input';
+import api from '@/lib/axios';
 
 //Definição de Tipos 
 interface FormDataState {
@@ -206,10 +207,9 @@ const Step2 = ({ formData, updateFormData, updateUnmasked, isLoadingCep, onFetch
   </>
 );
 
-// --- CORREÇÃO AQUI NO STEP 3 ---
 const Step3 = ({ formData, updateFormData }: StepProps) => (
   <>
-    <Text style={styles.stepTitle}>Sobre o espaço disponível</Text>
+    <Text style={styles.stepTitle}>Sobre o espaço</Text>
     <Text style={styles.label}>Tipo de moradia:</Text>
     <View style={styles.optionRow}>
       <CustomRadio label="Casa" isSelected={formData.tipoMoradia === 'Casa'} onSelect={() => updateFormData('tipoMoradia', 'Casa')} />
@@ -229,10 +229,7 @@ const Step3 = ({ formData, updateFormData }: StepProps) => (
     <Text style={styles.label}>Quais portes aceita?</Text>
     <View style={styles.optionRow}>
       <CustomCheckbox label="Pequeno" isSelected={formData.portesAceitos.includes('Pequeno')} onSelect={() => updateFormData('portesAceitos', 'Pequeno', true)} />
-      
-      {/* CORREÇÃO: Mudado de 'Média' para 'Médio' para bater com o filtro includes('Médio') */}
       <CustomCheckbox label="Médio" isSelected={formData.portesAceitos.includes('Médio')} onSelect={() => updateFormData('portesAceitos', 'Médio', true)} />
-      
       <CustomCheckbox label="Grande" isSelected={formData.portesAceitos.includes('Grande')} onSelect={() => updateFormData('portesAceitos', 'Grande', true)} />
     </View>
 
@@ -244,7 +241,6 @@ const Step3 = ({ formData, updateFormData }: StepProps) => (
     </View>
   </>
 );
-// --------------------------------
 
 //Experiência com animais
 const Step4 = ({ formData, updateFormData }: StepProps) => (
@@ -429,11 +425,13 @@ export default function FormularioVoluntariosScreen() {
     if (step > 1) setStep(step - 1);
   };
 
+  // --- LÓGICA DE ENVIO INTEGRADA COM O BACKEND ---
   const handleSubmit = async () => {
     if (!formData.declaracaoCompromisso || !formData.aceiteObrigatorio) {
       Alert.alert("Atenção", "Você precisa aceitar os termos para finalizar.");
       return;
     }
+    // Validação básica
     if (!formData.nome || !formData.cpfUnmasked || !formData.email || !formData.telefoneUnmasked || !formData.cepUnmasked) {
       Alert.alert("Formulário incompleto", "Por favor, volte e preencha todos os campos obrigatórios (Passo 1 e 2).");
       setStep(1);
@@ -442,11 +440,57 @@ export default function FormularioVoluntariosScreen() {
     }
 
     setIsLoading(true);
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setModalContent('enviado');
-    } catch (err) {
-      Alert.alert("Erro", "Não foi possível enviar seu formulário. Tente novamente.");
+        // 1. Monta o Payload para o Backend
+        // O controller espera nomes de campos específicos, então mapeamos aqui:
+        const payload = {
+            nomeCompleto: formData.nome,
+            cpf: formData.cpfUnmasked,
+            email: formData.email,
+            telefone: formData.telefoneUnmasked,
+
+            // Endereço como objeto JSON
+            endereco: {
+                cep: formData.cepUnmasked,
+                ruaBairro: formData.ruaBairro,
+                numero: formData.numero,
+                complemento: formData.complemento,
+                cidadeEstado: formData.cidadeEstado
+            },
+
+            tipoMoradia: formData.tipoMoradia,
+            quintal: formData.possuiQuintal, // Boolean (Controller usa !!quintal)
+            
+            // Arrays convertidos para JSON String ou String simples
+            porteAnimal: JSON.stringify(formData.portesAceitos), 
+            tipoAnimal: JSON.stringify(formData.especiesAceitas),
+
+            outrosAnimais: formData.outrosAnimais,
+            administraMedicamentos: formData.administrarMedicamentos,
+            levarVeterinario: formData.disponibilidadeVeterinario,
+            
+            // Mapeamento de nomes diferentes
+            arcarCustos: formData.fornecerRacao, // 'fornecerRacao' no front -> 'arcarCustos' no back
+            ajudaSuprimentos: formData.ajudaONGSuprimentos,
+
+            periodoDisponibilidade: formData.tempoDisponibilidade,
+
+            declaroVerdade: formData.declaracaoCompromisso,
+            declaroLido: formData.aceiteObrigatorio
+        };
+
+        // 2. Envia para a API
+        // Substitua '/lar-temporario' pela rota correta se for diferente
+        await api.post('/lares-Temporarios', payload); 
+
+        // 3. Sucesso
+        setModalContent('enviado');
+
+    } catch (err: any) {
+      console.error("Erro no envio:", err);
+      const msg = err.response?.data?.error || "Não foi possível enviar seu formulário. Tente novamente.";
+      Alert.alert("Erro", msg);
       setIsModalVisible(false);
     } finally {
       setIsLoading(false);
