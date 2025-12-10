@@ -1,5 +1,5 @@
 import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View, SafeAreaView } from 'react-native';
 import { useAuth } from '../../context/AuthContext'; 
@@ -8,7 +8,7 @@ export default function ConfigScreen() {
   const router = useRouter();
   const { signOut } = useAuth(); 
   
-  
+  // Mantive sua função de voltar
   const handleGoBackToProfile = () => {
     if (router.canGoBack()) {
       router.back();
@@ -17,7 +17,6 @@ export default function ConfigScreen() {
     }
   };
 
-  
   const handleLogout = () => {
     signOut(); 
     router.replace('/'); 
@@ -25,10 +24,13 @@ export default function ConfigScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <Stack.Screen options={{ headerShown: false }} />
+    
+
       <View style={styles.container}>
         
         <View style={styles.header}>
-          {/* Botão de Voltar */}
+          {/* Mantive o SEU botão de voltar personalizado */}
           <TouchableOpacity 
             onPress={handleGoBackToProfile} 
             style={styles.backButtonContainer} 
@@ -106,7 +108,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingTop: 20, 
   },
   header: {
     flexDirection: 'row',
