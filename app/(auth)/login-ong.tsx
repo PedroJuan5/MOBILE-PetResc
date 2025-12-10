@@ -1,4 +1,3 @@
-
 import { Ionicons } from '@expo/vector-icons'; 
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -15,51 +14,52 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import MaskInput, { Masks } from 'react-native-mask-input';
-import api from '../../lib/axios';
 import { useAuth } from '../../context/AuthContext'; 
 
 export default function LoginOngScreen() {
   const router = useRouter();
 
-  const [cnpj, setCnpj] = useState('');
+  // Alterado de CNPJ para Email
+  const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
- const { signIn } = useAuth(); // Já importado corretamente
+const { signIn } = useAuth(); 
 
   const handleLogin = async () => {
-    if (!cnpj || !senha) {
-      Alert.alert("Atenção", "Preencha CNPJ e senha.");
+    if (!email || !senha) {
+      Alert.alert("Atenção", "Preencha E-mail e senha.");
       return;
     }
   
     setIsLoading(true);
   
     try {
-      console.log("Tentando logar como ONG...");
-      
-      // CHAMA O CONTEXTO PARA LOGAR DE VERDADE
-      await signIn({
-        cnpj: cnpj, 
+      // Recebe o usuário logado
+      const user = await signIn({
+        email: email, 
         password: senha, 
         type: 'ONG' 
       });
 
-      console.log("Login Realizado! Redirecionando...");
-      
-      // Redireciona para a home da ONG
-      router.replace('/(ong)/(tabs)/home-ong' as any);
+      // VERIFICAÇÃO DUPLA DE REDIRECIONAMENTO
+      if (user.role === 'ONG') {
+          // Força a navegação para o grupo (ong)
+          // Tente usar o caminho absoluto
+          router.replace('/(ong)/(tabs)/home-ong'); 
+      } else {
+          Alert.alert("Erro", "Login realizado, mas esta conta não é de ONG.");
+      }
 
     } catch (error: any) {
       console.error(error);
-      const msg = error.response?.data?.error || "Verifique suas credenciais.";
-      Alert.alert("Falha ao entrar", msg);
+      const msg = error.response?.data?.error || error.message || "Falha ao entrar.";
+      Alert.alert("Erro", msg);
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
@@ -76,15 +76,17 @@ export default function LoginOngScreen() {
 
           {/* Formulário */}
           <View style={styles.formContainer}>
-            <Text style={styles.label}>CNPJ</Text>
-            <MaskInput
+            
+            {/* CAMPO DE E-MAIL (Substituindo o CNPJ) */}
+            <Text style={styles.label}>E-mail da ONG</Text>
+            <TextInput
               style={styles.input}
-              placeholder="XX.XXX.XXX/0001-XX"
+              placeholder="ong@exemplo.com"
               placeholderTextColor="#a0c4df"
-              value={cnpj}
-              onChangeText={(masked, unmasked) => setCnpj(masked)}
-              mask={Masks.BRL_CNPJ}
-              keyboardType="numeric"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
 
             <Text style={styles.label}>Senha</Text>

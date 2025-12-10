@@ -7,16 +7,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import api from '@/lib/axios';
 
-// --- IMPORTANTE: Imports de Armazenamento ---
-import * as SecureStore from 'expo-secure-store';
+// --- CORREÇÃO DE IMPORTS DE ARMAZENAMENTO ---
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Função Helper para pegar o Token (Compatível Web/Mobile)
+// Função Helper CORRIGIDA (Igual ao AuthContext)
 const getToken = async () => {
+  const key = '@PetResc:token'; // Mesma chave do AuthContext
+  
   if (Platform.OS === 'web') {
-    return await AsyncStorage.getItem('token');
+    return localStorage.getItem(key); // Web usa localStorage direto
   } else {
-    return await SecureStore.getItemAsync('token');
+    return await AsyncStorage.getItem(key); // Mobile usa AsyncStorage
   }
 };
 
@@ -39,32 +40,31 @@ export default function EnderecoOngScreen() {
   const [saving, setSaving] = useState(false);
   const [loadingCep, setLoadingCep] = useState(false);
 
-  // 1. Carregar dados da ONG ao abrir
   useEffect(() => {
     async function fetchUserData() {
       try {
         setLoadingData(true);
         
-        // Debug: Verificar Token com a função compatível
+        // 1. Verifica Token no lugar certo
         const token = await getToken();
-        console.log("Token atual:", token ? "Presente" : "Ausente");
+        console.log("Token encontrado:", token ? "Sim" : "Não");
 
         if (!token) {
+            // Se não achou, o axios também não vai ter.
             Alert.alert("Sessão Expirada", "Faça login novamente.");
-            // Redireciona para o login correto (ajuste a rota se necessário)
-            router.replace('/(auth)/login-ong');
+            router.replace('/(auth)/login-ong' as any);
             return;
         }
 
-        // Busca dados
+        // 2. Garante que o Axios tenha o header (Segurança extra para Web)
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+        // 3. Busca dados
         const response = await api.get('/usuarios/me');
         const user = response.data;
         
-        console.log("Dados recebidos da ONG:", user); 
-
         setUserId(user.id);
         
-        // Lógica de Prioridade
         const cep = user.ong?.cep || user.cep || '';
         const rua = user.ong?.rua || user.rua || '';
         const numero = user.ong?.numero || user.numero || '';
@@ -74,23 +74,14 @@ export default function EnderecoOngScreen() {
         const estado = user.ong?.estado || user.estado || '';
 
         setForm({
-          cep: cep,
-          rua: rua,
-          numero: numero ? String(numero) : '',
-          complemento: complemento,
-          bairro: bairro,
-          cidade: cidade,
-          estado: estado
+          cep, rua, numero: String(numero), complemento, bairro, cidade, estado
         });
 
       } catch (error: any) {
-        console.error("Erro no fetchUserData:", error.message);
-        
+        console.error("Erro fetchUserData:", error);
         if (error.response?.status === 401) {
-            Alert.alert("Sessão Inválida", "Por favor, faça login novamente.");
-            router.replace('/(auth)/login-ong');
-        } else {
-            // Alert.alert("Erro", "Não foi possível carregar os dados.");
+            Alert.alert("Sessão Inválida", "Faça login novamente.");
+            router.replace('/(auth)/login-ong' as any);
         }
       } finally {
         setLoadingData(false);
@@ -99,6 +90,8 @@ export default function EnderecoOngScreen() {
     fetchUserData();
   }, []);
 
+  // ... (RESTANTE DO CÓDIGO PERMANECE IGUAL: handleChange, handleBlurCep, handleSalvar, render...)
+  
   const handleChange = (field: string, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
   };
@@ -108,7 +101,8 @@ export default function EnderecoOngScreen() {
     if (cepLimpo.length !== 8) return;
 
     setLoadingCep(true);
-    Keyboard.dismiss();
+    // Keyboard.dismiss só funciona no mobile, na web não quebra mas não faz nada
+    if (Platform.OS !== 'web') Keyboard.dismiss();
     
     try {
       const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
@@ -152,8 +146,8 @@ export default function EnderecoOngScreen() {
       ]);
 
     } catch (error: any) {
-      console.error("Erro ao salvar:", error);
-      Alert.alert("Erro", "Falha ao salvar alterações.");
+      console.error("Erro salvar:", error);
+      Alert.alert("Erro", "Falha ao salvar.");
     } finally {
       setSaving(false);
     }
@@ -184,6 +178,7 @@ export default function EnderecoOngScreen() {
           
           <Text style={styles.subtitle}>Alterar localização</Text>
 
+          {/* CAMPOS DO FORMULÁRIO (Mesmos de antes) */}
           <Text style={styles.label}>CEP</Text>
           <View style={styles.inputContainer}>
             <TextInput
@@ -192,7 +187,6 @@ export default function EnderecoOngScreen() {
               placeholderTextColor="#999"
               value={form.cep}
               onChangeText={(t) => handleChange('cep', t)}
-              keyboardType="numeric"
               maxLength={9}
               onBlur={handleBlurCep}
             />
@@ -200,78 +194,35 @@ export default function EnderecoOngScreen() {
           </View>
 
           <Text style={styles.label}>Rua</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Logradouro"
-            placeholderTextColor="#999"
-            value={form.rua}
-            onChangeText={(t) => handleChange('rua', t)}
-          />
+          <TextInput style={styles.input} value={form.rua} onChangeText={(t) => handleChange('rua', t)} />
 
           <View style={styles.row}>
             <View style={{ flex: 1, marginRight: 10 }}>
               <Text style={styles.label}>Número</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="123"
-                placeholderTextColor="#999"
-                value={form.numero}
-                onChangeText={(t) => handleChange('numero', t)}
-                keyboardType="numeric"
-              />
+              <TextInput style={styles.input} value={form.numero} onChangeText={(t) => handleChange('numero', t)} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.label}>Comp.</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Opcional"
-                placeholderTextColor="#999"
-                value={form.complemento}
-                onChangeText={(t) => handleChange('complemento', t)}
-              />
+              <TextInput style={styles.input} value={form.complemento} onChangeText={(t) => handleChange('complemento', t)} />
             </View>
           </View>
 
           <Text style={styles.label}>Bairro</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Bairro"
-            placeholderTextColor="#999"
-            value={form.bairro}
-            onChangeText={(t) => handleChange('bairro', t)}
-          />
+          <TextInput style={styles.input} value={form.bairro} onChangeText={(t) => handleChange('bairro', t)} />
 
           <View style={styles.row}>
             <View style={{ flex: 2, marginRight: 10 }}>
               <Text style={styles.label}>Cidade</Text>
-              <TextInput
-                style={[styles.input, { backgroundColor: '#F0F0F0' }]} 
-                value={form.cidade}
-                onChangeText={(t) => handleChange('cidade', t)}
-              />
+              <TextInput style={[styles.input, { backgroundColor: '#F0F0F0' }]} value={form.cidade} onChangeText={(t) => handleChange('cidade', t)} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.label}>UF</Text>
-              <TextInput
-                style={[styles.input, { backgroundColor: '#F0F0F0' }]}
-                value={form.estado}
-                onChangeText={(t) => handleChange('estado', t)}
-                maxLength={2}
-                autoCapitalize="characters"
-              />
+              <TextInput style={[styles.input, { backgroundColor: '#F0F0F0' }]} value={form.estado} onChangeText={(t) => handleChange('estado', t)} maxLength={2} />
             </View>
           </View>
 
-          <TouchableOpacity 
-            style={[styles.button, saving && { backgroundColor: '#A0A0A0' }]} 
-            onPress={handleSalvar}
-            disabled={saving}
-          >
-            {saving ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Salvar alterações</Text>
-            )}
+          <TouchableOpacity style={[styles.button, saving && { backgroundColor: '#A0A0A0' }]} onPress={handleSalvar} disabled={saving}>
+            {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Salvar alterações</Text>}
           </TouchableOpacity>
 
         </ScrollView>
@@ -281,75 +232,15 @@ export default function EnderecoOngScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: 25,
-    paddingTop: 50,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  backBtn: {
-    padding: 5,
-    marginRight: 5
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#2D68A6',
-  },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#2D68A6',
-    marginBottom: 20,
-    marginTop: 10
-  },
-  label: {
-    fontSize: 14,
-    color: '#2D68A6',
-    fontWeight: '500',
-    marginBottom: 6,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#DCE9F5',
-    backgroundColor: '#FAFAFA',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    fontSize: 16,
-    marginBottom: 15,
-    color: '#333'
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  button: {
-    backgroundColor: '#2D68A6',
-    paddingVertical: 16,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 30,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
+  container: { flex: 1, backgroundColor: '#fff', paddingHorizontal: 25, paddingTop: 50 },
+  header: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
+  backBtn: { padding: 5, marginRight: 5 },
+  headerTitle: { fontSize: 22, fontWeight: 'bold', color: '#2D68A6' },
+  subtitle: { fontSize: 18, fontWeight: '600', color: '#2D68A6', marginBottom: 20, marginTop: 10 },
+  label: { fontSize: 14, color: '#2D68A6', fontWeight: '500', marginBottom: 6 },
+  input: { borderWidth: 1, borderColor: '#DCE9F5', backgroundColor: '#FAFAFA', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 12, fontSize: 16, marginBottom: 15, color: '#333' },
+  inputContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 15 },
+  row: { flexDirection: 'row', justifyContent: 'space-between' },
+  button: { backgroundColor: '#2D68A6', paddingVertical: 16, borderRadius: 10, alignItems: 'center', marginTop: 20, marginBottom: 30 },
+  buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
 });

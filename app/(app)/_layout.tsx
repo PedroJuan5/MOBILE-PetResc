@@ -1,67 +1,80 @@
 import { useAuth } from '@/context/AuthContext';
 import { SplashScreen, Stack, useRouter, useSegments } from 'expo-router';
 import React, { useEffect } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 
-//SplashScreen.preventAutoHideAsync();
+// Previne o Splash de sumir antes da hora
+SplashScreen.preventAutoHideAsync();
 
-//lógica de navegação e autenticação
 function RootLayoutNav() {
   const { user, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading) {
-      const inAuthGroup = segments[0] === '(auth)';
-      console.log('RootLayoutNav: hiding splash', { user: !!user, isLoading, segments });
+    if (isLoading) return;
 
-      (async () => {
-        try {
-          if (user && inAuthGroup) {
-            await SplashScreen.hideAsync();
-            router.replace('/(tabs)/home' as any);
-          } else if (!user && !inAuthGroup) {
-            console.log('RootLayoutNav: redirecting to login', { user: !!user, inAuthGroup });
-            await SplashScreen.hideAsync();
-            router.replace('/' as any);
+    const inAuthGroup = segments[0] === '(auth)';
+
+    const hideSplashAndNavigate = async () => {
+      try {
+        if (user && inAuthGroup) {
+          // --- CORREÇÃO DO REDIRECIONAMENTO ---
+          await SplashScreen.hideAsync();
+          
+          if (user.role === 'ONG') {
+            // Se for ONG, manda para a pasta (ong)
+            router.replace('/(ong)/(tabs)/home-ong' as any);
           } else {
-            await SplashScreen.hideAsync();
+            // Se for PÚBLICO, manda para a pasta (tabs)
+            router.replace('/(tabs)/home' as any);
           }
-        } catch (e) {
-          console.log('RootLayoutNav: error hiding splash', e);
-          try {
-            await SplashScreen.hideAsync();
-          } catch (e2) {
-            console.log('RootLayoutNav: second attempt to hide splash failed', e2);
-          }
+
+        } else if (!user && !inAuthGroup) {
+          // Se não tem usuário e não está no login, manda pro login
+          await SplashScreen.hideAsync();
+          router.replace('/' as any); 
+        } else {
+          await SplashScreen.hideAsync();
         }
-      })();
-    }
+      } catch (e) {
+        console.warn('Erro navegação:', e);
+        SplashScreen.hideAsync();
+      }
+    };
+
+    hideSplashAndNavigate();
+
   }, [user, isLoading, segments]);
   
   if (isLoading) {
-    return null; 
+    return (
+      <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+        <ActivityIndicator size="large" color="#2D68A6"/>
+      </View>
+    ); 
   }
 
-  SplashScreen.hide()
-
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
+    <Stack screenOptions={{ headerShown: false }}>
+      {/* Grupo de Autenticação */}
+      <Stack.Screen name="(auth)" />
 
-  <Stack.Screen name="(tabs)" />
-  <Stack.Screen name="formulario-interesse" />
-  <Stack.Screen name="pet/[id]" />
-  <Stack.Screen name="formulario-voluntarios" />
-  <Stack.Screen name="meus-dados" />
-  {/* Mostrar header nativo apenas nessas telas específicas */}
-  <Stack.Screen name="seguranca"   />
-  <Stack.Screen name="HistoricoSolicitacoes" options={{ headerShown: true, title: 'Histórico' }} />
-  <Stack.Screen name="notificacoes"  options={{ headerShown: true, title: 'Histórico' }} />
-  <Stack.Screen name="AlterarSenha-ong" options={{ headerShown: true, title: 'Alterar Senha' }} />
+      {/* Grupo de Usuário Comum */}
+      <Stack.Screen name="(tabs)" />
+      
+      {/* Grupo da ONG (ESSENCIAL ADICIONAR ISTO) */}
+      <Stack.Screen name="(ong)" />
+
+      {/* Outras telas soltas */}
+      <Stack.Screen name="formulario-interesse" />
+      <Stack.Screen name="pet/[id]" />
+      <Stack.Screen name="formulario-voluntarios" />
+      <Stack.Screen name="meus-dados" />
+      <Stack.Screen name="seguranca" />
+      <Stack.Screen name="HistoricoSolicitacoes" options={{ headerShown: true, title: 'Histórico' }} />
+      <Stack.Screen name="notificacoes" options={{ headerShown: true, title: 'Notificações' }} />
+      <Stack.Screen name="AlterarSenha-ong" options={{ headerShown: true, title: 'Alterar Senha' }} />
     </Stack>
   );
 }

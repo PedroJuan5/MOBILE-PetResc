@@ -21,7 +21,7 @@ interface User {
 }
 
 interface AuthContextData {
-  signIn(credentials: SignInCredentials): Promise<void>;
+  signIn(credentials: SignInCredentials): Promise<User>; // <--- MUDOU AQUI (retorna User)
   signOut(): void;
   user: User | null;
   isLoading: boolean;
@@ -75,23 +75,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     loadUserFromStorage();
   }, []);
 
-  const signIn = async ({ email, cnpj, password, type }: SignInCredentials) => {
-    const route = type === 'ONG' ? '/auth/login-ong' : '/auth/login';
+const signIn = async ({ email, cnpj, password, type }: SignInCredentials): Promise<User> => {
+    const route = '/auth/login'; 
 
-    const payload: any = { password };
-    if (type === 'ONG') payload.cnpj = cnpj!.replace(/\D/g, '');
-    else payload.email = email;
+    const payload = { 
+        email: email, 
+        password: password 
+    };
 
-    const response = await api.post(route, payload);
+    try {
+        const response = await api.post(route, payload);
+        
+        const { token, usuario } = response.data;
 
-    const { token, usuario } = response.data;
+        // Validação de segurança
+        if (type === 'ONG' && usuario.role !== 'ONG') {
+             throw new Error("Esta conta não é de uma ONG.");
+        }
 
-    await storageSet('@PetResc:token', token);
-    await storageSet('@PetResc:user', JSON.stringify(usuario));
+        await storageSet('@PetResc:token', token);
+        await storageSet('@PetResc:user', JSON.stringify(usuario));
 
-    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        setUser(usuario);
+        
+        return usuario; // <--- RETORNA O USUÁRIO LOGADO
 
-    setUser(usuario);
+    } catch (error) {
+        throw error; 
+    }
   };
 
   const signOut = async () => {
