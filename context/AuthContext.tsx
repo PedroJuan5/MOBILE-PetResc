@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Platform } from "react-native";
 
 interface SignInCredentials {
-  email?: string; 
+  email?: string;
   cnpj?: string;
   password: string;
   type: 'PUBLICO' | 'ONG';
@@ -21,8 +21,8 @@ interface User {
 }
 
 interface AuthContextData {
-  signIn(credentials: SignInCredentials): Promise<User>; // <--- MUDOU AQUI (retorna User)
-  signOut(): void;
+  signIn(credentials: SignInCredentials): Promise<User>;
+  signOut(): Promise<void>;
   user: User | null;
   isLoading: boolean;
 }
@@ -34,26 +34,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+ 
   async function storageGet(key: string) {
-    return Platform.OS === "web"
+    return Platform.OS === 'web'
       ? localStorage.getItem(key)
       : AsyncStorage.getItem(key);
   }
 
   async function storageSet(key: string, value: string) {
-    return Platform.OS === "web"
+    return Platform.OS === 'web'
       ? localStorage.setItem(key, value)
       : AsyncStorage.setItem(key, value);
   }
 
   async function storageRemove(key: string) {
-    return Platform.OS === "web"
+    return Platform.OS === 'web'
       ? localStorage.removeItem(key)
       : AsyncStorage.removeItem(key);
   }
 
+ 
   useEffect(() => {
-    async function loadUserFromStorage() {
+    (async () => {
       try {
         const token = await storageGet('@PetResc:token');
         const storedUser = await storageGet('@PetResc:user');
@@ -62,7 +64,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
           const response = await api.get('/auth/me');
-          setUser(response.data);
+
+          if (response?.data) {
+            setUser(response.data);
+          }
         }
       } catch (e) {
         await storageRemove('@PetResc:token');
@@ -70,47 +75,45 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } finally {
         setIsLoading(false);
       }
-    }
-
-    loadUserFromStorage();
+    })();
   }, []);
 
-const signIn = async ({ email, cnpj, password, type }: SignInCredentials): Promise<User> => {
-    const route = '/auth/login'; 
 
-    const payload = { 
-        email: email, 
-        password: password 
-    };
+  const signIn = async ({ email, password, type }: SignInCredentials): Promise<User> => {
+    const route = '/auth/login';
+
+    await storageRemove('@PetResc:token');
+    await storageRemove('@PetResc:user');
+    setUser(null);
 
     try {
-        const response = await api.post(route, payload);
-        
-        const { token, usuario } = response.data;
+      const response = await api.post(route, { email, password });
 
-        // Validação de segurança
-        if (type === 'ONG' && usuario.role !== 'ONG') {
-             throw new Error("Esta conta não é de uma ONG.");
-        }
+      const { token, usuario } = response.data;
 
-        await storageSet('@PetResc:token', token);
-        await storageSet('@PetResc:user', JSON.stringify(usuario));
+      if (type === 'ONG' && usuario.role !== 'ONG') {
+        throw new Error('Esta conta não é de uma ONG.');
+      }
 
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        setUser(usuario);
-        
-        return usuario; // <--- RETORNA O USUÁRIO LOGADO
+      
+      await storageSet('@PetResc:token', token);
+      await storageSet('@PetResc:user', JSON.stringify(usuario));
 
-    } catch (error) {
-        throw error; 
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+      setUser(usuario);
+      return usuario;
+    } catch (err) {
+      throw err;
     }
   };
+
 
   const signOut = async () => {
     await storageRemove('@PetResc:token');
     await storageRemove('@PetResc:user');
     delete api.defaults.headers.common['Authorization'];
-    setUser(null);
+    setUser(null); 
   };
 
   return (

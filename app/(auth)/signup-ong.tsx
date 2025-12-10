@@ -170,7 +170,7 @@ export default function SignupOngScreen() {
             onPress: () => {
               console.log("Redirecionando para Login...");
               // CORREÇÃO AQUI: Adicionado /(auth) para igualar ao seu arquivo
-              router.replace('/(auth)/login-ong');
+              router.replace('/login-ong');
             } 
           }
         ]

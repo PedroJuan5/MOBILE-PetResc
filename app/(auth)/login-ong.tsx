@@ -26,7 +26,7 @@ export default function LoginOngScreen() {
   const [isLoading, setIsLoading] = useState(false);
 const { signIn } = useAuth(); 
 
-  const handleLogin = async () => {
+ const handleLogin = async () => {
     if (!email || !senha) {
       Alert.alert("Atenção", "Preencha E-mail e senha.");
       return;
@@ -35,31 +35,30 @@ const { signIn } = useAuth();
     setIsLoading(true);
   
     try {
-      // Recebe o usuário logado
+      // 1. Faz o Login e recebe o usuário
       const user = await signIn({
         email: email, 
         password: senha, 
         type: 'ONG' 
       });
 
-      // VERIFICAÇÃO DUPLA DE REDIRECIONAMENTO
+      // 2. NAVEGAÇÃO MANUAL E DIRETA
       if (user.role === 'ONG') {
-          // Força a navegação para o grupo (ong)
-          // Tente usar o caminho absoluto
-          router.replace('/(ong)/(tabs)/home-ong'); 
+          // Tente usar o caminho direto. 
+          // Se o arquivo é app/(ong)/(tabs)/home-ong.tsx, a rota é /home-ong
+          router.replace('/home-ong' as any); 
       } else {
-          Alert.alert("Erro", "Login realizado, mas esta conta não é de ONG.");
+          Alert.alert("Erro", "Essa conta não é de ONG.");
       }
 
     } catch (error: any) {
       console.error(error);
-      const msg = error.response?.data?.error || error.message || "Falha ao entrar.";
+      const msg = error.response?.data?.error || "Falha ao entrar.";
       Alert.alert("Erro", msg);
     } finally {
       setIsLoading(false);
     }
-  };
-
+};
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>

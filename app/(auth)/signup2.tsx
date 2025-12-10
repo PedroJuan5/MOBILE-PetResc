@@ -2,8 +2,11 @@ import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import React, { useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator } from "react-native";
-import api, { AxiosError } from '../../lib/axios';
 import MaskInput from "react-native-mask-input";
+
+// --- CORREÇÃO DOS IMPORTS AQUI ---
+import api from '../../lib/axios'; // Importa sua instância configurada
+import { AxiosError } from 'axios'; // Importa a classe de erro da biblioteca original
 
 export default function CadastroScreen2() {
   const router = useRouter();
@@ -21,6 +24,7 @@ export default function CadastroScreen2() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleFinalizeCadastro = async () => {
+    // Validações
     if (!telefone.trim() || !password || !confirmPassword) {
       Alert.alert("Erro", "Todos os campos são obrigatórios.");
       return;
@@ -50,21 +54,30 @@ export default function CadastroScreen2() {
         role: 'PUBLICO',
       };
 
-       await api.post('/api/auth/register', userData);      
+      console.log("Enviando dados:", userData);
+
+      // --- ROTA CORRIGIDA (Sem o /api se a baseURL já tiver) ---
+      await api.post('/auth/register', userData);      
+      
       console.log("CADASTRO REALIZADO COM SUCESSO!");
-      Alert.alert("Sucesso", "Cadastro realizado! Por favor, faça o login."); 
-      router.replace('/(auth)/login');
+      Alert.alert("Sucesso", "Cadastro realizado! Por favor, faça o login.", [
+        { text: "OK", onPress: () => router.replace('/(auth)/login') }
+      ]);
 
     } catch (error) {
-      let errorMessage = "Não foi possível realizar o cadastro. Verifique os dados e tente novamente.";
+      let errorMessage = "Não foi possível realizar o cadastro.";
+      
+      // Agora o instanceof vai funcionar porque importamos do 'axios'
       if (error instanceof AxiosError) {
         console.error("Erro detalhado do Axios:", JSON.stringify(error.response?.data, null, 2));
-        errorMessage = error.response?.data?.message || error.response?.data?.error || errorMessage;
+        
+        // Tenta pegar a mensagem de erro do backend
+        errorMessage = error.response?.data?.error || error.response?.data?.message || errorMessage;
       } else {
         console.error("Erro inesperado:", error);
       }
+      
       Alert.alert("Erro no Cadastro", errorMessage);
-      setIsLoading(false);
     } finally {
       setIsLoading(false);
     }
@@ -72,12 +85,10 @@ export default function CadastroScreen2() {
 
   return (
     <View style={styles.container}>
-      {/* Botão de voltar fixo no topo */}
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <AntDesign name="arrow-left" size={24} color="#1c5b8f" />
       </TouchableOpacity>
       
-      {/* Conteúdo centralizado */}
       <View style={styles.contentCenter}>
         <Text style={styles.title}>Cadastre-se</Text>
         <Text style={styles.subtitle}>Crie sua conta e ajude a transformar vidas.</Text>

@@ -1,24 +1,34 @@
-import { Stack } from 'expo-router';
-import { useFonts } from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
-import React, { StrictMode } from 'react';
-import 'react-native-gesture-handler';
-import { AuthProvider } from '../context/AuthContext';
+import { Stack } from "expo-router";
+import { StrictMode } from "react";
+import { AuthProvider } from "@/context/AuthContext";
+import { useFonts } from "expo-font";
+import { View, ActivityIndicator } from 'react-native';
 
 export default function RootLayout() {
-  // Carrega a fonte
   const [loaded, error] = useFonts({
-    'MoreSugar': require('../assets/fonts/MoreSugar-Regular.otf'), // <--- Nome que você vai usar : Caminho do arquivo
+    "MoreSugar": require("../assets/fonts/MoreSugar-Regular.otf"),
   });
-  
+
+  if (!loaded && !error) {
+    return (
+      <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+        <ActivityIndicator size="large" color="#2D68A6"/>
+      </View>
+    );
+  }
+
   return (
     <StrictMode>
       <AuthProvider>
         <Stack screenOptions={{ headerShown: false }}>
-          {/* Registrando todas as pastas principais */}
+          {/* Index: Tela de Entrada/Splash */}
+          <Stack.Screen name="index" />
+
+          {/* (auth): Login e Cadastro */}
           <Stack.Screen name="(auth)" />
+
+          {/* (app): Toda a área logada (Protegida) */}
           <Stack.Screen name="(app)" />
-          <Stack.Screen name="(ong)" />
         </Stack>
       </AuthProvider>
     </StrictMode>
