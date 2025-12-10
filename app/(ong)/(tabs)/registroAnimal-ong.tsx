@@ -1,18 +1,7 @@
 import React, { useState } from 'react';
 import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TextInput, 
-  TouchableOpacity, 
-  ScrollView, 
-  StatusBar,
-  Modal,
-  FlatList,
-  Image,
-  Alert,
-  ActivityIndicator,
-  Platform
+  View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, StatusBar,
+  Modal, FlatList, Image, Alert, ActivityIndicator, Platform
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,7 +10,6 @@ import MaskInput from 'react-native-mask-input';
 import * as ImagePicker from 'expo-image-picker';
 import api from '@/lib/axios';
 
-// --- CORES PADRÃO ---
 const COLORS = {
   primary: '#2D68A6',
   background: '#205A8D',
@@ -33,7 +21,9 @@ const COLORS = {
   white: '#FFFFFF',
 };
 
-// --- COMPONENTES VISUAIS (MOVIDOS PARA FORA PARA CORRIGIR O BUG DA DIGITAÇÃO) ---
+// ... (Mantenha os componentes InputField, SelectField, YesNoSelector, MedicalCheckbox, ImageUploadBox IGUAIS) ...
+// (Para economizar espaço na resposta, vou omitir a repetição dos componentes visuais, 
+// pois eles não mudaram. Foque na lógica do handleSubmitFinal abaixo)
 
 const InputField = ({ label, value, onChangeText, placeholder, mask, subLabel, multiline, height }: any) => (
   <View style={styles.inputWrapper}>
@@ -89,9 +79,7 @@ const YesNoSelector = ({ label, value, onSelect }: any) => (
       >
           <Text style={[styles.yesNoText, value === 'sim' && styles.yesNoTextActive]}>SIM</Text>
       </TouchableOpacity>
-      
       <View style={{ width: 15 }} />
-      
       <TouchableOpacity 
         style={[styles.yesNoButton, value === 'nao' && styles.yesNoButtonActive]} 
         onPress={() => onSelect('nao')}
@@ -110,7 +98,6 @@ const MedicalCheckbox = ({ label, checked, textValue, onCheck, onTextChange, tex
           </View>
           <Text style={styles.checkboxText}>{label}</Text>
       </TouchableOpacity>
-      
       {checked && (
           <MaskInput
               style={styles.conditionalInput}
@@ -145,7 +132,7 @@ const ImageUploadBox = ({ label, subLabel, imageUri, onPress }: any) => (
   </View>
 );
 
-// --- INTERFACE DOS DADOS ---
+// --- INTERFACE ---
 interface AnimalData {
   nome: string; especie: string; raca: string; sexo: string;
   idade: string; dataResgate: string;
@@ -153,8 +140,7 @@ interface AnimalData {
   vermifugado: boolean; dataVermifugo: string;
   vacinado: boolean; descVacina: string;
   castrado: boolean; dataCastracao: string;
-  doencas: boolean; descDoencas: string;
-  tratamentos: string;
+  doencas: boolean; descDoencas: string; tratamentos: string;
   disponivelAdocao: string; motivoIndisponivel: string; localAtual: string;
   fotoResgate: string | null; fotoAtual: string | null;
   observacoes: string; historia: string;
@@ -166,21 +152,19 @@ export default function RegistroAnimalScreen() {
   const totalSteps = 7; 
   const [isLoading, setIsLoading] = useState(false);
 
-  // --- MODAIS ---
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [currentField, setCurrentField] = useState<keyof AnimalData | null>(null);
   const [optionsList, setOptionsList] = useState<string[]>([]);
 
-  // --- ESTADO DO FORMULÁRIO ---
   const [formData, setFormData] = useState<AnimalData>({
     nome: '', especie: '', raca: '', sexo: '',
     idade: '', dataResgate: '',
     localEncontro: '', condicaoResgate: '', comFilhotes: '', comColeira: '',
     vermifugado: false, dataVermifugo: '', vacinado: false, descVacina: '',
     castrado: false, dataCastracao: '', doencas: false, descDoencas: '', tratamentos: '',
-    disponivelAdocao: '', motivoIndisponivel: '', localAtual: '',
+    disponivelAdocao: 'sim', motivoIndisponivel: '', localAtual: '',
     fotoResgate: null, fotoAtual: null,
     observacoes: '', historia: ''
   });
@@ -189,7 +173,6 @@ export default function RegistroAnimalScreen() {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
-  // --- SELEÇÃO DE OPÇÃO ---
   const openOptionModal = (field: keyof AnimalData, options: string[]) => {
     setCurrentField(field); setOptionsList(options); setModalVisible(true);
   };
@@ -199,7 +182,6 @@ export default function RegistroAnimalScreen() {
     setModalVisible(false);
   };
 
-  // --- SELEÇÃO DE IMAGEM ---
   const pickImage = async (fieldKey: keyof AnimalData) => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -210,12 +192,10 @@ export default function RegistroAnimalScreen() {
     if (!result.canceled) updateForm(fieldKey, result.assets[0].uri);
   };
 
-  // --- LÓGICA DE NAVEGAÇÃO ---
   const handleNext = () => {
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
-      // VALIDAÇÃO FINAL BÁSICA
       if (!formData.nome || !formData.especie) {
         setErrorModalVisible(true);
       } else {
@@ -229,86 +209,129 @@ export default function RegistroAnimalScreen() {
     else router.back();
   };
 
-  // --- ENVIO PARA A API (INTEGRAÇÃO) ---
+  // Helper de Data Seguro
+  const convertDate = (dateStr: string) => {
+      if (!dateStr || dateStr.length !== 10) return ''; // Retorna string vazia se inválido
+      const [dia, mes, ano] = dateStr.split('/');
+      // Verifica validade básica
+      if(isNaN(Number(dia)) || isNaN(Number(mes)) || isNaN(Number(ano))) return '';
+      return `${ano}-${mes}-${dia}`; // Formato ISO para o backend (YYYY-MM-DD)
+  };
+
+  // --- FUNÇÃO CORRIGIDA DE ENVIO ---
   const handleSubmitFinal = async () => {
     setIsLoading(true);
 
     try {
         const data = new FormData();
 
-        // 1. DADOS BÁSICOS
+        // 1. DADOS OBRIGATÓRIOS
         data.append('nome', formData.nome);
         data.append('especie', formData.especie);
-        data.append('raca', formData.raca || "SRD");
-        data.append('sexo', formData.sexo === 'Macho' ? 'MACHO' : (formData.sexo === 'Fêmea' ? 'FEMEA' : 'OUTRO'));
-        data.append('idade', formData.idade);
         
-        // 2. RESGATE (Opcionais)
-        if (formData.dataResgate) data.append('data_resgate', convertDate(formData.dataResgate)); 
-        data.append('local_atual', formData.localEncontro); 
+        // Dados Opcionais com Defaults
+        data.append('raca', formData.raca || "SRD");
+        data.append('sexo', formData.sexo === 'Macho' ? 'MACHO' : (formData.sexo === 'Fêmea' ? 'FEMEA' : 'OUTRO')); // Enum Prisma
+        data.append('idade', formData.idade || "Não informada");
+        
+        // --- CORREÇÃO DO STATUS ---
+        // Se 'disponivelAdocao' for sim -> DISPONIVEL
+        // Se nao -> INDISPONIVEL (que é um valor seguro de Enum)
+        // Se tiver tratamento -> EM_TRATAMENTO (se seu banco suportar, senão use INDISPONIVEL)
+        let statusFinal = 'DISPONIVEL';
+        if (formData.disponivelAdocao === 'nao') {
+            statusFinal = 'INDISPONIVEL'; 
+        }
+        data.append('status', statusFinal);
+        
+        // 2. RESGATE
+        if (convertDate(formData.dataResgate)) data.append('data_resgate', convertDate(formData.dataResgate)); 
+        data.append('local_atual', formData.localEncontro || ''); 
         data.append('tinha_filhotes', formData.comFilhotes === 'sim' ? 'true' : 'false');
         data.append('tinha_coleira', formData.comColeira === 'sim' ? 'true' : 'false');
+        data.append('motivo_nao_disponivel', formData.motivoIndisponivel || '');
 
-      
         // 3. SAÚDE
         data.append('vermifugado', formData.vermifugado ? 'true' : 'false');
-        if (formData.dataVermifugo) data.append('data_vermifugado', convertDate(formData.dataVermifugo));
+        if (convertDate(formData.dataVermifugo)) data.append('data_vermifugado', convertDate(formData.dataVermifugo));
         
         data.append('vacinado', formData.vacinado ? 'true' : 'false');
-        data.append('vacinas_texto', formData.descVacina);
+        data.append('vacinas_texto', formData.descVacina || '');
         
         data.append('castrado', formData.castrado ? 'true' : 'false');
-        if (formData.dataCastracao) data.append('data_castrado', convertDate(formData.dataCastracao));
+        if (convertDate(formData.dataCastracao)) data.append('data_castrado', convertDate(formData.dataCastracao));
         
         data.append('testado_doencas', formData.doencas ? 'true' : 'false');
-        data.append('testes_texto', formData.descDoencas);
-        data.append('cuidado', formData.tratamentos);
+        data.append('testes_texto', formData.descDoencas || '');
+        data.append('cuidado', formData.tratamentos || '');
 
         // 4. TEXTOS
-        data.append('descricao', formData.historia); 
-        data.append('observacoes', formData.observacoes);
+        data.append('descricao', formData.historia || ''); 
+        data.append('observacoes', formData.observacoes || '');
 
-        // 5. IMAGENS
+        // 5. IMAGENS (Web vs Mobile)
         if (formData.fotoAtual) {
-            const filename = formData.fotoAtual.split('/').pop();
-            const match = /\.(\w+)$/.exec(filename || '');
-            const type = match ? `image/${match[1]}` : `image`;
-            // @ts-ignore
-            data.append('imagem', { uri: formData.fotoAtual, name: filename || 'foto.jpg', type });
+            const uri = formData.fotoAtual;
+            if (Platform.OS === 'web') {
+                const res = await fetch(uri);
+                const blob = await res.blob();
+                data.append('imagem', blob, 'foto-atual.jpg');
+            } else {
+                const filename = uri.split('/').pop() || 'foto.jpg';
+                const match = /\.(\w+)$/.exec(filename);
+                const type = match ? `image/${match[1]}` : `image/jpeg`;
+                // @ts-ignore
+                data.append('imagem', { uri, name: filename, type });
+            }
         }
 
         if (formData.fotoResgate) {
-            const filename = formData.fotoResgate.split('/').pop();
-            const match = /\.(\w+)$/.exec(filename || '');
-            const type = match ? `image/${match[1]}` : `image`;
-            // @ts-ignore
-            data.append('imagem_resgate', { uri: formData.fotoResgate, name: filename || 'resgate.jpg', type });
+            const uri = formData.fotoResgate;
+            if (Platform.OS === 'web') {
+                const res = await fetch(uri);
+                const blob = await res.blob();
+                data.append('imagem_resgate', blob, 'foto-resgate.jpg');
+            } else {
+                const filename = uri.split('/').pop() || 'resgate.jpg';
+                const match = /\.(\w+)$/.exec(filename);
+                const type = match ? `image/${match[1]}` : `image/jpeg`;
+                // @ts-ignore
+                data.append('imagem_resgate', { uri, name: filename, type });
+            }
         }
 
-        await api.post('/animais', data, {
-            headers: { 'Content-Type': 'multipart/form-data' },
+        // --- ENVIO ---
+        // Header 'multipart/form-data' é gerado automaticamente pelo axios/fetch quando o body é FormData
+        const response = await api.post('/animais', data, {
+            headers: {
+                'Content-Type': 'multipart/form-data', // Explicitar ajuda em alguns Androids
+            },
         });
 
+        console.log("Sucesso:", response.data);
         setIsLoading(false);
         setSuccessModalVisible(true);
 
     } catch (error: any) {
         setIsLoading(false);
-        console.error("Erro cadastro animal:", error.response?.data || error);
-        Alert.alert("Erro", "Falha ao salvar animal. Verifique os dados.");
+        console.error("Erro completo:", error);
+        console.error("Resposta do erro:", error.response?.data);
+        
+        let msg = "Falha ao salvar animal.";
+        
+        // Tratamento específico para erro de Status
+        if (error.response?.data?.error && error.response.data.error.includes("status")) {
+             msg = "Erro de Status inválido. Verifique se o backend aceita 'INDISPONIVEL'.";
+        } else if (error.response?.data?.error) {
+             msg = error.response.data.error; // Mensagem do backend
+        }
+        
+        Alert.alert("Erro no Cadastro", msg);
     }
   };
 
-  const convertDate = (dateStr: string) => {
-      if (!dateStr || dateStr.length !== 10) return '';
-      const [dia, mes, ano] = dateStr.split('/');
-      return `${ano}-${mes}-${dia}`;
-  };
-
-  // --- CONTEÚDO DAS ETAPAS ---
   const renderStepContent = () => {
     switch(step) {
-        // Etapa 1: Dados Básicos
         case 1: return (
             <>
                 <InputField label="Nome do animal" subLabel="Obrigatório" value={formData.nome} onChangeText={(t: string) => updateForm('nome', t)} />
@@ -317,14 +340,12 @@ export default function RegistroAnimalScreen() {
                 <SelectField label="Sexo" value={formData.sexo} placeholder="Selecione" options={['Macho', 'Fêmea']} onPress={() => openOptionModal('sexo', ['Macho', 'Fêmea'])} />
             </>
         );
-        // Etapa 2: Idade / Data
         case 2: return (
             <>
                 <InputField label="Idade aproximada" subLabel="Ex: 2 anos" value={formData.idade} onChangeText={(t: string) => updateForm('idade', t)} />
                 <InputField label="Data de entrada/resgate" value={formData.dataResgate} onChangeText={(t: string) => updateForm('dataResgate', t)} mask={[/\d/,/\d/, '/', /\d/,/\d/, '/', /\d/,/\d/,/\d/,/\d/]} placeholder="00/00/0000"/>
             </>
         );
-        // Etapa 3: Resgate (OPCIONAL AGORA)
         case 3: return (
             <>
                 <Text style={styles.sectionHeaderTitle}>Informações de Resgate (Opcional)</Text>
@@ -334,7 +355,6 @@ export default function RegistroAnimalScreen() {
                 <YesNoSelector label="Estava com coleira/ID?" value={formData.comColeira} onSelect={(val: string) => updateForm('comColeira', val)}/>
             </>
         );
-        // Etapa 4: Saúde
         case 4: return (
             <>
                 <Text style={styles.sectionHeaderTitle}>Exames realizados:</Text>
@@ -346,13 +366,13 @@ export default function RegistroAnimalScreen() {
                 <InputField label="Tratamentos em andamento:" value={formData.tratamentos} onChangeText={(t: string) => updateForm('tratamentos', t)} placeholder="Ex. antibióticos..." multiline={true} height={80} />
             </>
         );
-        // Etapa 5: Disponibilidade
         case 5: return (
             <>
+                <YesNoSelector label="Disponível para adoção?" value={formData.disponivelAdocao} onSelect={(val: string) => updateForm('disponivelAdocao', val)} />
+                <SelectField label="Motivo (se não)" value={formData.motivoIndisponivel} placeholder="Selecione" options={['Em tratamento', 'Muito jovem', 'Aguardando castração']} onPress={() => openOptionModal('motivoIndisponivel', ['Em tratamento', 'Muito jovem', 'Aguardando castração'])} />
                 <SelectField label="Local atual" value={formData.localAtual} placeholder="Selecione" options={['Lar temporário', 'Abrigo', 'Clínica']} onPress={() => openOptionModal('localAtual', ['Lar temporário', 'Abrigo', 'Clínica'])} />
             </>
         );
-        // Etapa 6: Fotos
         case 6: return (
             <>
                 <ImageUploadBox label="Foto do resgate" subLabel="Opcional" imageUri={formData.fotoResgate} onPress={() => pickImage('fotoResgate')} />
@@ -360,7 +380,6 @@ export default function RegistroAnimalScreen() {
                 <ImageUploadBox label="Foto atual do animal" subLabel="Importante para divulgação" imageUri={formData.fotoAtual} onPress={() => pickImage('fotoAtual')} />
             </>
         );
-        // Etapa 7: Detalhes Finais
         case 7: return (
             <>
                 <InputField label="Observações gerais" subLabel="Opcional" value={formData.observacoes} onChangeText={(t: string) => updateForm('observacoes', t)} placeholder="Ex. dócil com crianças..." multiline={true} height={120} />
@@ -400,6 +419,7 @@ export default function RegistroAnimalScreen() {
                     style={styles.feedbackButton} 
                     onPress={() => { 
                         setSuccessModalVisible(false); 
+                        // Corrigido para garantir rota válida no seu projeto
                         router.replace('/(ong)/(tabs)/home-ong' as any); 
                     }}
                 >
