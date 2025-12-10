@@ -22,7 +22,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 // Import da API configurada
 import api from '@/lib/axios';
 
-// --- TIPOS (Adaptados ao retorno do Backend) ---
+// TIPOS (Adaptados ao retorno do Backend)
 interface Animal {
   id: number;
   nome: string;
@@ -53,8 +53,11 @@ const AnimalGridCard = ({ item }: { item: Animal }) => {
     <TouchableOpacity 
       style={styles.cardContainer} 
       activeOpacity={0.9}
-      // Passa o ID para a tela de detalhes
-      onPress={() => router.push({ pathname: '/(ong)/detalhes-pet-ong', params: { id: item.id } } as any)}
+      // --- ALTERAÇÃO AQUI: Link para Gerenciar Adoção ONG ---
+      onPress={() => router.push({ 
+          pathname: '/(ong)/gerenciar-adocao-ong', 
+          params: { petId: item.id } 
+      } as any)}
     >
       <Image source={imageSource} style={styles.cardImage} resizeMode="cover" />
       <View style={styles.cardInfo}>
@@ -80,7 +83,6 @@ const AnimalGridCard = ({ item }: { item: Animal }) => {
 const FilterModal = ({ visible, onClose }: FilterModalProps) => {
     const router = useRouter();
     const [isGato, setIsGato] = useState(false);
-    // ... (Mantive o código visual do filtro igual para usarmos depois)
     
     return (
       <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onClose}>
@@ -214,7 +216,7 @@ const styles = StyleSheet.create({
   verMaisLink: { alignSelf: 'flex-end', marginTop: 4 },
   verMaisText: { fontSize: 10, color: '#8FA7B8', fontWeight: 'bold' },
 
-  // --- FILTRO STYLES (Mantidos para não quebrar layout) ---
+  // --- FILTRO STYLES ---
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', flexDirection: 'row' },
   filterSidebar: { width: '80%', backgroundColor: '#fff', padding: 20, borderTopRightRadius: 30, borderBottomRightRadius: 30 },
   modalCloserArea: { width: '20%' },

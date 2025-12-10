@@ -1,10 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useFocusEffect } from 'expo-router';
 import React, { useState, useCallback } from "react";
-import { 
-  Image, ScrollView, StyleSheet, Text, TouchableOpacity, 
-  View, ActivityIndicator, Alert 
-} from "react-native";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, Alert } from "react-native";
 import { DenuncieModal } from "../../../components/denuncieModal"; 
 
 // API
@@ -37,7 +34,7 @@ interface Pedido {
   };
 }
 
-export default function HomeScreen(): React.ReactElement {
+export default function HomeOngScreen(): React.ReactElement {
   const router = useRouter();
   const [denuncieVisible, setDenuncieVisible] = useState<boolean>(false);
   
@@ -55,11 +52,11 @@ export default function HomeScreen(): React.ReactElement {
 
   const fetchDashboardData = async () => {
     try {
-      // 1. Buscar Animais da ONG (Endpoint que já criamos ou similar)
-      const resAnimais = await api.get('/animais'); // Rota que lista animais da ONG logada
+      // 1. Buscar Animais da ONG
+      const resAnimais = await api.get('/animais'); 
       setAnimaisRecentes(resAnimais.data);
 
-      // 2. Buscar Pedidos de Adoção recebidos (Novo endpoint sugerido)
+      // 2. Buscar Pedidos de Adoção recebidos
       const resPedidos = await api.get('/pedidos-adocao/gerenciar');
       setPedidosPendentes(resPedidos.data);
 
@@ -80,10 +77,9 @@ export default function HomeScreen(): React.ReactElement {
     tipo: 'animal' | 'pedido'
   ): React.ReactElement => {
     
-    // Imagem: Se tiver URL usa ela, senão usa placeholder
     const imageSource = photoURL 
       ? { uri: photoURL } 
-      : require("../../../assets/images/pets/branquinho.png"); // Fallback
+      : require("../../../assets/images/pets/branquinho.png"); 
 
     return (
       <TouchableOpacity 
@@ -91,11 +87,15 @@ export default function HomeScreen(): React.ReactElement {
         style={styles.animalCard}
         onPress={() => {
           if (tipo === 'animal') {
-             // Ir para detalhes do animal (Visão da ONG)
-             router.push({ pathname: '/(ong)/detalhes-pet-ong', params: { id } } as any);
+             router.push({
+                pathname: '/(ong)/gerenciar-adocao-ong',
+                params: { petId: id }
+             } as any);
           } else {
-             // Ir para detalhes do pedido
-             router.push({ pathname: '/(ong)/detalhes-pedido', params: { id } } as any);
+             router.push({
+                pathname: '/(ong)/gerenciar-adocao-ong',
+                params: { pedidoId: id } 
+             } as any);
           }
         }}
       >
@@ -115,11 +115,10 @@ export default function HomeScreen(): React.ReactElement {
     );
   };
 
-  // Helper de cores para status
   const getStatusColor = (status: string) => {
-    if (status === 'PENDENTE') return '#F59E0B'; // Laranja
-    if (status === 'DISPONIVEL') return '#10B981'; // Verde
-    if (status === 'ADOTADO') return '#2D68A6'; // Azul
+    if (status === 'PENDENTE') return '#F59E0B'; 
+    if (status === 'DISPONIVEL') return '#10B981'; 
+    if (status === 'ADOTADO') return '#2D68A6'; 
     return '#666';
   };
 
@@ -131,10 +130,7 @@ export default function HomeScreen(): React.ReactElement {
     );
   }
 
-  // Filtra apenas os pendentes para exibir no topo
-  const pedidosDisplay = pedidosPendentes.filter(p => p.status === 'PENDENTE').slice(0, 3); // Mostra max 3
-  
-  // Filtra animais recentes (pega os últimos 3)
+  const pedidosDisplay = pedidosPendentes.filter(p => p.status === 'PENDENTE').slice(0, 3); 
   const animaisDisplay = animaisRecentes.slice(0, 3);
 
   return (
@@ -146,16 +142,13 @@ export default function HomeScreen(): React.ReactElement {
         <View style={styles.headerContainer}>
           
           <View style={styles.headerIcons}>
-            {/* Esquerda: Alerta */}
             <CustomHeaderLeft onDenunciePress={() => setDenuncieVisible(true)} />
-            
-            {/* Direita: Notificação */}
             <CustomHeaderRight 
                 onNotificationPress={() => router.push('/(ong)/notificacoes-ong' as any)} 
             />
           </View>
 
-          {/* TÍTULO COM AS PATINHAS */}
+          {/* TÍTULO COM AS PATINHAS (FONTE MORE SUGAR) */}
           <View style={styles.titleContainer}>
             <Text style={styles.pageTitle}>Conheça seu novo{"\n"}melhor amigo!</Text>
 
@@ -227,7 +220,7 @@ export default function HomeScreen(): React.ReactElement {
           </TouchableOpacity>
         </Section>
 
-        {/* ÁREA DE CAMPANHAS (Mantida Estática por enquanto ou pode integrar depois) */}
+        {/* ÁREA DE CAMPANHAS */}
         <View style={styles.campanhasContainer}>
           <Text style={styles.campanhasTitle}>Minhas campanhas</Text>
 
@@ -252,7 +245,7 @@ export default function HomeScreen(): React.ReactElement {
                 style={styles.gatoImage} 
                 resizeMode="contain" 
               />
-              <TouchableOpacity style={styles.btnNovaCampanha}>
+              <TouchableOpacity style={styles.btnNovaCampanha} onPress={() => router.push('/(ong)/(tabs)/doacoes' as any)}>
                 <Text style={styles.btnTextBlue}>Nova campanha</Text>
               </TouchableOpacity>
             </View>
@@ -283,14 +276,24 @@ const styles = StyleSheet.create({
   headerIcons: { 
     flexDirection: "row", 
     justifyContent: "space-between", 
-    marginBottom: 10,
+    marginBottom: 20, 
     alignItems: 'center' 
   },
-  titleContainer: { position: 'relative', marginBottom: 15 },
-  pageTitle: { fontSize: 24, fontWeight: "700", color: "#2D68A6", width: "70%", marginTop: 5 },
-  paw: { position: 'absolute', width: 150, height: 150, opacity: 0.5 },
-  paw1: { top: -20, right: 15, transform: [{ rotate: '15deg' }] },
-  paw2: { top: 50, right: -1, transform: [{ rotate: '-20deg' }] },
+  titleContainer: { position: 'relative', marginBottom: 30, marginTop: 10 },
+  
+  pageTitle: { 
+    fontSize: 32, 
+    fontWeight: "800", 
+    color: "#2D68A6", 
+    width: "80%", 
+    marginTop: 5,
+    fontFamily: 'MoreSugar',
+    lineHeight: 40,
+  },
+  paw: { position: 'absolute', width: 110, height: 110, opacity: 0.5 },
+  paw1: { top: -40, right: 40, transform: [{ rotate: '15deg' }] },
+  paw2: { top: 70, right: 10, transform: [{ rotate: '-20deg' }] },
+
   btnCadastrar: { backgroundColor: "#5DA9F6", paddingVertical: 10, borderRadius: 20, alignItems: "center", width: 150 },
   btnCadastrarText: { color: "#fff", fontWeight: "700" },
   section: { marginTop: 15, paddingHorizontal: 15 },
@@ -306,14 +309,33 @@ const styles = StyleSheet.create({
   verMaisBtn: { alignSelf: "center", marginTop: 10, padding: 5 },
   verMaisText: { color: "#2D68A6", fontWeight: "600", fontSize: 14 },
   emptyText: { color: "#999", fontStyle: "italic", textAlign: "center", marginVertical: 10 },
+  
   campanhasContainer: { marginTop: 20, paddingHorizontal: 20, paddingBottom: 10 },
-  campanhasTitle: { fontSize: 20, fontWeight: "bold", color: "#2D68A6", marginBottom: 10 },
+  
+  // TÍTULO DA SEÇÃO DE CAMPANHAS AUMENTADO
+  campanhasTitle: { 
+    fontSize: 22, 
+    fontWeight: "bold", 
+    color: "#2D68A6", 
+    marginBottom: 15 
+  },
+  
   campanhasRow: { flexDirection: "row", alignItems: "flex-end" },
   campanhasLeftCol: { flex: 1, paddingRight: 5, justifyContent: 'space-between' },
   campanhasRightCol: { width: 140, alignItems: "center" },
-  campanhasText: { color: "#2D68A6", fontSize: 13, lineHeight: 18, textAlign: 'left' },
+  
+  // TEXTO DA SEÇÃO DE CAMPANHAS
+  campanhasText: { 
+    color: "#2D68A6", 
+    fontSize: 19, 
+    lineHeight: 22, 
+    textAlign: 'left' 
+  },
+  
   gatoImage: { width: 135, height: 145, marginBottom: -8 },
   btnNovaCampanha: { backgroundColor: "#BFD6F5", borderRadius: 20, paddingVertical: 10, width: '100%', alignItems: 'center', marginTop: 1 },
   btnCampanhasAnteriores: { backgroundColor: "#BFD6F5", borderRadius: 20, paddingVertical: 10, paddingHorizontal: 15, alignSelf: 'flex-start', marginTop: 10 },
-  btnTextBlue: { color: "#2D68A6", fontWeight: "bold", fontSize: 13 },
+  
+  // TEXTO DOS BOTÕES DE CAMPANHA LEVEMENTE AUMENTADO
+  btnTextBlue: { color: "#2D68A6", fontWeight: "bold", fontSize: 14 },
 });

@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar,Image,ImageBackground,Dimensions,TextInput,Modal,Alert} from 'react-native';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  ScrollView, 
+  StatusBar,
+  Image,
+  ImageBackground,
+  Dimensions,
+  TextInput,
+  Modal,
+  Alert
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -379,9 +392,29 @@ const styles = StyleSheet.create({
 
   //DASHBOARD
   introSection: { padding: 25 },
-  titleRow: { flexDirection: 'row', marginBottom: 20, width: '80%', justifyContent: 'center' },
-  pageTitle: { fontSize: 24, fontWeight: 'bold', color: COLORS.primary, textAlign: 'center', lineHeight: 32 },
-  introText: { fontSize: 15, color: COLORS.primary, textAlign: 'center', marginBottom: 15, lineHeight: 22 },
+  titleRow: { flexDirection: 'row', marginBottom: 20, width: '100%', justifyContent: 'center' },
+  
+  // --- TÍTULO PRINCIPAL ATUALIZADO ---
+  pageTitle: { 
+    fontSize: 32, // Aumentado
+    // fontWeight: 'bold', // Removido para funcionar a fonte
+    color: COLORS.primary, 
+    textAlign: 'center', 
+    lineHeight: 40,
+    fontFamily: 'MoreSugar', // Fonte aplicada
+    width: '90%',
+    alignSelf: 'center'
+  },
+  
+  // --- TEXTO DE INTRODUÇÃO AUMENTADO ---
+  introText: { 
+    fontSize: 18, // Aumentado de 15 para 18
+    color: COLORS.primary, 
+    textAlign: 'center', 
+    marginBottom: 20, 
+    lineHeight: 26 // Aumentado
+  },
+  
   mainButton: { backgroundColor: '#2D68A6', paddingVertical: 15, borderRadius: 30, alignItems: 'center', marginTop: 10, width: '80%', alignSelf: 'center', elevation: 3 },
   mainButtonText: { color: '#FFF', fontSize: 18, fontWeight: 'bold', textTransform: 'uppercase' },
   gridContainer: { width: '100%', paddingHorizontal: 15, marginTop: 10 },
@@ -393,10 +426,18 @@ const styles = StyleSheet.create({
   spacer: { height: 20 },
   financialBanner: { width: '100%', height: 180, justifyContent: 'center', alignItems: 'center' },
   overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(45, 104, 166, 0.5)' },
-  moneyText: { fontSize: 32, fontWeight: 'bold', color: '#FFF', zIndex: 1 },
+  moneyText: { fontSize: 36, fontWeight: 'bold', color: '#FFF', zIndex: 1 }, // Aumentado um pouco
   moneyLabel: { fontSize: 16, color: '#E0E0E0', zIndex: 1, marginTop: 5 },
   donateSection: { padding: 30, alignItems: 'center' },
-  footerText: { fontSize: 15, color: COLORS.primary, textAlign: 'center', marginTop: 15, lineHeight: 22 },
+  
+  // --- TEXTO DO RODAPÉ AUMENTADO ---
+  footerText: { 
+    fontSize: 20, // Aumentado
+    color: COLORS.primary, 
+    textAlign: 'center', 
+    marginTop: 20, 
+    lineHeight: 24 
+  },
 
   //NOVA CAMPANHA 
   ncIntroText: { color: '#FFF', fontSize: 16, textAlign: 'center', marginBottom: 25, lineHeight: 22 },

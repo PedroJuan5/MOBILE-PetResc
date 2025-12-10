@@ -206,11 +206,11 @@ export default function PerfilOngScreen(): React.ReactElement {
                 <Text style={styles.btnText}>Adotados</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.btn} onPress={() => router.push("/(ong)/(tabs)/meusAnimais-ong" as any)}>
+            <TouchableOpacity style={styles.btn} onPress={() => router.push("/(ong)/registrados" as any)}>
                 <Text style={styles.btnText}>Registrados</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.btn} onPress={() => router.push("/(ong)/voluntarios-lista" as any)}>
+            <TouchableOpacity style={styles.btn} onPress={() => router.push("/(ong)/lar-temporario" as any)}>
                 <Text style={styles.btnText}>Lar Temp.</Text>
             </TouchableOpacity>
 
