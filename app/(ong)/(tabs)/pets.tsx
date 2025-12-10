@@ -7,14 +7,11 @@ import {
   Image,
   TouchableOpacity,
   Modal,
-  Switch,
-  TextInput,
   ScrollView,
   SafeAreaView,
   StatusBar,
   Platform,
-  ActivityIndicator,
-  Alert
+  ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -26,7 +23,7 @@ import api from '@/lib/axios';
 interface Animal {
   id: number;
   nome: string;
-  photoURL: string | null; // Agora vem do backend como string (URL)
+  photoURL: string | null; // Agora vem do backend como string (URL) ou null
   raca: string | null;
   status: string; // "DISPONIVEL", "ADOTADO", etc.
   especie: string;
@@ -41,13 +38,27 @@ interface FilterModalProps {
 const AnimalGridCard = ({ item }: { item: Animal }) => {
   const router = useRouter(); 
 
-  // Define a imagem: Se tiver URL usa ela, senão usa placeholder
-  const imageSource = item.photoURL 
-    ? { uri: item.photoURL } 
-    : require('../../../assets/images/ui/gatoHome.png'); // Imagem padrão se não tiver foto
+  // URL Base do Backend (Ajuste se necessário, ex: para local com IP)
+  // Se o backend retorna URL completa (http...), essa constante não é usada na lógica abaixo
+  const BASE_URL = "https://petresc.onrender.com"; 
 
-  // Formata o status para ficar bonitinho
+  // Lógica de Imagem
+  let imageSource;
+  if (item.photoURL) {
+      // Se já tem http, usa direto. Se for caminho relativo, adiciona base.
+      const uri = item.photoURL.startsWith('http') 
+          ? item.photoURL 
+          : `${BASE_URL}/${item.photoURL.replace(/\\/g, '/')}`;
+      imageSource = { uri };
+  } else {
+      imageSource = require('../../../assets/images/ui/gatoHome.png'); // Placeholder
+  }
+
+  // Formata o status para ficar bonitinho (ex: DISPONIVEL -> Disponivel)
   const statusFormatado = item.status.charAt(0) + item.status.slice(1).toLowerCase();
+
+  // Cor do status
+  const statusColor = item.status === 'DISPONIVEL' ? '#27AE60' : (item.status === 'ADOTADO' ? '#2D68A6' : '#E67E22');
 
   return (
     <TouchableOpacity 
@@ -65,9 +76,7 @@ const AnimalGridCard = ({ item }: { item: Animal }) => {
         <Text style={styles.cardDetails} numberOfLines={1}>
           {item.raca || "SRD"}
         </Text>
-        <Text style={[styles.cardStatus, { 
-            color: item.status === 'DISPONIVEL' ? '#27AE60' : '#E67E22' 
-        }]}>
+        <Text style={[styles.cardStatus, { color: statusColor }]}>
             {statusFormatado}
         </Text>
         
@@ -79,11 +88,8 @@ const AnimalGridCard = ({ item }: { item: Animal }) => {
   );
 };
 
-// --- MODAL DE FILTRO (UI Mantida, Lógica futura) ---
+// --- MODAL DE FILTRO (UI Mantida) ---
 const FilterModal = ({ visible, onClose }: FilterModalProps) => {
-    const router = useRouter();
-    const [isGato, setIsGato] = useState(false);
-    
     return (
       <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onClose}>
         <View style={styles.modalOverlay}>
@@ -124,7 +130,6 @@ export default function PetsOngScreen() {
       setAnimais(response.data);
     } catch (error) {
       console.error("Erro ao buscar animais:", error);
-      // Opcional: Alert.alert("Erro", "Não foi possível carregar os animais.");
     } finally {
       setLoading(false);
     }
