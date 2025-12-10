@@ -1,12 +1,13 @@
+import api from '@/lib/axios';
 import { Ionicons } from "@expo/vector-icons";
 import { router, Stack, useFocusEffect } from "expo-router";
-import React, { useState, useCallback } from "react";
-import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, RefreshControl } from "react-native";
+import React, { useCallback, useState } from "react";
+import { ActivityIndicator, Dimensions, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { BarChart, LineChart } from "react-native-chart-kit";
-import api from '@/lib/axios';
 
+// Cálculo da largura responsiva (Largura da tela - Padding horizontal total)
 const { width } = Dimensions.get('window');
-const screenWidth = width - 40;
+const screenWidth = width - 40; // 20px de margem em cada lado
 
 // Tipos
 interface ProfileData {
@@ -60,6 +61,7 @@ export default function PerfilOngScreen(): React.ReactElement {
     try {
       if (!refreshing) setLoading(true);
 
+      // 1. DADOS DO USUÁRIO
       const resUser = await api.get('/usuarios/me');
       const user = resUser.data;
 
@@ -67,7 +69,7 @@ export default function PerfilOngScreen(): React.ReactElement {
       const telefoneReal = user.telefone || user.ong?.telefone || "Não informado";
       const cidade = user.ong?.cidade || user.cidade;
       const estado = user.ong?.estado || user.estado;
-      const localReal = (cidade && estado) ? `${cidade} - ${estado}` : "Localização não inf.";
+      const localReal = (cidade && estado) ? `${cidade} - ${estado}` : "Local não inf.";
 
       setPerfil({
         nomeDisplay: nomeReal,
@@ -77,28 +79,38 @@ export default function PerfilOngScreen(): React.ReactElement {
         photoURL: null 
       });
 
+      // 2. DADOS DE ESTATÍSTICAS
+      // We fetch ANIMALS (to count adopted/available) and REQUESTS (to count pending)
       const [resAnimais, resPedidos] = await Promise.all([
-        api.get('/animais/meus'),
-        api.get('/pedidos-adocao/gerenciar')
+        api.get('/animais/gerenciar/lista'), // Correct route for ONG's animals
+        api.get('/pedidos-adocao/gerenciar') // Correct route for Adoption Requests
       ]);
 
       const animais = resAnimais.data || [];
       const pedidos = resPedidos.data || [];
 
+      // --- CÁLCULO DAS ESTATÍSTICAS (CORRIGIDO) ---
       setStats({
+        // Count animals belonging to this ONG with status 'DISPONIVEL'
         aguardando: animais.filter((a: any) => a.status === 'DISPONIVEL').length,
+        
+        // Count animals belonging to this ONG with status 'ADOTADO'
+        // Make sure your backend sets status to 'ADOTADO' upon approval
         adotados: animais.filter((a: any) => a.status === 'ADOTADO').length,
+        
+        // Count adoption requests that are still 'PENDENTE'
         processo: pedidos.filter((p: any) => p.status === 'PENDENTE').length
       });
 
+      // Define o "Último Pet" com atividade
       if (pedidos.length > 0) {
         const p = pedidos[0];
         setLastPet({
-            nome: p.animal.nome,
-            raca: p.animal.raca || "SRD",
+            nome: p.animal?.nome || "Pet",
+            raca: p.animal?.raca || "SRD",
             status: "Novo Pedido",
-            data: new Date(p.dataPedido).toLocaleDateString(),
-            foto: p.animal.photoURL
+            data: p.dataPedido ? new Date(p.dataPedido).toLocaleDateString() : "Hoje",
+            foto: p.animal?.photoURL
         });
       } else if (animais.length > 0) {
         const a = animais[0];
@@ -106,7 +118,7 @@ export default function PerfilOngScreen(): React.ReactElement {
             nome: a.nome,
             raca: a.raca || "SRD",
             status: "Cadastrado",
-            data: "Recente",
+            data: a.createdAt ? new Date(a.createdAt).toLocaleDateString() : "Recente",
             foto: a.photoURL
         });
       }
@@ -121,14 +133,14 @@ export default function PerfilOngScreen(): React.ReactElement {
 
   if (loading && !refreshing) {
     return (
-        <View style={[styles.loadingContainer]}>
+        <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#1A3C6E" />
         </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.mainContainer}>
       <Stack.Screen options={{ headerShown: false }} />
       
       <ScrollView 
@@ -137,20 +149,16 @@ export default function PerfilOngScreen(): React.ReactElement {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#1A3C6E']} />}
       >
         
-        {/* HEADER / BANNER com Botões Esquerda e Direita */}
+        {/* HEADER / BANNER */}
         <View style={styles.headerTop}>
-          
-          {/* Botão Voltar para Home (Esquerda) */}
           <TouchableOpacity onPress={() => router.push('/(ong)/home-ong' as any)} style={styles.headerBtn}>
             <Ionicons name="home-outline" size={28} color="#1A3C6E" />
           </TouchableOpacity>
 
-          {/* Botão Notificações (Direita) */}
           <TouchableOpacity onPress={() => router.push('/(ong)/notificacoes-ong' as any)} style={styles.headerBtn}>
             <Ionicons name="notifications-outline" size={28} color="#1A3C6E" />
             <View style={styles.notificacaoDot} /> 
           </TouchableOpacity>
-
         </View>
 
         <View style={styles.perfilHeader}>
@@ -181,16 +189,16 @@ export default function PerfilOngScreen(): React.ReactElement {
         {/* ESTATÍSTICAS REAIS */}
         <View style={styles.statsContainer}>
             <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.adotados}</Text>
-            <Text style={styles.statLabel}>Adotados</Text>
+              <Text style={styles.statNumber}>{stats.adotados}</Text>
+              <Text style={styles.statLabel}>Adotados</Text>
             </View>
             <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.processo}</Text>
-            <Text style={styles.statLabel}>Em processo</Text>
+              <Text style={styles.statNumber}>{stats.processo}</Text>
+              <Text style={styles.statLabel}>Em processo</Text>
             </View>
             <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.aguardando}</Text>
-            <Text style={styles.statLabel}>Aguardando</Text>
+              <Text style={styles.statNumber}>{stats.aguardando}</Text>
+              <Text style={styles.statLabel}>Aguardando</Text>
             </View>
         </View>
 
@@ -227,7 +235,7 @@ export default function PerfilOngScreen(): React.ReactElement {
                 labels: ["Mai", "Jun", "Jul", "Ago", "Set", "Out"],
                 datasets: [{ data: [23, 12, 25, 16, 22, 7] }] 
                 }}
-                width={screenWidth}
+                width={screenWidth} // Largura Responsiva
                 height={220}
                 yAxisLabel=""  
                 yAxisSuffix="" 
@@ -252,7 +260,7 @@ export default function PerfilOngScreen(): React.ReactElement {
                 labels: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
                 datasets: [{ data: [1, 2, 1, 1, 2, 3, 2] }]
                 }}
-                width={screenWidth} 
+                width={screenWidth} // Largura Responsiva
                 height={250}
                 fromZero
                 bezier
@@ -285,22 +293,20 @@ export default function PerfilOngScreen(): React.ReactElement {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFFFFF' },
+  mainContainer: { flex: 1, backgroundColor: '#FFFFFF' },
+  container: { flex: 1 },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' },
   scrollContent: { paddingBottom: 20 },
   
-  // --- HEADER AJUSTADO PARA TER 2 BOTÕES ---
   headerTop: { 
       flexDirection: 'row', 
-      justifyContent: 'space-between', // Separa esquerda e direita
+      justifyContent: 'space-between', 
       alignItems: 'center', 
       paddingHorizontal: 20, 
       paddingTop: 40, 
       marginBottom: 5 
   },
-  headerBtn: {
-      padding: 5
-  },
+  headerBtn: { padding: 5 },
   notificacaoDot: { position: 'absolute', top: 5, right: 5, width: 8, height: 8, borderRadius: 4, backgroundColor: '#FF3B30', borderWidth: 1, borderColor: '#FFF' },
   
   perfilHeader: { alignItems: 'center', marginBottom: 20 },
@@ -364,56 +370,5 @@ const styles = StyleSheet.create({
       backgroundColor: '#FFFFFF', width: 55, height: 55, borderRadius: 27.5, 
       justifyContent: 'center', alignItems: 'center', 
       elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.25, shadowRadius: 5 
-  },
-  
-  // Estilos do Card Pet que estavam faltando
-  petCard: {
-    flexDirection: "row",
-    backgroundColor: "#F7F9FC",
-    borderRadius: 12,
-    padding: 15,
-    marginHorizontal: 20,
-    marginBottom: 25,
-    elevation: 2,
-  },
-  petImg: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    backgroundColor: '#eee'
-  },
-  petInfo: {
-    flex: 1,
-    justifyContent: "space-between",
-    marginLeft: 15
-  },
-  petName: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#1A3C6E",
-  },
-  petSub: {
-    fontSize: 14,
-    color: "#1A3C6E",
-    marginTop: 2,
-    fontWeight: "600"
-  },
-  petDetails: {
-    fontSize: 13,
-    color: "#1A3C6E",
-    marginTop: 5,
-  },
-  infoButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 6,
-    alignSelf: "flex-end",
-    marginTop: 8,
-    backgroundColor: '#CCE1FF'
-  },
-  infoButtonText: {
-    color: "#1A3C6E",
-    fontWeight: "bold",
-    fontSize: 12,
-  },
+  }
 });
