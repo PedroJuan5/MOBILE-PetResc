@@ -6,10 +6,10 @@ import CustomHeaderRight from '../../../components/elementosDireita';
 import CustomHeaderLeft from '../../../components/elementosEsquerda';
 import { useRouter, useFocusEffect } from 'expo-router';
 import api from '@/lib/axios'; 
-import { SafeAreaView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context"; // Importante usar do safe-area-context para controle fino
 
 
-// Função Auxiliar Maps
+// --- Função Auxiliar Maps ---
 const handleOpenMaps = async (endereco: string) => {
   const encodedAddress = encodeURIComponent(endereco);
   const url = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
@@ -97,11 +97,15 @@ export default function HomeScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    // 'edges' remove o padding automático de baixo (bottom), tirando o espaço branco extra
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       
       <DenuncieModal visible={modalVisible} onClose={() => setModalVisible(false)} />
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false} 
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }} // Padding pequeno apenas para não cortar a sombra
+      >
         <View style={styles.container}>
           
           <View style={styles.iconHeaderContainer}>
@@ -109,7 +113,7 @@ export default function HomeScreen() {
             <CustomHeaderRight />
           </View>
 
-          {/* TÍTULO DA PÁGINA (Aumentado) */}
+          {/* TÍTULO DA PÁGINA */}
           <View style={styles.titleContainer}>
             <Text style={styles.tituloDePagina}>Conheça seu novo melhor amigo!</Text>
             <Image source={require("../../../assets/images/ui/pata.png")} style={[styles.paw, styles.paw1]} resizeMode="contain"/>
@@ -150,7 +154,7 @@ export default function HomeScreen() {
             </ScrollView>
           )}
 
-          {/* SESSÃO: DOAÇÃO (Aumentada para preencher a tela) */}
+          {/* SESSÃO: DOAÇÃO */}
           <Text style={styles.subTitulo}>Sua contribuição salva vidas</Text>
           <View style={styles.boxContribuicao}>
             <View style={styles.textoContribuicao}>
@@ -179,13 +183,18 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#FFFFFF" },
-  container: { padding: 20, paddingTop: 20 }, 
+  
+  container: { 
+    paddingHorizontal: 20, 
+    paddingTop: 20,
+    paddingBottom: 0 // Importante para remover espaço extra
+  }, 
   
   iconHeaderContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 20, 
     marginTop: 10,
   }, 
   
@@ -195,7 +204,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   
-  // Título Principal 
   tituloDePagina: {
     fontSize: 32, 
     fontWeight: "800",
@@ -214,13 +222,12 @@ const styles = StyleSheet.create({
   paw1: { top: -40, right: 40, transform: [{ rotate: '15deg' }] },
   paw2: { top: 70, right: 10, transform: [{ rotate: '-20deg' }] },
   
-  // Subtítulos
   subTitulo: {
     fontSize: 22, 
     fontWeight: "700",
     color: "#3A5C7A",
     marginBottom: 25,
-    marginTop: 35,
+    marginTop: 35, 
   },
   subTituloSemMargem: {
     fontSize: 22, 
@@ -242,21 +249,20 @@ const styles = StyleSheet.create({
   nomeAnimal: { fontSize: 18, fontWeight: "700", color: "#2D68A6", marginBottom: 4 },
   detalheAnimal: { fontSize: 14, color: "#3A5C7A", marginTop: 2},
   
-  // Box de Doação
+  // Box de Doação Ajustado
   boxContribuicao: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
-    marginBottom: 50,
+    marginBottom: 5, // Reduzido drasticamente para remover espaço branco
   },
   textoContribuicao: { flex: 1, marginRight: 15 },
   
-  // Texto de doação
   paragrafoContribuicao: {
-    fontSize: 19, 
+    fontSize: 22, 
     color: "#3A5C7A",
     lineHeight: 24, 
-    marginBottom: 25,
+    marginBottom: 45,
   },
   
   botaoDoar: {
@@ -268,7 +274,7 @@ const styles = StyleSheet.create({
   },
   textoBotaoDoar: { color: "#2D68A6", fontWeight: "700", fontSize: 16 },
   
-  imagemContribuicao: { width: 150, height: 200, resizeMode: "contain" },
+  imagemContribuicao: { width: 150, height: 200, resizeMode: "contain" }, 
   
   cartaoOng: {
     backgroundColor: "#E6F0FA",
