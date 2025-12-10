@@ -1,4 +1,3 @@
-// FormularioInteresseScreen.tsx
 import React, { useState, useMemo } from 'react';
 import {
   View,
@@ -10,7 +9,6 @@ import {
   Alert,
   ActivityIndicator,
   Keyboard,
-  Platform,
   StatusBar
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -55,12 +53,12 @@ export default function FormularioInteresseScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
 
-  // START AT STEP 2 (modal de termos) - conforme solicitado anteriormente
-  const [step, setStep] = useState<number>(2);
+  // --- CORREÇÃO AQUI: Começa no Step 1 (Intro) e não no 2 ---
+  const [step, setStep] = useState<number>(1); 
+  
   const [loadingCep, setLoadingCep] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [termsExpanded, setTermsExpanded] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState<FormData>({
     termsAccepted: false,
@@ -98,7 +96,7 @@ export default function FormularioInteresseScreen() {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
-  // Busca CEP via viacep
+  // Busca CEP
   const buscarCep = async (cepDigitado: string) => {
     const cepLimpo = cepDigitado.replace(/\D/g, '');
     if (cepLimpo.length !== 8) return;
@@ -125,13 +123,11 @@ export default function FormularioInteresseScreen() {
     }
   };
 
-  const { currentProgressStep, totalProgressSteps } = useMemo(() => {
-    return { currentProgressStep: step, totalProgressSteps: 16 };
-  }, [step]);
-
+  // Lógica do botão Voltar
   const handleBack = () => {
-    if (step === 1) router.back();
-    else if (step === 12) {
+    if (step === 1) {
+        router.back(); // Volta para a tela de Detalhes do Pet
+    } else if (step === 12) {
       if (formData.viuPetInteresse === 'sim') setStep(11);
       else setStep(10);
     } else if (step === 11) setStep(8);
@@ -139,24 +135,20 @@ export default function FormularioInteresseScreen() {
     else setStep(step - 1);
   };
 
-  // Finalizar formulário: atualiza perfil e cria pedido se houver codigoPet
+  // Finalizar formulário
   const finalizarFormulario = async () => {
-    // protegendo UX
     if (isSubmitting) return;
     setIsSubmitting(true);
 
     try {
-      // 1) Obter usuário atual (id)
       const meRes = await api.get('/usuarios/me');
       const user = meRes.data;
       const userId = user?.id;
 
-      // montar cidade/estado
       const cidadeSplit = (formData.cidadeEstado || '').split(' - ');
       const cidade = cidadeSplit[0] || '';
       const estado = cidadeSplit[1] || formData.cidadeEstado || '';
 
-      // 2) Atualizar perfil do usuário com os dados básicos do formulário (opcional, mas útil)
       if (userId) {
         try {
           await api.put(`/usuarios/${userId}`, {
@@ -171,46 +163,37 @@ export default function FormularioInteresseScreen() {
             bairro: user.bairro || '',
             cidade: cidade || user.cidade,
             estado: estado || user.estado,
-            // persistir respostas essenciais para uso futuro
             tipoMoradia: formData.tipoMoradia || (user.tipoMoradia ?? undefined),
             pessoasNaCasa: formData.pessoasLar || (user.pessoasNaCasa ?? undefined),
             alergias: formData.temAlergia || (user.alergias ?? undefined)
           } as any);
         } catch (err) {
-          // não é fatal: avisar mas prosseguir
           console.warn('Falha ao atualizar perfil:', err);
         }
       }
 
-      // 3) Se não há código do pet, apenas mostre a tela de sucesso (fluxo web faz isso)
       if (!formData.codigoPet) {
         setStep(16);
         return;
       }
 
-      // 4) Preparar payload para /pedidos-adocao
-      // mapeamento para os campos que o controller espera.
       const payload = {
         animalId: parseInt(formData.codigoPet.replace(/\D/g, '')) || parseInt(formData.codigoPet) || null,
         respostasFormulario: {
           tipoMoradia: formData.tipoMoradia || 'Não informado',
-          // booleans que o formulário não tem explicitamente: deixamos em branco/undefined -> controller tratará
           possuiQuintal: undefined,
           quintalTelado: undefined,
           janelasTeladas: undefined,
           moradiaPropria: undefined,
           todosConcordam: undefined,
-
           criancasEmCasa: undefined,
           alergias: formData.temAlergia === 'sim' ? 'sim' : 'nao',
           possuiOutrosAnimais: formData.qtdOutrosAnimais && Number(formData.qtdOutrosAnimais) > 0 ? 'sim' : 'nao',
           teveAnimaisAntes: undefined,
           temVeterinario: undefined,
           cienteCustos: undefined,
-
           pessoasNaCasa: formData.pessoasLar || '1',
           horasSozinho: undefined,
-
           rotinaPasseios: undefined,
           quemCuidara: undefined,
           historicoAnimais: undefined,
@@ -219,19 +202,16 @@ export default function FormularioInteresseScreen() {
         }
       };
 
-      // Validação final: animalId precisa existir (controller exige). Se for NaN/null, abortar.
       if (!payload.animalId || Number.isNaN(payload.animalId)) {
         Alert.alert('Atenção', 'Código do pet inválido. Verifique e tente novamente.');
         setIsSubmitting(false);
         return;
       }
 
-      // 5) Chamar API para criar pedido
       const res = await api.post('/pedidos-adocao', payload);
       if (res?.status === 201 || res?.status === 200) {
         setStep(16);
       } else {
-        console.warn('Resposta inesperada ao criar pedido:', res);
         Alert.alert('Erro', 'Ocorreu um problema ao enviar o pedido. Tente novamente.');
       }
     } catch (err: any) {
@@ -244,11 +224,10 @@ export default function FormularioInteresseScreen() {
   };
 
   const handleNext = () => {
-    // validações por passo
+    // Validações
     if (step === 2 && !formData.termsAccepted) return Alert.alert('Atenção', 'Aceite os termos.');
     if (step === 3 && (!formData.nome || !formData.cpf || !formData.email)) return Alert.alert('Atenção', 'Preencha os dados obrigatórios.');
     if (step === 4 && (!formData.cep || !formData.rua)) return Alert.alert('Atenção', 'Preencha o endereço.');
-
     if (step === 5 && !formData.tipoMoradia) return Alert.alert('Atenção', 'Selecione a moradia.');
     if (step === 6 && !formData.porteAceito) return Alert.alert('Atenção', 'Selecione o porte.');
     if (step === 7 && !formData.animalAceito) return Alert.alert('Atenção', 'Selecione o animal.');
@@ -291,13 +270,11 @@ export default function FormularioInteresseScreen() {
 
     if (step === 15) {
       if (!formData.declaracaoCompromisso) return Alert.alert('Atenção', 'Você precisa aceitar os termos finais para continuar.');
-      // Ao aceitar, chamamos finalizar (que atualiza perfil e cria pedido quando houver codigo)
       finalizarFormulario();
       return;
     }
 
     if (step === 16) {
-      // ok -> volta para lista ou home
       router.push('/(app)/(tabs)/pets-disponiveis' as any);
       return;
     }
@@ -305,7 +282,6 @@ export default function FormularioInteresseScreen() {
     setStep(step + 1);
   };
 
-  // Components (SingleChoiceOption, CustomCheckbox)
   const SingleChoiceOption = ({ label, value, icon, field }: any) => (
     <TouchableOpacity
       style={[styles.choiceOption, (formData as any)[field] === value && styles.choiceOptionSelected]}
@@ -327,18 +303,40 @@ export default function FormularioInteresseScreen() {
 
   const renderStep = () => {
     switch (step) {
+      // --- PASSO 1: BOAS VINDAS (O que estava faltando) ---
       case 1: return (
         <View style={styles.stepContent}>
-          <Text style={styles.pageTitle}>Formulário de interesse em adoção</Text>
+          {/* Seta de Voltar para a Home/Detalhes */}
+          <View style={{flexDirection:'row', alignItems:'center', marginBottom: 20}}>
+             <TouchableOpacity onPress={handleBack} style={{padding: 5, marginRight: 10}}>
+                <Ionicons name="arrow-back" size={24} color="#005A9C" />
+             </TouchableOpacity>
+          </View>
+
+          {/* Ícones Decorativos */}
+          <View style={{flexDirection:'row', justifyContent:'center', alignItems:'center', marginBottom: 20}}>
+             <View style={styles.iconCircleBig}><Feather name="user" size={24} color="#005A9C" /></View>
+             <View style={{width: 50, height: 4, backgroundColor: '#E0E0E0'}} />
+             <View style={styles.iconCircleBig}><Feather name="home" size={24} color="#005A9C" /></View>
+          </View>
+
+          <Text style={styles.pageTitle}>Formulário de{'\n'}interesse em adoção</Text>
           <Text style={styles.paragraphCenter}>Bem-vindo(a) ao nosso Formulário de Interesse.</Text>
           <Text style={styles.paragraphCenter}>Ficamos muito felizes por você ter dado o primeiro passo para adotar um pet.</Text>
           <View style={{ height: 20 }} />
           <Text style={styles.paragraphCenter}>
-            Aqui você irá responder algumas perguntas iniciais para que a ONG/protetor parceiro possa te conhecer melhor e dar agilidade ao processo de adoção.
+           Aqui você irá responder algumas perguntas iniciais para que a ONG/protetor parceiro possa te conhecer melhor e dar agilidade ao processo de adoção. Precisaremos de alguns dados pessoais para que possam entrar em contato com você, além de saber um pouco sobre a sua casa, sua família, estrutura, entre outras informações.
           </Text>
+          
+          <View style={{alignItems:'flex-end', marginTop: 30}}>
+             <TouchableOpacity style={styles.fabNextBig} onPress={handleNext}>
+                <Feather name="chevron-right" size={32} color="#FFFFFF" />
+             </TouchableOpacity>
+          </View>
         </View>
       );
 
+      // --- PASSO 2: POP-UP DE DECLARAÇÃO ---
       case 2: return (
         <View style={styles.modalStepContainer}>
           <View style={styles.modalCard}>
@@ -543,7 +541,7 @@ export default function FormularioInteresseScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <Stack.Screen options={{ headerShown: false }} />
-      {step !== 2 && (
+      {step > 2 && (
         <View style={styles.headerBar}>
           <TouchableOpacity onPress={handleBack} style={styles.headerButton}><Feather name="chevron-left" size={28} color="#005A9C" /></TouchableOpacity>
           <View style={styles.progressContainer}>
@@ -567,7 +565,7 @@ export default function FormularioInteresseScreen() {
         <View style={{ height: 100 }} />
       </ScrollView>
 
-      {step !== 2 && step < 16 && (
+      {step > 2 && step < 16 && (
         <TouchableOpacity style={styles.fabNext} onPress={handleNext}>
           {isSubmitting ? <ActivityIndicator color="#fff" /> : <Feather name="chevron-right" size={32} color="#FFFFFF" />}
         </TouchableOpacity>
@@ -584,6 +582,11 @@ const styles = StyleSheet.create({
   iconProgressRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   iconCircle: { width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: '#A0B4CC', justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' },
   iconCircleActive: { borderColor: '#005A9C' },
+  
+  // ESTILOS PARA STEP 1 (ICONES GRANDES)
+  iconCircleBig: { width: 50, height: 50, borderRadius: 25, borderWidth: 1, borderColor: '#005A9C', justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' },
+  fabNextBig: { width: 60, height: 60, borderRadius: 15, backgroundColor: '#005A9C', justifyContent: 'center', alignItems: 'center', elevation: 5 },
+
   progressLine: { width: 50, height: 2, backgroundColor: '#E0E0E0', marginHorizontal: 5 },
   progressBar: { width: '80%', height: 4, backgroundColor: '#005A9C', borderRadius: 2 },
   scrollContainer: { padding: 25, paddingBottom: 100 },
