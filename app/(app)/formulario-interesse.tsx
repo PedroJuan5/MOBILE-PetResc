@@ -9,7 +9,8 @@ import {
   Alert,
   ActivityIndicator,
   Keyboard,
-  StatusBar
+  StatusBar,
+  Modal
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
@@ -53,9 +54,11 @@ export default function FormularioInteresseScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
 
-  // --- CORREÇÃO AQUI: Começa no Step 1 (Intro) e não no 2 ---
   const [step, setStep] = useState<number>(1); 
   
+  // --- MUDANÇA 1: Modal começa fechado ---
+  const [showTermsModal, setShowTermsModal] = useState(false); 
+
   const [loadingCep, setLoadingCep] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [termsExpanded, setTermsExpanded] = useState(false);
@@ -96,7 +99,6 @@ export default function FormularioInteresseScreen() {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
-  // Busca CEP
   const buscarCep = async (cepDigitado: string) => {
     const cepLimpo = cepDigitado.replace(/\D/g, '');
     if (cepLimpo.length !== 8) return;
@@ -123,10 +125,11 @@ export default function FormularioInteresseScreen() {
     }
   };
 
-  // Lógica do botão Voltar
   const handleBack = () => {
     if (step === 1) {
-        router.back(); // Volta para a tela de Detalhes do Pet
+        router.back(); 
+    } else if (step === 3) {
+        setStep(1); 
     } else if (step === 12) {
       if (formData.viuPetInteresse === 'sim') setStep(11);
       else setStep(10);
@@ -135,7 +138,6 @@ export default function FormularioInteresseScreen() {
     else setStep(step - 1);
   };
 
-  // Finalizar formulário
   const finalizarFormulario = async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
@@ -224,8 +226,13 @@ export default function FormularioInteresseScreen() {
   };
 
   const handleNext = () => {
+    // --- MUDANÇA 2: No passo 1, clicar na seta ABRE O MODAL ---
+    if (step === 1) {
+        setShowTermsModal(true); 
+        return;
+    }
+
     // Validações
-    if (step === 2 && !formData.termsAccepted) return Alert.alert('Atenção', 'Aceite os termos.');
     if (step === 3 && (!formData.nome || !formData.cpf || !formData.email)) return Alert.alert('Atenção', 'Preencha os dados obrigatórios.');
     if (step === 4 && (!formData.cep || !formData.rua)) return Alert.alert('Atenção', 'Preencha o endereço.');
     if (step === 5 && !formData.tipoMoradia) return Alert.alert('Atenção', 'Selecione a moradia.');
@@ -282,6 +289,12 @@ export default function FormularioInteresseScreen() {
     setStep(step + 1);
   };
 
+  // --- MUDANÇA 3: Ao aceitar o modal, fecha e VAI PARA O PASSO 3 ---
+  const handleAcceptTerms = () => {
+      setShowTermsModal(false);
+      setStep(3); // Pula direto para o formulário
+  };
+
   const SingleChoiceOption = ({ label, value, icon, field }: any) => (
     <TouchableOpacity
       style={[styles.choiceOption, (formData as any)[field] === value && styles.choiceOptionSelected]}
@@ -303,17 +316,14 @@ export default function FormularioInteresseScreen() {
 
   const renderStep = () => {
     switch (step) {
-      // --- PASSO 1: BOAS VINDAS (O que estava faltando) ---
       case 1: return (
         <View style={styles.stepContent}>
-          {/* Seta de Voltar para a Home/Detalhes */}
           <View style={{flexDirection:'row', alignItems:'center', marginBottom: 20}}>
              <TouchableOpacity onPress={handleBack} style={{padding: 5, marginRight: 10}}>
                 <Ionicons name="arrow-back" size={24} color="#005A9C" />
              </TouchableOpacity>
           </View>
 
-          {/* Ícones Decorativos */}
           <View style={{flexDirection:'row', justifyContent:'center', alignItems:'center', marginBottom: 20}}>
              <View style={styles.iconCircleBig}><Feather name="user" size={24} color="#005A9C" /></View>
              <View style={{width: 50, height: 4, backgroundColor: '#E0E0E0'}} />
@@ -325,32 +335,14 @@ export default function FormularioInteresseScreen() {
           <Text style={styles.paragraphCenter}>Ficamos muito felizes por você ter dado o primeiro passo para adotar um pet.</Text>
           <View style={{ height: 20 }} />
           <Text style={styles.paragraphCenter}>
-           Aqui você irá responder algumas perguntas iniciais para que a ONG/protetor parceiro possa te conhecer melhor e dar agilidade ao processo de adoção. Precisaremos de alguns dados pessoais para que possam entrar em contato com você, além de saber um pouco sobre a sua casa, sua família, estrutura, entre outras informações.
+            Aqui você irá responder algumas perguntas iniciais para que a ONG/protetor parceiro possa te conhecer melhor e dar agilidade ao processo de adoção. Precisaremos de alguns dados pessoais para que possam entrar em contato com você, além de saber um pouco sobre a sua casa, sua família, estrutura, entre outras informações.
           </Text>
           
           <View style={{alignItems:'flex-end', marginTop: 30}}>
+             {/* Este botão agora chama handleNext, que abre o modal */}
              <TouchableOpacity style={styles.fabNextBig} onPress={handleNext}>
                 <Feather name="chevron-right" size={32} color="#FFFFFF" />
              </TouchableOpacity>
-          </View>
-        </View>
-      );
-
-      // --- PASSO 2: POP-UP DE DECLARAÇÃO ---
-      case 2: return (
-        <View style={styles.modalStepContainer}>
-          <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Antes de começar</Text>
-            <TouchableOpacity style={styles.termsRow} onPress={() => updateFormData('termsAccepted', !formData.termsAccepted)}>
-              <MaterialCommunityIcons name={formData.termsAccepted ? 'checkbox-marked-outline' : 'checkbox-blank-outline'} size={28} color="#005A9C" />
-              <Text style={styles.termsText}>
-                Declaro que sou maior de 18 anos, li e estou ciente das informações passadas e de acordo em compartilhar meus dados para fins de contato por uma ONG/protetor.
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={[styles.btnComecar, !formData.termsAccepted && styles.btnDisabled]} onPress={handleNext} disabled={!formData.termsAccepted}>
-              <Text style={styles.btnComecarText}>Começar</Text>
-            </TouchableOpacity>
           </View>
         </View>
       );
@@ -541,7 +533,9 @@ export default function FormularioInteresseScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <Stack.Screen options={{ headerShown: false }} />
-      {step > 2 && (
+      
+      {/* HEADER DE PROGRESSO (Só aparece do step 3 em diante) */}
+      {step > 1 && (
         <View style={styles.headerBar}>
           <TouchableOpacity onPress={handleBack} style={styles.headerButton}><Feather name="chevron-left" size={28} color="#005A9C" /></TouchableOpacity>
           <View style={styles.progressContainer}>
@@ -560,16 +554,47 @@ export default function FormularioInteresseScreen() {
         </View>
       )}
 
+      {/* CONTEÚDO PRINCIPAL */}
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {renderStep()}
         <View style={{ height: 100 }} />
       </ScrollView>
 
-      {step > 2 && step < 16 && (
+      {/* BOTÃO NEXT FLUTUANTE (Step 3 ao 15) */}
+      {step > 1 && step < 16 && (
         <TouchableOpacity style={styles.fabNext} onPress={handleNext}>
           {isSubmitting ? <ActivityIndicator color="#fff" /> : <Feather name="chevron-right" size={32} color="#FFFFFF" />}
         </TouchableOpacity>
       )}
+
+      {/* --- MODAL DE TERMOS --- */}
+      <Modal 
+        visible={showTermsModal} 
+        transparent={true} 
+        animationType="fade"
+        onRequestClose={() => {}}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Antes de começar</Text>
+            <TouchableOpacity style={styles.termsRow} onPress={() => updateFormData('termsAccepted', !formData.termsAccepted)}>
+              <MaterialCommunityIcons name={formData.termsAccepted ? 'checkbox-marked-outline' : 'checkbox-blank-outline'} size={28} color="#005A9C" />
+              <Text style={styles.termsText}>
+                Declaro que sou maior de 18 anos, li e estou ciente das informações passadas e de acordo em compartilhar meus dados para fins de contato por uma ONG/protetor.
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+                style={[styles.btnComecar, !formData.termsAccepted && styles.btnDisabled]} 
+                onPress={handleAcceptTerms} 
+                disabled={!formData.termsAccepted}
+            >
+              <Text style={styles.btnComecarText}>Aceitar e Começar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
     </SafeAreaView>
   );
 }
@@ -606,9 +631,12 @@ const styles = StyleSheet.create({
   choiceIconSelected: { color: '#fff' },
   choiceLabel: { fontSize: 16, color: '#333', fontWeight: '500' },
   choiceTextSelected: { color: '#005A9C', fontWeight: 'bold' },
-  modalStepContainer: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.05)', padding: 20, margin: -25, height: '100%' },
+  
+  // MODAL STYLES (NOVO)
+  modalOverlay: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', padding: 20 },
   modalCard: { backgroundColor: '#fff', borderRadius: 10, padding: 30, elevation: 5, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10 },
   modalTitle: { fontSize: 22, fontWeight: 'bold', color: '#005A9C', marginBottom: 20 },
+  
   termsRow: { flexDirection: 'row', marginBottom: 30 },
   termsText: { fontSize: 16, color: '#555', marginLeft: 15, flex: 1, lineHeight: 24 },
   btnComecar: { backgroundColor: '#94B9D8', paddingVertical: 15, borderRadius: 6, alignItems: 'center' },
