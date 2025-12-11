@@ -399,7 +399,7 @@ export default function FormularioInteresseScreen() {
           <SingleChoiceOption label="Pequeno" value="pequeno" icon="A" field="porteAceito" />
           <SingleChoiceOption label="Médio" value="medio" icon="B" field="porteAceito" />
           <SingleChoiceOption label="Grande" value="grande" icon="C" field="porteAceito" />
-          <SingleChoiceOption label="Todos" value="todos" icon="D" field="porteAceito" />
+          <SingleChoiceOption label="Outros" value="outros" icon="D" field="porteAceito" />
         </View>
       );
 
@@ -408,8 +408,8 @@ export default function FormularioInteresseScreen() {
           <Text style={styles.stepTitle}>Quais animais são aceitos:</Text>
           <SingleChoiceOption label="Gato" value="gato" icon="A" field="animalAceito" />
           <SingleChoiceOption label="Cachorro" value="cachorro" icon="B" field="animalAceito" />
-          <SingleChoiceOption label="Pássaros" value="outros" icon="C" field="animalAceito" />
-          <SingleChoiceOption label="Todos" value="todos" icon="D" field="animalAceito" />
+          <SingleChoiceOption label="Pássaros" value="passaros" icon="C" field="animalAceito" />
+          <SingleChoiceOption label="Outros" value="outros" icon="D" field="animalAceito" />
         </View>
       );
 
