@@ -85,12 +85,12 @@ export default function DoacoesOngScreen() {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [16, 9],
-      quality: 0.7,
+      quality: 0.7, 
     });
     if (!result.canceled) setCampanhaImagem(result.assets[0].uri);
   };
 
-  // --- 2. CRIAR CAMPANHA ---
+  // --- 2. CRIAR CAMPANHA (LÓGICA IDÊNTICA AO REGISTRO DE ANIMAL) ---
   const handleCriarCampanha = async () => {
     if (!campanhaNome || !campanhaMeta || !campanhaData || !campanhaImagem) {
         Alert.alert("Atenção", "Preencha todos os campos e adicione uma imagem.");
@@ -102,35 +102,54 @@ export default function DoacoesOngScreen() {
        Alert.alert("Erro", "Data inválida. Use DD/MM/AAAA");
        return;
     }
+    
     const dataFormatadaISO = `${ano}-${mes}-${dia}`;
     const metaLimpa = campanhaMeta.replace(/\./g, '').replace(',', '.');
 
     setLoading(true);
     try {
         const formData = new FormData();
+        
+        // Campos de Texto
         formData.append('titulo', campanhaNome);
         formData.append('descricao', campanhaDesc);
         formData.append('meta_financeira', metaLimpa);
         formData.append('data_limite', dataFormatadaISO);
         formData.append('itens_descricao', JSON.stringify([])); 
 
-        const filename = campanhaImagem.split('/').pop();
-        const match = /\.(\w+)$/.exec(filename || '');
-        const type = match ? `image/${match[1]}` : `image/jpeg`;
+        // --- TRATAMENTO DE IMAGEM (IGUAL AO REGISTRO DE ANIMAL) ---
+        const uri = campanhaImagem; // Use a URI direta primeiro para verificar Web
+        
+        if (Platform.OS === 'web') {
+            const res = await fetch(uri);
+            const blob = await res.blob();
+            formData.append('imagem', blob, 'campanha.jpg');
+        } else {
+            // Lógica Mobile (Android/iOS)
+            const filename = uri.split('/').pop() || 'campanha.jpg';
+            const match = /\.(\w+)$/.exec(filename);
+            const type = match ? `image/${match[1]}` : `image/jpeg`;
 
-        // @ts-ignore
-        formData.append('imagem', {
-            uri: Platform.OS === 'android' ? campanhaImagem : campanhaImagem.replace('file://', ''),
-            name: filename || 'campanha.jpg',
-            type
-        } as any);
+            // @ts-ignore
+            formData.append('imagem', { 
+                uri: uri, // Mantém a URI original (file:// ou content://)
+                name: filename, 
+                type 
+            });
+        }
 
+        console.log("Enviando campanha...", formData);
+
+        // --- ENVIO COM CABEÇALHO EXPLÍCITO (Igual ao que funciona no seu projeto) ---
         await api.post('/campanha', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
+            headers: { 
+                'Content-Type': 'multipart/form-data',
+            },
         });
 
         Alert.alert("Sucesso", "Campanha criada com sucesso!");
         
+        // Limpa campos
         setCampanhaNome('');
         setCampanhaData('');
         setCampanhaMeta('');
@@ -141,8 +160,8 @@ export default function DoacoesOngScreen() {
         fetchCampanhas();
 
     } catch (error: any) {
-        console.error("Erro ao criar campanha:", error);
-        const errorMsg = error.response?.data?.message || "Erro ao conectar com o servidor.";
+        console.error("Erro detalhado:", error.response?.data || error.message);
+        const errorMsg = error.response?.data?.message || error.response?.data?.error || "Erro ao conectar com o servidor.";
         Alert.alert("Erro", errorMsg);
     } finally {
         setLoading(false);
@@ -155,10 +174,26 @@ export default function DoacoesOngScreen() {
     return numero.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
+  const getImageSource = (url: string | null) => {
+      if (!url) return null;
+      if (url.startsWith('http')) {
+          return { uri: url };
+      }
+      return { uri: `https://petresc.onrender.com/${url.replace(/\\/g, '/')}` };
+  };
+
   const renderCampanhaCard = (item: Campanha) => (
     <View key={item.id} style={styles.campanhaCard}>
-        {item.imagemUrl && (
-            <Image source={{ uri: item.imagemUrl }} style={styles.campanhaCardImage} />
+        {item.imagemUrl ? (
+            <Image 
+                source={getImageSource(item.imagemUrl) as any} 
+                style={styles.campanhaCardImage} 
+                resizeMode="cover"
+            />
+        ) : (
+            <View style={[styles.campanhaCardImage, {backgroundColor:'#ddd', justifyContent:'center', alignItems:'center'}]}>
+                <Ionicons name="image-outline" size={30} color="#999"/>
+            </View>
         )}
         <View style={styles.campanhaCardContent}>
             <Text style={styles.campanhaTitle} numberOfLines={1}>{item.titulo}</Text>
