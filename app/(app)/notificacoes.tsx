@@ -1,8 +1,7 @@
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
-import { Stack } from 'expo-router';
+import { useNavigation, Stack } from 'expo-router'; // 1. Importe useNavigation
 import React, { useState } from "react";
-import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from "react-native";
-
+import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, StatusBar } from "react-native";
 
 const UNREAD = [
   { id: "1", icon: "alert-circle", text: "Termos de uso e privacidade" },
@@ -13,8 +12,6 @@ const READ = [
   { id: "4", icon: "checkmark-circle", text: "Seu cadastro foi concluído." },
 ];
 
-
-
 const ItemNotificacao = ({ item }: { item: { id: string; icon: string; text: string } }) => (
   <TouchableOpacity style={styles.row} accessibilityRole="button">
     <Ionicons name={item.icon as any} size={24} color="#3A5C7A" />
@@ -24,22 +21,34 @@ const ItemNotificacao = ({ item }: { item: { id: string; icon: string; text: str
 );
 
 export default function Notificacoes() {
+  const navigation = useNavigation(); // 2. Instancie a navegação nativa
   const [aba, setAba] = useState<"UNREAD" | "READ">("UNREAD");
 
   const lista = aba === "READ" ? READ : UNREAD;
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" backgroundColor="#F6FBFF" />
+
+      <Stack.Screen options={{ headerShown: false }} />
+
+      <View style={styles.header}>
+     
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#2D68A6" />
+        </TouchableOpacity>
+        
+        <Text style={styles.headerTitle}>Notificações</Text>
+        <View style={{ width: 24 }} /> 
+      </View>
+
       <View style={styles.container}>
-        {/* Define opções de header apenas para esta tela (usa o header do Stack) */}
-  <Stack.Screen options={{ title: 'Notificações', headerShown: true }} />
+        
         {/* Abas (Lidos / Não lidos) */}
         <View style={styles.tabsContainer}>
           <TouchableOpacity
             style={[styles.tab, aba === "READ" && styles.activeTab]}
             onPress={() => setAba("READ")}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: aba === "READ" }}
           >
             <Text style={[styles.tabText, aba === "READ" && styles.activeTabText]}>LIDOS</Text>
           </TouchableOpacity>
@@ -47,22 +56,20 @@ export default function Notificacoes() {
           <TouchableOpacity
             style={[styles.tab, aba === "UNREAD" && styles.activeTab]}
             onPress={() => setAba("UNREAD")}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: aba === "UNREAD" }}
           >
             <Text style={[styles.tabText, aba === "UNREAD" && styles.activeTabText]}>NÃO LIDOS</Text>
           </TouchableOpacity>
         </View>
 
         {/* Lista de notificações */}
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false}>
           {lista.map((item) => (
             <ItemNotificacao key={item.id} item={item} />
           ))}
         </ScrollView>
       </View>
 
-      {/* Patinhas decorativas no canto inferior direito */}
+      {/* Patinhas decorativas */}
       <View style={styles.pawsContainer} pointerEvents="none">
         <FontAwesome5 name="paw" size={20} color="#D6EAF7" style={styles.paw1} />
         <FontAwesome5 name="paw" size={16} color="#E6F0FA" style={styles.paw2} />
@@ -72,18 +79,33 @@ export default function Notificacoes() {
   );
 }
 
-/* Estilos */
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#F6FBFF",
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E6F0FA',
+    backgroundColor: "#F6FBFF",
+  },
+  backButton: {
+    padding: 5,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#2D68A6',
+  },
   container: {
     flex: 1,
     paddingHorizontal: 20,
   },
-
-  // Abas
   tabsContainer: {
     flexDirection: "row",
     backgroundColor: "#E6F0FA",
@@ -107,8 +129,6 @@ const styles = StyleSheet.create({
   activeTabText: {
     color: "#FFFFFF",
   },
-
-  // Itens da lista
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -122,8 +142,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#3A5C7A",
   },
-
-  // Patinhas decorativas
   pawsContainer: {
     position: "absolute",
     bottom: 20,
@@ -148,25 +166,5 @@ const styles = StyleSheet.create({
     bottom: 80,
     right: 20,
     transform: [{ rotate: "30deg" }],
-  },
-
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#666",
-    marginBottom: 20,
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 10,
-  },
-  linkText: {
-    color: "#2D68A6",
-    fontSize: 16,
   },
 });

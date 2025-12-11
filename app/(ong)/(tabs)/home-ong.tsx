@@ -259,10 +259,6 @@ export default function HomeOngScreen(): React.ReactElement {
                 {"\n\n"}
                 Aqui você também encontra todas as suas campanhas anteriores.
               </Text>
-              
-              <TouchableOpacity style={styles.btnCampanhasAnteriores}>
-                <Text style={styles.btnTextBlue}>Campanhas anteriores</Text>
-              </TouchableOpacity>
             </View>
 
             {/* Coluna da Direita */}

@@ -54,7 +54,6 @@ export default function PublicIndex() {
     });
   }, [navigation]);
   
-  // Enquanto verifica o login, ou se já está redirecionando, não mostra nada.
   if (isLoading || user) {
     return null;
   }
@@ -106,13 +105,12 @@ export default function PublicIndex() {
         </TouchableOpacity>
       </Modal>
       
-      {/* Elementos de fundo decorativos (patinhas) REMOVIDOS daqui */}
-
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           <View style={styles.headerTitle}>
+            {/* --- FONTE APLICADA AQUI --- */}
             <Text style={styles.title}>Conheça seu novo melhor amigo!</Text>
-            {/* Ícone de pata no cabeçalho mantido */}
+            
             <View style={styles.paws}><FontAwesome5 name="paw" size={18} color="#BFE1F7" /></View>
           </View>
 
@@ -146,7 +144,15 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
   container: { paddingHorizontal: 20 },
   headerTitle: { paddingTop: 80, marginBottom: 30, position: 'relative' },
-  title: { fontSize: 36, fontWeight: 'bold', color: '#2D68A6', width: '80%' },
+  
+  title: { 
+    fontSize: 36, 
+    color: '#2D68A6', 
+    width: '90%', 
+    fontFamily: 'MoreSugar', 
+    lineHeight: 44, 
+  },
+  
   paws: { position: 'absolute', right: 10, top: 80 },
   sectionTitle: { fontSize: 20, fontWeight: '600', color: '#3A5C7A', marginBottom: 5 },
   missionBox: { backgroundColor: '#E6F0FA', padding: 25, borderRadius: 20, marginBottom: 30 },

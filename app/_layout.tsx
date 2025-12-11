@@ -3,6 +3,13 @@ import { StrictMode } from "react";
 import { AuthProvider } from "@/context/AuthContext";
 import { useFonts } from "expo-font";
 import { View, ActivityIndicator } from 'react-native';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs([
+  'Using UNSAFE_componentWillUpdate',
+  'Using UNSAFE_componentWillReceiveProps',
+  'Using UNSAFE_componentWillMount',
+]);
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
