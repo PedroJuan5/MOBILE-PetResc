@@ -1,17 +1,36 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { 
+  ScrollView, 
+  StyleSheet, 
+  Text, 
+  TouchableOpacity, 
+  View, 
+  LayoutAnimation, 
+  Platform, 
+  UIManager 
+} from 'react-native';
+
+// Habilita animações no Android
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const FAQScreen: React.FC = () => {
-  const [expandedSections, setExpandedSections] = useState<string[]>([]);
+  // Alterado para string | null (apenas uma aberta por vez)
+  const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const router = useRouter();
 
   const toggleSection = (section: string) => {
-    setExpandedSections((prev) =>
-      prev.includes(section)
-        ? prev.filter((item) => item !== section) // fecha se já estiver aberta
-        : [...prev, section] // adiciona se não estiver aberta
+    // Configura a animação suave antes de mudar o estado
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
+    setExpandedSection((current) => 
+      current === section ? null : section
     );
   };
 
@@ -33,16 +52,17 @@ const FAQScreen: React.FC = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        
         {/* Conta e acesso */}
         <TouchableOpacity style={styles.sectionHeader} onPress={() => toggleSection('conta')}>
           <Text style={styles.sectionTitle}>Conta e acesso</Text>
           <Ionicons
-            name={expandedSections.includes('conta') ? 'chevron-up' : 'chevron-down'}
+            name={expandedSection === 'conta' ? 'chevron-up' : 'chevron-down'}
             size={18}
             color="#003366"
           />
         </TouchableOpacity>
-        {expandedSections.includes('conta') && (
+        {expandedSection === 'conta' && (
           <View style={styles.sectionContent}>
             {renderQuestion(
               'Como criar uma conta no aplicativo?',
@@ -63,12 +83,12 @@ const FAQScreen: React.FC = () => {
         <TouchableOpacity style={styles.sectionHeader} onPress={() => toggleSection('ongs')}>
           <Text style={styles.sectionTitle}>Cadastro de ONGs</Text>
           <Ionicons
-            name={expandedSections.includes('ongs') ? 'chevron-up' : 'chevron-down'}
+            name={expandedSection === 'ongs' ? 'chevron-up' : 'chevron-down'}
             size={18}
             color="#003366"
           />
         </TouchableOpacity>
-        {expandedSections.includes('ongs') && (
+        {expandedSection === 'ongs' && (
           <View style={styles.sectionContent}>
             {renderQuestion(
               'Como cadastrar uma ONG?',
@@ -89,12 +109,12 @@ const FAQScreen: React.FC = () => {
         <TouchableOpacity style={styles.sectionHeader} onPress={() => toggleSection('animais')}>
           <Text style={styles.sectionTitle}>Cadastro de animais</Text>
           <Ionicons
-            name={expandedSections.includes('animais') ? 'chevron-up' : 'chevron-down'}
+            name={expandedSection === 'animais' ? 'chevron-up' : 'chevron-down'}
             size={18}
             color="#003366"
           />
         </TouchableOpacity>
-        {expandedSections.includes('animais') && (
+        {expandedSection === 'animais' && (
           <View style={styles.sectionContent}>
             {renderQuestion(
               'Como cadastrar um pet para adoção?',
@@ -115,12 +135,12 @@ const FAQScreen: React.FC = () => {
         <TouchableOpacity style={styles.sectionHeader} onPress={() => toggleSection('adocao')}>
           <Text style={styles.sectionTitle}>Adoção e doação</Text>
           <Ionicons
-            name={expandedSections.includes('adocao') ? 'chevron-up' : 'chevron-down'}
+            name={expandedSection === 'adocao' ? 'chevron-up' : 'chevron-down'}
             size={18}
             color="#003366"
           />
         </TouchableOpacity>
-        {expandedSections.includes('adocao') && (
+        {expandedSection === 'adocao' && (
           <View style={styles.sectionContent}>
             {renderQuestion(
               'Como adotar um animal?',
@@ -141,12 +161,12 @@ const FAQScreen: React.FC = () => {
         <TouchableOpacity style={styles.sectionHeader} onPress={() => toggleSection('notificacoes')}>
           <Text style={styles.sectionTitle}>Notificações e alertas</Text>
           <Ionicons
-            name={expandedSections.includes('notificacoes') ? 'chevron-up' : 'chevron-down'}
+            name={expandedSection === 'notificacoes' ? 'chevron-up' : 'chevron-down'}
             size={18}
             color="#003366"
           />
         </TouchableOpacity>
-        {expandedSections.includes('notificacoes') && (
+        {expandedSection === 'notificacoes' && (
           <View style={styles.sectionContent}>
             {renderQuestion(
               'Como funcionam as notificações?',
@@ -163,16 +183,16 @@ const FAQScreen: React.FC = () => {
         <TouchableOpacity style={styles.sectionHeader} onPress={() => toggleSection('suporte')}>
           <Text style={styles.sectionTitle}>Suporte e contato</Text>
           <Ionicons
-            name={expandedSections.includes('suporte') ? 'chevron-up' : 'chevron-down'}
+            name={expandedSection === 'suporte' ? 'chevron-up' : 'chevron-down'}
             size={18}
             color="#003366"
           />
         </TouchableOpacity>
-        {expandedSections.includes('suporte') && (
+        {expandedSection === 'suporte' && (
           <View style={styles.sectionContent}>
             {renderQuestion(
               'Como entro em contato com o suporte?',
-              'Envie um e-mail para suporte@petco.com.br informando o problema ou dúvida. Nosso time responderá o mais rápido possível.'
+              'Envie um e-mail para suporte@petResc.com.br informando o problema ou dúvida. Nosso time responderá o mais rápido possível.'
             )}
             {renderQuestion(
               'O suporte funciona em quais horários?',
@@ -185,12 +205,12 @@ const FAQScreen: React.FC = () => {
         <TouchableOpacity style={styles.sectionHeader} onPress={() => toggleSection('seguranca')}>
           <Text style={styles.sectionTitle}>Segurança e privacidade</Text>
           <Ionicons
-            name={expandedSections.includes('seguranca') ? 'chevron-up' : 'chevron-down'}
+            name={expandedSection === 'seguranca' ? 'chevron-up' : 'chevron-down'}
             size={18}
             color="#003366"
           />
         </TouchableOpacity>
-        {expandedSections.includes('seguranca') && (
+        {expandedSection === 'seguranca' && (
           <View style={styles.sectionContent}>
             {renderQuestion(
               'Meus dados estão protegidos?',
@@ -241,6 +261,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#d0d0d0',
     paddingVertical: 14,
+    backgroundColor: '#fff', 
   },
   sectionTitle: {
     fontSize: 16,
@@ -250,9 +271,11 @@ const styles = StyleSheet.create({
   sectionContent: {
     paddingLeft: 10,
     paddingBottom: 10,
+    overflow: 'hidden', 
   },
   questionContainer: {
     marginBottom: 10,
+    marginTop: 5,
   },
   question: {
     color: '#0d549bff',
