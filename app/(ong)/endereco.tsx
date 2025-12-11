@@ -7,17 +7,21 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import api from '@/lib/axios';
 
-// --- CORREÇÃO DE IMPORTS DE ARMAZENAMENTO ---
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// --- CORREÇÃO 1: Usar SecureStore (Igual ao AuthContext) ---
+import * as SecureStore from 'expo-secure-store';
 
-// Função Helper CORRIGIDA (Igual ao AuthContext)
+// --- CORREÇÃO 2: Usar a MESMA chave do AuthContext ---
+const KEY_TOKEN = "petresc_token"; 
+
 const getToken = async () => {
-  const key = '@PetResc:token'; // Mesma chave do AuthContext
-  
-  if (Platform.OS === 'web') {
-    return localStorage.getItem(key); // Web usa localStorage direto
-  } else {
-    return await AsyncStorage.getItem(key); // Mobile usa AsyncStorage
+  try {
+    if (Platform.OS === 'web') {
+      return localStorage.getItem(KEY_TOKEN);
+    } else {
+      return await SecureStore.getItemAsync(KEY_TOKEN);
+    }
+  } catch (error) {
+    return null;
   }
 };
 
@@ -45,18 +49,18 @@ export default function EnderecoOngScreen() {
       try {
         setLoadingData(true);
         
-        // 1. Verifica Token no lugar certo
+        // 1. Verifica Token
         const token = await getToken();
-        console.log("Token encontrado:", token ? "Sim" : "Não");
+        // Debug para confirmar se pegou
+        console.log("Token lido na tela Endereço:", token ? "OK" : "Vazio"); 
 
         if (!token) {
-            // Se não achou, o axios também não vai ter.
             Alert.alert("Sessão Expirada", "Faça login novamente.");
             router.replace('/(auth)/login-ong' as any);
             return;
         }
 
-        // 2. Garante que o Axios tenha o header (Segurança extra para Web)
+        // 2. Garante header (segurança)
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
         // 3. Busca dados
@@ -65,6 +69,7 @@ export default function EnderecoOngScreen() {
         
         setUserId(user.id);
         
+        // Mapeamento seguro com Optional Chaining
         const cep = user.ong?.cep || user.cep || '';
         const rua = user.ong?.rua || user.rua || '';
         const numero = user.ong?.numero || user.numero || '';
@@ -79,6 +84,7 @@ export default function EnderecoOngScreen() {
 
       } catch (error: any) {
         console.error("Erro fetchUserData:", error);
+        // Se o erro for 401 (Não autorizado), aí sim desloga
         if (error.response?.status === 401) {
             Alert.alert("Sessão Inválida", "Faça login novamente.");
             router.replace('/(auth)/login-ong' as any);
@@ -90,8 +96,6 @@ export default function EnderecoOngScreen() {
     fetchUserData();
   }, []);
 
-  // ... (RESTANTE DO CÓDIGO PERMANECE IGUAL: handleChange, handleBlurCep, handleSalvar, render...)
-  
   const handleChange = (field: string, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
   };
@@ -101,7 +105,6 @@ export default function EnderecoOngScreen() {
     if (cepLimpo.length !== 8) return;
 
     setLoadingCep(true);
-    // Keyboard.dismiss só funciona no mobile, na web não quebra mas não faz nada
     if (Platform.OS !== 'web') Keyboard.dismiss();
     
     try {
@@ -131,6 +134,8 @@ export default function EnderecoOngScreen() {
     setSaving(true);
 
     try {
+      // Usa a rota correta de update (ajuste conforme seu backend se for diferente)
+      // Se for atualização de ONG, verifique se a rota é /ongs/:id ou /usuarios/:id
       await api.put(`/usuarios/${userId}`, {
         cep: form.cep,
         rua: form.rua,
@@ -178,7 +183,6 @@ export default function EnderecoOngScreen() {
           
           <Text style={styles.subtitle}>Alterar localização</Text>
 
-          {/* CAMPOS DO FORMULÁRIO (Mesmos de antes) */}
           <Text style={styles.label}>CEP</Text>
           <View style={styles.inputContainer}>
             <TextInput
