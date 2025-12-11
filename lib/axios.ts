@@ -8,11 +8,11 @@ async function getToken() {
   if (tokenCache) return tokenCache;
 
   if (Platform.OS === "web") {
-    tokenCache = localStorage.getItem("@PetResc:token");
+    tokenCache = localStorage.getItem("PetResc_token");
     return tokenCache;
   }
 
-  tokenCache = await SecureStore.getItemAsync("@PetResc:token");
+  tokenCache = await SecureStore.getItemAsync("PetResc_token");
   return tokenCache;
 }
 

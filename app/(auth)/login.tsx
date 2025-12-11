@@ -34,7 +34,11 @@ export default function TelaLogin() {
   }
   setCarregando(true);
   try {
-    await signIn({ email, password: senha });
+await signIn({
+  email: email,       // Sua variável de email
+  password: senha,    // <--- AQUI: O lado esquerdo DEVE ser 'password', o direito é a sua variável
+  type: 'PUBLICO'     // <--- AQUI: Use 'PUBLICO' ou 'ONG' (em maiúsculo, como pediu o erro)
+});
     router.replace("/(app)/(tabs)/home");
   } catch (err: any) {
     Alert.alert("Erro no Login", err.message || "Erro desconhecido");
