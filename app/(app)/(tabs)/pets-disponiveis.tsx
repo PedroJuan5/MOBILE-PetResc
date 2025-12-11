@@ -147,17 +147,7 @@ const FilterModal = ({ visible, onClose, onApply }: { visible: boolean; onClose:
                 <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
                     <Text style={styles.applyButtonText}>APLICAR FILTROS</Text>
                 </TouchableOpacity>
-
-                {/*botão perdidos e achados*/}
-             <TouchableOpacity 
-                    style={styles.lostFoundButton}
-                    onPress={() => {
-                        onClose(); 
-                        router.push('/(app)/(tabs)/perdidos-achados' as any); 
-                    }}
-                >
-                    <Text style={styles.lostFoundText}>PERDIDOS E ACHADOS</Text>
-                </TouchableOpacity>
+             
 
             </ScrollView>
           </View>
