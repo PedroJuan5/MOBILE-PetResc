@@ -408,7 +408,7 @@ export default function FormularioInteresseScreen() {
           <Text style={styles.stepTitle}>Quais animais são aceitos:</Text>
           <SingleChoiceOption label="Gato" value="gato" icon="A" field="animalAceito" />
           <SingleChoiceOption label="Cachorro" value="cachorro" icon="B" field="animalAceito" />
-          <SingleChoiceOption label="Pássaros" value="passaros" icon="C" field="animalAceito" />
+          <SingleChoiceOption label="Pássaros" value="outros" icon="C" field="animalAceito" />
           <SingleChoiceOption label="Todos" value="todos" icon="D" field="animalAceito" />
         </View>
       );
